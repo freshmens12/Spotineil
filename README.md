@@ -1,14 +1,27 @@
 # Spotineil
 
-An unofficial Spotify client for Android, written in Kotlin with Jetpack Compose (Material 3).
+A free Android music app, written in Kotlin with Jetpack Compose (Material 3). It opens straight into music, with no account needed.
 
-Spotineil uses **only official, ToS-compliant Spotify integrations**:
+**Where the music comes from (all free and legal):**
 
-- [Spotify Web API](https://developer.spotify.com/documentation/web-api)
-- [Spotify App Remote SDK](https://developer.spotify.com/documentation/android)
-- Authorization Code + PKCE login
+- **YouTube**: the main catalog. Trending music, search and genres, played in YouTube's official player, with picture-in-picture.
+- **Jamendo, Audius, Internet Archive (live concerts and netlabels), ccMixter**: full songs shared for free by artists.
+- **Deezer, iTunes, Last.fm charts**: official 30-second previews of mainstream hits.
+- **Radio Browser**: thousands of live radio stations.
+- **Apple Podcasts directory**: top shows, with episodes from each show's RSS feed.
+- **Your own music files** on the phone.
+- **Lyrics** from LRCLIB, plus Liked Songs and play history saved on the phone.
+- **Spotify (optional)**: log in from Settings with Spotify's official PKCE login.
 
-It does **not** block ads, download or rip audio from Spotify or any other service, or work around Spotify Free limits. You sign in on Spotify's own page, and Spotineil never sees your password.
+It does **not** block ads, rip or download audio from YouTube, Spotify or any other streaming service, or play YouTube in the background (YouTube's terms forbid it). Downloads are offered only where the artist or licence allows them.
+
+## Install on your phone
+
+1. On your phone, open [`apk/Spotineil-debug.apk`](apk/Spotineil-debug.apk) in this repo and tap **Download** (or **View raw**).
+2. Open the downloaded file. If Android asks, allow **Install unknown apps** for your browser or Files app.
+3. Tap **Install**, then open **Spotineil**. Android 10 or newer is required.
+
+> This is a debug build for testing. Google Play Protect may warn that the app is from an unknown developer. Tap **Install anyway**.
 
 > **Disclaimer:** Spotineil is an independent, unofficial project. It is **not affiliated with, endorsed, or sponsored by Spotify AB**. "Spotify" is a trademark of Spotify AB. All Spotify content, metadata, and artwork are provided by Spotify. Lyrics are provided by [LRCLIB](https://lrclib.net).
 
