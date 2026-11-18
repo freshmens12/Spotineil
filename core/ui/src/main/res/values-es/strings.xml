@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ui_add_liked">Añadir a Canciones que te gustan</string>
+    <string name="ui_remove_liked">Quitar de Canciones que te gustan</string>
+    <string name="ui_added_liked">Añadida a Canciones que te gustan</string>
+    <string name="ui_removed_liked">Quitada de Canciones que te gustan</string>
+    <string name="ui_add_queue">Añadir a la cola</string>
+    <string name="ui_added_queue">Añadida a la cola</string>
+    <string name="ui_add_playlist">Añadir a playlist</string>
+    <string name="ui_added_playlist">Añadida a la playlist</string>
+    <string name="ui_remove_playlist">Quitar de esta playlist</string>
+    <string name="ui_choose_playlist">Elige una playlist</string>
+    <string name="ui_no_editable_playlists">Aún no tienes playlists editables.</string>
+    <string name="ui_go_artist">Ir al artista</string>
+    <string name="ui_go_album">Ir al álbum</string>
+    <string name="ui_share">Compartir</string>
+    <string name="ui_action_failed">No se pudo completar. Inténtalo de nuevo.</string>
+    <string name="ui_free_notice">Usas Spotify Free. Spotify limita algunos controles a demanda (como elegir una canción concreta o saltar libremente). Mejora a Premium en la app de Spotify para tener control total.</string>
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="playlist_songs">%1$d songs</string>
+    <string name="playlist_public">Public</string>
+    <string name="playlist_private">Private</string>
+    <string name="playlist_collaborative">Collaborative</string>
+    <string name="playlist_follow">Follow playlist</string>
+    <string name="playlist_unfollow">Unfollow playlist</string>
+    <string name="playlist_edit_details">Edit details</string>
+    <string name="playlist_reorder">Edit tracks</string>
+    <string name="playlist_done">Done</string>
+    <string name="playlist_remove">Remove</string>
+    <string name="playlist_drag">Drag to reorder</string>
+    <string name="playlist_name">Name</string>
+    <string name="playlist_description">Description</string>
+    <string name="playlist_save">Save</string>
+    <string name="playlist_cancel">Cancel</string>
+    <string name="playlist_saved">Playlist updated</string>
+</resources>

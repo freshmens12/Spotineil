@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Spotineil</string>
+    <string name="login_tagline">Your music, your way.</string>
+    <string name="login_button">Log in with Spotify</string>
+    <string name="login_cancelled">Login was cancelled.</string>
+    <string name="login_spotify_missing">The Spotify app is required for playback on this phone. You can still browse your library without it.</string>
+    <string name="login_get_spotify">Get Spotify on Google Play</string>
+    <string name="login_not_configured">This build has no Spotify Client ID. Add SPOTIFY_CLIENT_ID to local.properties and rebuild (see README).</string>
+    <string name="login_disclaimer">Spotineil is an unofficial app and is not affiliated with Spotify. You sign in on Spotify\'s own page — Spotineil never sees your password.</string>
+    <string name="login_guest">Continue without Spotify</string>
+    <string name="login_guest_hint">Free music, internet radio, song previews and music on your phone. No account needed.</string>
+    <string name="nav_discover">Discover</string>
+    <string name="nav_your_music">Your music</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_library">Your Library</string>
+    <string name="event_premium_required">That needs Spotify Premium. Spotify Free users can control playback in the Spotify app.</string>
+    <string name="event_no_device">No active device. Open Spotify on a device or pick one from Devices.</string>
+    <string name="event_spotify_missing">Install the Spotify app to play music.</string>
+    <string name="event_spotify_logged_out">Log in to the Spotify app first.</string>
+    <string name="event_get_spotify">Get</string>
+    <string name="event_error">Playback error</string>
+    <string name="widget_name">Spotineil — Now playing</string>
+    <string name="widget_description">See what\'s playing and control playback.</string>
+    <string name="widget_nothing_playing">Nothing playing</string>
+    <string name="widget_play_pause">Play or pause</string>
+    <string name="widget_next">Next</string>
+    <string name="widget_previous">Previous</string>
+    <string name="pip_play">Play</string>
+    <string name="pip_pause">Pause</string>
+    <string name="pip_next">Next</string>
+</resources>

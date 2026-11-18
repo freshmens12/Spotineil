@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="library_title">Tu biblioteca</string>
+    <string name="library_playlists">Playlists</string>
+    <string name="library_albums">Álbumes</string>
+    <string name="library_artists">Artistas</string>
+    <string name="library_podcasts">Podcasts</string>
+    <string name="library_sort_recent">Recientes</string>
+    <string name="library_sort_az">Alfabético</string>
+    <string name="library_sort_creator">Creador</string>
+    <string name="library_grid_view">Vista de cuadrícula</string>
+    <string name="library_list_view">Vista de lista</string>
+    <string name="library_liked_songs">Canciones que te gustan</string>
+    <string name="library_songs_count">%1$d canciones</string>
+    <string name="library_playlist">Playlist</string>
+    <string name="library_local_files">Archivos locales</string>
+    <string name="library_local_files_sub">Música guardada en este dispositivo</string>
+    <string name="library_empty">Aún no hay nada aquí.</string>
+    <string name="library_no_liked">Las canciones que te gusten aparecerán aquí.</string>
+    <string name="library_no_local">No se encontraron archivos de audio.</string>
+    <string name="library_permission_title">Permite el acceso a tu música</string>
+    <string name="library_permission_body">Spotineil necesita permiso para leer los archivos de audio de este dispositivo y reproducirlos.</string>
+    <string name="library_grant">Permitir</string>
+    <string name="library_create_playlist">Crear playlist</string>
+    <string name="library_name">Nombre</string>
+    <string name="library_description">Descripción (opcional)</string>
+    <string name="library_public">Pública</string>
+    <string name="library_collaborative">Colaborativa</string>
+    <string name="library_create">Crear</string>
+    <string name="library_cancel">Cancelar</string>
+    <string name="library_shuffle">Aleatorio</string>
+    <string name="library_play">Reproducir</string>
+    <string name="library_songs">Canciones</string>
+</resources>

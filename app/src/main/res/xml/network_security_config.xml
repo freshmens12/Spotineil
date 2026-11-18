@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Many internet radio stations (Radio Browser directory) still stream over plain HTTP, so
+  cleartext is permitted for media streams. All Spotify, account and API traffic uses HTTPS.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">spotify.com</domain>
+        <domain includeSubdomains="true">audius.co</domain>
+        <domain includeSubdomains="true">jamendo.com</domain>
+        <domain includeSubdomains="true">deezer.com</domain>
+        <domain includeSubdomains="true">lrclib.net</domain>
+        <domain includeSubdomains="true">radio-browser.info</domain>
+        <domain includeSubdomains="true">archive.org</domain>
+        <domain includeSubdomains="true">apple.com</domain>
+        <domain includeSubdomains="true">audioscrobbler.com</domain>
+    </domain-config>
+</network-security-config>

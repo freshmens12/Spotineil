@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Original Spotineil mark: equalizer bars on a rounded tile. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#1ED760"
+        android:pathData="M42,28 L66,28 Q80,28 80,42 L80,66 Q80,80 66,80 L42,80 Q28,80 28,66 L28,42 Q28,28 42,28 Z" />
+    <path android:strokeColor="#121212" android:strokeWidth="6" android:strokeLineCap="round" android:pathData="M39,49 L39,59" />
+    <path android:strokeColor="#121212" android:strokeWidth="6" android:strokeLineCap="round" android:pathData="M49,42 L49,66" />
+    <path android:strokeColor="#121212" android:strokeWidth="6" android:strokeLineCap="round" android:pathData="M59,46 L59,62" />
+    <path android:strokeColor="#121212" android:strokeWidth="6" android:strokeLineCap="round" android:pathData="M69,39 L69,69" />
+</vector>

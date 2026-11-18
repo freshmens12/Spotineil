@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_tagline">Tu música, a tu manera.</string>
+    <string name="login_button">Iniciar sesión con Spotify</string>
+    <string name="login_cancelled">Se canceló el inicio de sesión.</string>
+    <string name="login_spotify_missing">Se necesita la app de Spotify para reproducir en este teléfono. Puedes explorar tu biblioteca sin ella.</string>
+    <string name="login_get_spotify">Obtener Spotify en Google Play</string>
+    <string name="login_not_configured">Esta compilación no tiene Client ID de Spotify. Añade SPOTIFY_CLIENT_ID a local.properties y recompila (ver README).</string>
+    <string name="login_disclaimer">Spotineil es una app no oficial y no está afiliada a Spotify. Inicias sesión en la página de Spotify: Spotineil nunca ve tu contraseña.</string>
+    <string name="login_guest">Continuar sin Spotify</string>
+    <string name="login_guest_hint">Música gratis, radio por internet, avances de canciones y la música de tu teléfono. Sin cuenta.</string>
+    <string name="nav_discover">Descubrir</string>
+    <string name="nav_your_music">Tu música</string>
+    <string name="nav_home">Inicio</string>
+    <string name="nav_search">Buscar</string>
+    <string name="nav_library">Tu biblioteca</string>
+    <string name="event_premium_required">Esto requiere Spotify Premium. Con Spotify Free puedes controlar la reproducción en la app de Spotify.</string>
+    <string name="event_no_device">No hay un dispositivo activo. Abre Spotify en un dispositivo o elige uno en Dispositivos.</string>
+    <string name="event_spotify_missing">Instala la app de Spotify para reproducir música.</string>
+    <string name="event_spotify_logged_out">Inicia sesión primero en la app de Spotify.</string>
+    <string name="event_get_spotify">Obtener</string>
+    <string name="event_error">Error de reproducción</string>
+    <string name="widget_name">Spotineil — Reproduciendo</string>
+    <string name="widget_description">Mira qué suena y controla la reproducción.</string>
+    <string name="widget_nothing_playing">No se reproduce nada</string>
+    <string name="widget_play_pause">Reproducir o pausar</string>
+    <string name="widget_next">Siguiente</string>
+    <string name="widget_previous">Anterior</string>
+    <string name="pip_play">Reproducir</string>
+    <string name="pip_pause">Pausar</string>
+    <string name="pip_next">Siguiente</string>
+</resources>

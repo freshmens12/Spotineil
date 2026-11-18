@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_play">Reproducir</string>
+    <string name="player_pause">Pausar</string>
+    <string name="player_next">Siguiente</string>
+    <string name="player_previous">Anterior</string>
+    <string name="player_shuffle">Aleatorio</string>
+    <string name="player_repeat">Repetir</string>
+    <string name="player_like">Añadir a Canciones que te gustan</string>
+    <string name="player_unlike">Quitar de Canciones que te gustan</string>
+    <string name="player_collapse">Minimizar reproductor</string>
+    <string name="player_now_playing">Reproduciendo</string>
+    <string name="player_devices">Dispositivos</string>
+    <string name="player_lyrics">Letra</string>
+    <string name="player_queue">Cola</string>
+    <string name="player_next_up">A continuación</string>
+    <string name="player_next_up_reorder">A continuación · arrastra para reordenar</string>
+    <string name="player_queue_empty">No hay nada en cola.</string>
+    <string name="player_drag">Arrastra para reordenar</string>
+    <string name="player_connect_device">Conectar a un dispositivo</string>
+    <string name="player_connect_hint">El control con Spotify Connect requiere Spotify Premium.</string>
+    <string name="player_no_devices">No hay dispositivos. Abre Spotify en otro dispositivo para verlo aquí.</string>
+    <string name="player_listening_on">Escuchando en</string>
+    <string name="player_refresh">Actualizar</string>
+    <string name="player_sleep_timer">Temporizador</string>
+    <string name="player_sleep_minutes">%1$d minutos</string>
+    <string name="player_sleep_end_of_track">Al terminar la canción</string>
+    <string name="player_sleep_end_of_track_active">Se detendrá al terminar esta canción</string>
+    <string name="player_sleep_remaining">Se detendrá en unos %1$d min</string>
+    <string name="player_sleep_off">Desactivar temporizador</string>
+    <string name="player_lyrics_unavailable">Letra no disponible</string>
+    <string name="player_lyrics_instrumental">Instrumental — disfruta la música</string>
+    <string name="player_lyrics_source">Letras de LRCLIB</string>
+</resources>

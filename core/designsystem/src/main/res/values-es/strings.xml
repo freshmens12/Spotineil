@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ds_error_offline">Sin conexión. Revisa tu red.</string>
+    <string name="ds_error_rate_limited">Spotify está ocupado. Reintenta en %1$d s.</string>
+    <string name="ds_error_premium">Esto requiere Spotify Premium.</string>
+    <string name="ds_error_unavailable">No disponible para esta app.</string>
+    <string name="ds_error_not_found">No encontrado.</string>
+    <string name="ds_error_session">Tu sesión expiró. Inicia sesión de nuevo.</string>
+    <string name="ds_error_server">El servicio de música tiene problemas. Inténtalo más tarde.</string>
+    <string name="ds_error_youtube_quota">Se agotaron las búsquedas de YouTube por hoy. Te mostramos música gratis; vuelve a intentarlo mañana.</string>
+    <string name="ds_error_generic">Algo salió mal.</string>
+    <string name="ds_retry">Reintentar</string>
+    <string name="ds_play">Reproducir</string>
+    <string name="ds_shuffle_play">Aleatorio</string>
+    <string name="ds_back">Atrás</string>
+</resources>

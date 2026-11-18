@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="artist_followers">%1$s seguidores</string>
+    <string name="artist_follow">Seguir</string>
+    <string name="artist_following">Siguiendo</string>
+    <string name="artist_popular">Populares</string>
+    <string name="artist_see_more">Ver más</string>
+    <string name="artist_show_less">Ver menos</string>
+    <string name="artist_albums">Álbumes</string>
+    <string name="artist_singles">Sencillos y EP</string>
+    <string name="artist_about">Información</string>
+</resources>

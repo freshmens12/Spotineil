@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_good_morning">Buenos días</string>
+    <string name="home_good_afternoon">Buenas tardes</string>
+    <string name="home_good_evening">Buenas noches</string>
+    <string name="home_good_night">Buenas noches</string>
+    <string name="home_recently_played">Escuchado recientemente</string>
+    <string name="home_top_artists">Tus artistas favoritos</string>
+    <string name="home_top_tracks">En bucle</string>
+    <string name="home_your_playlists">Tus playlists</string>
+    <string name="home_new_releases">Novedades</string>
+    <string name="home_saved_albums">Álbumes guardados</string>
+    <string name="home_empty">Escucha algo en Spotify y tu inicio se llenará.</string>
+    <string name="home_settings">Ajustes</string>
+    <string name="home_profile">Perfil</string>
+    <string name="home_filter_all">Todo</string>
+    <string name="home_filter_music">Música</string>
+    <string name="home_filter_podcasts">Pódcasts</string>
+    <string name="home_your_podcasts">Tus pódcasts</string>
+    <string name="home_no_podcasts">Sigue un pódcast en Spotify y aparecerá aquí.</string>
+    <string name="home_liked_songs">Canciones que te gustan</string>
+</resources>

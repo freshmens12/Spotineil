@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="album_type_album">Album</string>
+    <string name="album_tracks">%1$d songs</string>
+    <string name="album_save">Save to Your Library</string>
+    <string name="album_remove">Remove from Your Library</string>
+</resources>

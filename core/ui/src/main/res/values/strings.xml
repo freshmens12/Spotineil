@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ui_add_liked">Add to Liked Songs</string>
+    <string name="ui_remove_liked">Remove from Liked Songs</string>
+    <string name="ui_added_liked">Added to Liked Songs</string>
+    <string name="ui_removed_liked">Removed from Liked Songs</string>
+    <string name="ui_add_queue">Add to queue</string>
+    <string name="ui_added_queue">Added to queue</string>
+    <string name="ui_add_playlist">Add to playlist</string>
+    <string name="ui_added_playlist">Added to playlist</string>
+    <string name="ui_remove_playlist">Remove from this playlist</string>
+    <string name="ui_choose_playlist">Choose a playlist</string>
+    <string name="ui_no_editable_playlists">You don\'t have any playlists you can edit yet.</string>
+    <string name="ui_go_artist">Go to artist</string>
+    <string name="ui_go_album">Go to album</string>
+    <string name="ui_share">Share</string>
+    <string name="ui_action_failed">Couldn\'t complete that. Try again.</string>
+    <string name="ui_free_notice">You\'re on Spotify Free. Some on-demand controls (like picking a specific song or skipping freely) are limited by Spotify. Upgrade to Premium in the Spotify app for full control.</string>
+</resources>

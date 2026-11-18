@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="library_title">Your Library</string>
+    <string name="library_playlists">Playlists</string>
+    <string name="library_albums">Albums</string>
+    <string name="library_artists">Artists</string>
+    <string name="library_podcasts">Podcasts</string>
+    <string name="library_sort_recent">Recents</string>
+    <string name="library_sort_az">Alphabetical</string>
+    <string name="library_sort_creator">Creator</string>
+    <string name="library_grid_view">Grid view</string>
+    <string name="library_list_view">List view</string>
+    <string name="library_liked_songs">Liked Songs</string>
+    <string name="library_songs_count">%1$d songs</string>
+    <string name="library_playlist">Playlist</string>
+    <string name="library_local_files">Local files</string>
+    <string name="library_local_files_sub">Music saved on this device</string>
+    <string name="library_empty">Nothing here yet.</string>
+    <string name="library_no_liked">Songs you like will appear here.</string>
+    <string name="library_no_local">No audio files found on this device.</string>
+    <string name="library_permission_title">Allow access to your music</string>
+    <string name="library_permission_body">Spotineil needs permission to read audio files stored on this device to play them.</string>
+    <string name="library_grant">Allow</string>
+    <string name="library_create_playlist">Create playlist</string>
+    <string name="library_name">Name</string>
+    <string name="library_description">Description (optional)</string>
+    <string name="library_public">Public</string>
+    <string name="library_collaborative">Collaborative</string>
+    <string name="library_create">Create</string>
+    <string name="library_cancel">Cancel</string>
+    <string name="library_shuffle">Shuffle</string>
+    <string name="library_play">Play</string>
+    <string name="library_songs">Songs</string>
+</resources>

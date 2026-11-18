@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_followers">%1$s seguidores</string>
+    <string name="profile_premium">Spotify Premium</string>
+    <string name="profile_free">Spotify Free</string>
+    <string name="profile_your_top">Tus estadísticas</string>
+    <string name="profile_range_4w">4 semanas</string>
+    <string name="profile_range_6m">6 meses</string>
+    <string name="profile_range_all">Siempre</string>
+    <string name="profile_top_artists">Artistas top</string>
+    <string name="profile_top_tracks">Canciones top</string>
+</resources>

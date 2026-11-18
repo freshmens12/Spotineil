@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_title">Search</string>
+    <string name="search_hint">What do you want to listen to?</string>
+    <string name="search_clear">Clear</string>
+    <string name="search_recent">Recent searches</string>
+    <string name="search_clear_all">Clear all</string>
+    <string name="search_remove_recent">Remove from recent searches</string>
+    <string name="search_browse_all">Browse all</string>
+    <string name="search_see_all">See all</string>
+    <string name="search_no_results">No results for \"%1$s\"</string>
+    <string name="search_filter_all">All</string>
+    <string name="search_filter_songs">Songs</string>
+    <string name="search_filter_artists">Artists</string>
+    <string name="search_filter_albums">Albums</string>
+    <string name="search_filter_playlists">Playlists</string>
+    <string name="search_filter_podcasts">Podcasts</string>
+    <string name="search_type_artist">Artist</string>
+</resources>

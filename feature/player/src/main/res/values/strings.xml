@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_play">Play</string>
+    <string name="player_pause">Pause</string>
+    <string name="player_next">Next</string>
+    <string name="player_previous">Previous</string>
+    <string name="player_shuffle">Shuffle</string>
+    <string name="player_repeat">Repeat</string>
+    <string name="player_like">Add to Liked Songs</string>
+    <string name="player_unlike">Remove from Liked Songs</string>
+    <string name="player_collapse">Minimize player</string>
+    <string name="player_now_playing">Now playing</string>
+    <string name="player_devices">Devices</string>
+    <string name="player_lyrics">Lyrics</string>
+    <string name="player_queue">Queue</string>
+    <string name="player_next_up">Next up</string>
+    <string name="player_next_up_reorder">Next up · drag to reorder</string>
+    <string name="player_queue_empty">Nothing queued.</string>
+    <string name="player_drag">Drag to reorder</string>
+    <string name="player_connect_device">Connect to a device</string>
+    <string name="player_connect_hint">Spotify Connect control requires Spotify Premium.</string>
+    <string name="player_no_devices">No devices found. Open Spotify on another device to see it here.</string>
+    <string name="player_listening_on">Listening on</string>
+    <string name="player_refresh">Refresh</string>
+    <string name="player_sleep_timer">Sleep timer</string>
+    <string name="player_sleep_minutes">%1$d minutes</string>
+    <string name="player_sleep_end_of_track">End of track</string>
+    <string name="player_sleep_end_of_track_active">Stopping at the end of this track</string>
+    <string name="player_sleep_remaining">Stopping in about %1$d min</string>
+    <string name="player_sleep_off">Turn off timer</string>
+    <string name="player_lyrics_unavailable">Lyrics not available</string>
+    <string name="player_lyrics_instrumental">Instrumental — enjoy the music</string>
+    <string name="player_lyrics_source">Lyrics provided by LRCLIB</string>
+</resources>

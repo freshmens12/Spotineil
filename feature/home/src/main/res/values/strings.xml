@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_good_morning">Good morning</string>
+    <string name="home_good_afternoon">Good afternoon</string>
+    <string name="home_good_evening">Good evening</string>
+    <string name="home_good_night">Good night</string>
+    <string name="home_recently_played">Recently played</string>
+    <string name="home_top_artists">Your top artists</string>
+    <string name="home_top_tracks">On repeat</string>
+    <string name="home_your_playlists">Your playlists</string>
+    <string name="home_new_releases">New releases</string>
+    <string name="home_saved_albums">Saved albums</string>
+    <string name="home_empty">Start listening on Spotify and your home feed will fill up.</string>
+    <string name="home_settings">Settings</string>
+    <string name="home_profile">Profile</string>
+    <string name="home_filter_all">All</string>
+    <string name="home_filter_music">Music</string>
+    <string name="home_filter_podcasts">Podcasts</string>
+    <string name="home_your_podcasts">Your podcasts</string>
+    <string name="home_no_podcasts">Follow a podcast on Spotify and it will show up here.</string>
+    <string name="home_liked_songs">Liked Songs</string>
+</resources>
