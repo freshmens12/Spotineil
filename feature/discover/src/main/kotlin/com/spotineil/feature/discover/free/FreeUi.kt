@@ -50,7 +50,9 @@ import com.spotineil.core.model.RecentItem
 import com.spotineil.core.model.StreamTrack
 import com.spotineil.core.model.toPlayable
 import com.spotineil.core.model.YOUTUBE_MEDIA_PREFIX
+import com.spotineil.core.model.YouTubeSession
 import com.spotineil.core.model.YouTubeVideo
+import com.spotineil.core.data.repository.YouTubeSessionStore
 import com.spotineil.core.model.isYouTube
 import com.spotineil.core.model.toYouTubeVideo
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -76,8 +78,10 @@ class FreePlayer @Inject constructor(
     private val recents: RecentsRepository,
     private val radio: RadioRepository,
     private val downloads: DownloadRepository,
+    private val youTubeSessions: YouTubeSessionStore,
     @ApplicationScope private val scope: CoroutineScope,
 ) {
+
     /** Media id of what's playing, to highlight the current row. */
     val nowPlayingId: Flow<String?> = player.state.map { it.track?.uri }.distinctUntilChanged()
 
@@ -114,6 +118,54 @@ class FreePlayer @Inject constructor(
         val i = index.coerceIn(0, list.lastIndex)
         _youTubeIndex.value = i
         scope.launch { recents.record(RecentItem.Song(list[i].toPlayable())) }
+        saveYouTubePosition(0)
+    }
+
+    /** Replaces everything after the current song (Start radio / autoplay). */
+    fun setYouTubeUpNext(videos: List<YouTubeVideo>) {
+        val kept = _youTubeQueue.value.take(_youTubeIndex.value + 1)
+        val keptIds = kept.mapTo(HashSet()) { it.id }
+        _youTubeQueue.value = kept + videos.filter { it.id !in keptIds }
+        saveYouTubePosition(lastSavedPosition)
+    }
+
+    // ---------------- "Continue listening": the saved YouTube session ----------------
+
+    /** The saved session (queue + song + position), for the Home "Continue listening" card. */
+    val youTubeSession: Flow<YouTubeSession?> = youTubeSessions.session
+
+    /** Song id → position to continue from, set when a saved session is restored. */
+    private var resumeAt: Pair<String, Long>? = null
+    private var lastSavedPosition = 0L
+
+    /** Where to start [videoId]: the saved position the first time it's opened, otherwise 0. */
+    fun takeResumePosition(videoId: String): Long {
+        val (id, ms) = resumeAt ?: return 0L
+        resumeAt = null
+        return if (id == videoId) ms else 0L
+    }
+
+    /** Opens the saved session again (the caller then navigates to the YouTube player). */
+    fun continueYouTube(session: YouTubeSession) {
+        if (session.queue.isEmpty()) return
+        player.pause()
+        _youTubeQueue.value = session.queue
+        _youTubeIndex.value = session.index.coerceIn(0, session.queue.lastIndex)
+        resumeAt = session.resumePoint()
+    }
+
+    /** The saved song and position; a song saved in its last seconds starts over instead. */
+    private fun YouTubeSession.resumePoint(): Pair<String, Long>? {
+        val song = current ?: return null
+        val nearEnd = song.durationMs > 0 && positionMs > song.durationMs - NEAR_END_MS
+        return song.id to if (nearEnd) 0L else positionMs
+    }
+
+    /** Saves the queue, the song and [positionMs] (runs in the app scope, so it also works on exit). */
+    fun saveYouTubePosition(positionMs: Long) {
+        lastSavedPosition = positionMs
+        val session = YouTubeSession(_youTubeQueue.value, _youTubeIndex.value, positionMs)
+        scope.launch { runCatching { youTubeSessions.save(session) } }
     }
 
     /**
@@ -144,6 +196,23 @@ class FreePlayer @Inject constructor(
 
     /** False when the track can't be downloaded (not allowed by the artist/licence). */
     fun download(track: StreamTrack): Boolean = downloads.download(track)
+
+    // Last in the class, so every field above is initialised before it runs.
+    init {
+        // Bring back the last YouTube queue (and where the song was) after the app was closed.
+        scope.launch {
+            val saved = runCatching { youTubeSessions.load() }.getOrNull() ?: return@launch
+            if (_youTubeQueue.value.isEmpty() && saved.queue.isNotEmpty()) {
+                _youTubeQueue.value = saved.queue
+                _youTubeIndex.value = saved.index.coerceIn(0, saved.queue.lastIndex)
+                resumeAt = saved.resumePoint()
+            }
+        }
+    }
+
+    private companion object {
+        const val NEAR_END_MS = 10_000L
+    }
 }
 
 // ---------------------------------------------------------------------------------------------

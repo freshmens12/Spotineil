@@ -104,4 +104,15 @@
     <string name="yt_error_embed">This song can\'t be played outside YouTube. Skipping.</string>
     <string name="yt_error_missing">This video is no longer available. Skipping.</string>
     <string name="yt_error_generic">YouTube couldn\'t play this song. Skipping.</string>
+    <string name="yt_start_radio">Start radio</string>
+    <string name="yt_play_similar">Play similar</string>
+    <string name="yt_radio_started">Radio on: songs by %1$s and similar artists are up next</string>
+    <string name="yt_radio_empty">Couldn\'t make a radio for this song right now</string>
+    <string name="yt_radio_quota">Today\'s YouTube searches are used up. Radio works again tomorrow.</string>
+    <string name="yt_similar_started">Playing %1$s songs from Audius and Jamendo. These keep playing with the screen off.</string>
+    <string name="yt_similar_empty">No similar songs found on the free sources</string>
+    <string name="yt_kind_song">Song</string>
+    <string name="yt_kind_video">Video</string>
+    <string name="free_continue_listening">Continue listening</string>
+    <string name="free_continue_at">%1$s • from %2$s</string>
 </resources>

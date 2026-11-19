@@ -1,6 +1,22 @@
 package com.spotineil.feature.discover.free
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import com.spotineil.core.designsystem.component.formatDuration
+import com.spotineil.core.model.YouTubeSession
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -194,6 +210,12 @@ class FreeHomeViewModel @Inject constructor(
         val RETRY_DELAYS_MS = listOf(2_000L, 5_000L)
     }
 
+    /** Where YouTube listening stopped (Home "Continue listening" card). */
+    val youTubeSession: StateFlow<YouTubeSession?> =
+        freePlayer.youTubeSession.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    fun continueYouTube(session: YouTubeSession) = freePlayer.continueYouTube(session)
+
     /** True when it's a YouTube song (the caller opens YouTube's player). */
     fun playRecent(item: RecentItem.Song): Boolean = freePlayer.playMixed(listOf(item.media), 0)
     fun playYouTube(videos: List<YouTubeVideo>, index: Int) = freePlayer.playYouTube(videos, index)
@@ -276,6 +298,17 @@ fun FreeHomeRoute(nav: FreeNavigation, viewModel: FreeHomeViewModel = hiltViewMo
                 )
             }
             item(key = "tiles") { HomeTiles(state, filter, viewModel, nav) }
+            if (music) {
+                item(key = "continue") {
+                    val session by viewModel.youTubeSession.collectAsStateWithLifecycle()
+                    session?.takeIf { it.current != null }?.let { s ->
+                        ContinueListeningCard(s) {
+                            viewModel.continueYouTube(s)
+                            nav.onYouTubePlayer()
+                        }
+                    }
+                }
+            }
 
             if (r.error != null && r.isLoading.not() && state.recents.isEmpty()) {
                 item(key = "error") { ErrorState(r.error, onRetry = viewModel::retry) }
@@ -318,6 +351,49 @@ fun FreeHomeRoute(nav: FreeNavigation, viewModel: FreeHomeViewModel = hiltViewMo
                 item(key = "albums") { collectionShelf(R.string.free_albums, r.albums) }
                 item(key = "cc") { trackShelf(R.string.free_ccmixter, r.ccMixter) }
             }
+        }
+    }
+}
+
+/** The YouTube song you were listening to, with how far you got; tap to continue from there. */
+@Composable
+private fun ContinueListeningCard(session: YouTubeSession, onClick: () -> Unit) {
+    val video = session.current ?: return
+    val progress = if (video.durationMs > 0) (session.positionMs.toFloat() / video.durationMs).coerceIn(0f, 1f) else 0f
+    Surface(
+        onClick = onClick,
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).testTag("continue_listening"),
+    ) {
+        Column {
+            Row(Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                CoverImage(video.thumbnailUrl, null, Modifier.size(56.dp))
+                Column(Modifier.weight(1f).padding(horizontal = 12.dp)) {
+                    Text(
+                        stringResource(R.string.free_continue_listening),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(video.songTitle, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(
+                        stringResource(R.string.free_continue_at, video.artist, formatDuration(session.positionMs)),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                Icon(Icons.Rounded.PlayArrow, null, Modifier.size(32.dp))
+            }
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier.fillMaxWidth().height(3.dp),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                drawStopIndicator = {},
+            )
         }
     }
 }

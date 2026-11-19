@@ -4,7 +4,7 @@ A free Android music app, written in Kotlin with Jetpack Compose (Material 3). I
 
 **Where the music comes from (all free and legal):**
 
-- **YouTube**: the main catalog. Trending music, search and genres, played in YouTube's official player, with picture-in-picture.
+- **YouTube**: the main catalog. Trending music, search and genres, played in YouTube's official player, with picture-in-picture. Official studio versions ("Topic" tracks) come first, **Start radio** builds a station from similar artists, autoplay keeps the music going, and **Continue listening** picks up where you stopped. Need more than ~89 searches a day? See [docs/youtube-quota-extension.md](docs/youtube-quota-extension.md).
 - **Jamendo, Audius, Internet Archive (live concerts and netlabels), ccMixter**: full songs shared for free by artists.
 - **Deezer, iTunes, Last.fm charts**: official 30-second previews of mainstream hits.
 - **Radio Browser**: thousands of live radio stations.

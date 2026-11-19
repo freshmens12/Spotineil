@@ -105,4 +105,15 @@
     <string name="yt_error_embed">Esta canción no se puede reproducir fuera de YouTube. Saltando.</string>
     <string name="yt_error_missing">Este video ya no está disponible. Saltando.</string>
     <string name="yt_error_generic">YouTube no pudo reproducir esta canción. Saltando.</string>
+    <string name="yt_start_radio">Iniciar radio</string>
+    <string name="yt_play_similar">Similares</string>
+    <string name="yt_radio_started">Radio activa: a continuación, canciones de %1$s y artistas parecidos</string>
+    <string name="yt_radio_empty">No se pudo crear una radio para esta canción ahora</string>
+    <string name="yt_radio_quota">Las búsquedas de YouTube de hoy se agotaron. La radio vuelve mañana.</string>
+    <string name="yt_similar_started">Reproduciendo canciones de %1$s de Audius y Jamendo. Siguen sonando con la pantalla apagada.</string>
+    <string name="yt_similar_empty">No se encontraron canciones parecidas en las fuentes gratuitas</string>
+    <string name="yt_kind_song">Canción</string>
+    <string name="yt_kind_video">Video</string>
+    <string name="free_continue_listening">Seguir escuchando</string>
+    <string name="free_continue_at">%1$s • desde %2$s</string>
 </resources>

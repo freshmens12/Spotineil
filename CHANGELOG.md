@@ -6,6 +6,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Added — YouTube that feels like a music app
+- **Song-style results:** official "Artist – Topic" audio tracks (studio version with album cover) are ranked up in search, lyric re-uploads, live versions, covers and karaoke sink (unless that's what you searched for), and duplicate versions of the same song collapse into the best one. Rows say **Song** or **Video**.
+- **Start radio** button on the YouTube player: Up next becomes songs by the current artist and similar artists (from Last.fm), mixed so the same artist doesn't play twice in a row. One YouTube search per station (cached for a day).
+- **Autoplay:** when the last song in the queue starts, a radio is lined up after it, so the music doesn't stop. It's skipped when fewer than ~20 searches are left today.
+- **Continue listening:** the YouTube queue, song and position are saved (also after the app is closed). A Home card continues from the exact spot.
+- **Play similar:** one tap finds songs by the same artist, or in the artist's genre (Last.fm tags), on Audius and Jamendo, and plays them with the screen off. Uses no YouTube quota.
+- Previous restarts the song after its first 3 seconds; the next song starts straight from the player's "ended" callback.
+- `docs/youtube-quota-extension.md` (answers for Google's free quota-increase form) and `docs/PRIVACY.md`.
+- 5 tests for song-style ranking, radio mixing and title decoding (75 total).
+
+### Fixed — YouTube titles
+- Titles from the Data API showed HTML codes (`I&#39;m`); they're now decoded, including in cached results.
+
 ### Added — Jamendo on Home
 - "Popular on Jamendo" Home shelf (full Creative Commons songs, this week's most popular) when `JAMENDO_CLIENT_ID` is set.
 

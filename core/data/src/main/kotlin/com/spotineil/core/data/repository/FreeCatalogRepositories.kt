@@ -328,6 +328,12 @@ class DefaultCcMixterRepository @Inject constructor(private val api: CcMixterApi
 interface LastFmRepository {
     val isEnabled: Boolean
     suspend fun topTracks(limit: Int = 20): List<StreamTrack>
+
+    /** Artists that sound like [artist] (empty without a Last.fm key or when unknown). */
+    suspend fun similarArtists(artist: String, limit: Int = 8): List<String> = emptyList()
+
+    /** Genre-like tags for [artist], most used first (lower case). */
+    suspend fun artistTags(artist: String): List<String> = emptyList()
 }
 
 @Singleton
@@ -355,5 +361,17 @@ class DefaultLastFmRepository @Inject constructor(
                 }
             }.awaitAll().filterNotNull().distinctBy { it.id }
         }
+    }
+
+    override suspend fun similarArtists(artist: String, limit: Int): List<String> {
+        if (!isEnabled || artist.isBlank()) return emptyList()
+        return apiCall { api.similarArtists(artist, config.lastFmApiKey, limit = limit) }
+            .similarartists.artist.map { it.name }.filter { it.isNotBlank() }
+    }
+
+    override suspend fun artistTags(artist: String): List<String> {
+        if (!isEnabled || artist.isBlank()) return emptyList()
+        return apiCall { api.artistTags(artist, config.lastFmApiKey) }
+            .toptags.tag.map { it.name.lowercase().trim() }.filter { it.isNotEmpty() }.take(10)
     }
 }

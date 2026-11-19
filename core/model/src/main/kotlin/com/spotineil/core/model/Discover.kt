@@ -224,6 +224,22 @@ data class YouTubeVideo(
     /** "Artist - Song (Official Video)" → artist/song guesses (for lyrics and display). */
     val songTitle: String get() = YouTubeTitles.song(title, channel)
     val artist: String get() = YouTubeTitles.artist(title, channel)
+
+    /**
+     * Uploaded by YouTube's auto-generated "Artist - Topic" channel: the official studio recording
+     * with its album cover, i.e. what YouTube Music plays as a "song" (not a music video).
+     */
+    val isTopic: Boolean get() = channel.endsWith(" - Topic", ignoreCase = true)
+}
+
+/** Where YouTube listening stopped, so it can continue later (even after the app was closed). */
+@Serializable
+data class YouTubeSession(
+    val queue: List<YouTubeVideo>,
+    val index: Int,
+    val positionMs: Long,
+) {
+    val current: YouTubeVideo? get() = queue.getOrNull(index)
 }
 
 const val YOUTUBE_MEDIA_PREFIX = "youtube:"

@@ -339,6 +339,18 @@ data class LastFmTrackListDto(val track: List<LastFmTrackDto> = emptyList())
 @Serializable
 data class LastFmChartDto(val tracks: LastFmTrackListDto = LastFmTrackListDto())
 
+@Serializable
+data class LastFmArtistListDto(val artist: List<LastFmArtistDto> = emptyList())
+
+@Serializable
+data class LastFmSimilarDto(val similarartists: LastFmArtistListDto = LastFmArtistListDto())
+
+@Serializable
+data class LastFmTagListDto(val tag: List<LastFmArtistDto> = emptyList())
+
+@Serializable
+data class LastFmTopTagsDto(val toptags: LastFmTagListDto = LastFmTagListDto())
+
 interface LastFmApi {
     @GET("2.0/")
     suspend fun topTracks(
@@ -347,6 +359,26 @@ interface LastFmApi {
         @Query("limit") limit: Int = 25,
         @Query("format") format: String = "json",
     ): LastFmChartDto
+
+    @GET("2.0/")
+    suspend fun similarArtists(
+        @Query("artist") artist: String,
+        @Query("api_key") apiKey: String,
+        @Query("method") method: String = "artist.getsimilar",
+        @Query("autocorrect") autocorrect: Int = 1,
+        @Query("limit") limit: Int = 8,
+        @Query("format") format: String = "json",
+    ): LastFmSimilarDto
+
+    /** Genre-like tags listeners gave an artist ("soul", "pop", "opm"…), most used first. */
+    @GET("2.0/")
+    suspend fun artistTags(
+        @Query("artist") artist: String,
+        @Query("api_key") apiKey: String,
+        @Query("method") method: String = "artist.gettoptags",
+        @Query("autocorrect") autocorrect: Int = 1,
+        @Query("format") format: String = "json",
+    ): LastFmTopTagsDto
 }
 
 // ---------------- YouTube Data API v3 (metadata only; playback happens in YouTube's official player) ----------------
