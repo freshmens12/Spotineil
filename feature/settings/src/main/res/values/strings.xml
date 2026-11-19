@@ -20,13 +20,11 @@
     <string name="settings_language_en">English</string>
     <string name="settings_language_es">Español</string>
     <string name="settings_logout">Log out</string>
-    <string name="settings_login_spotify">Log in with Spotify</string>
-    <string name="settings_login_spotify_desc">Connect your Spotify account for your library, playlists and full songs.</string>
     <string name="settings_logout_confirm">You\'ll need to log in with Spotify again to use Spotineil.</string>
     <string name="settings_cancel">Cancel</string>
     <string name="settings_close">Close</string>
     <string name="settings_about">About</string>
     <string name="settings_version">Version</string>
     <string name="settings_licenses">Open-source licenses</string>
-    <string name="settings_attribution">Spotineil is an unofficial client and is not affiliated with, endorsed or sponsored by Spotify AB. Spotify content, metadata and artwork are provided by Spotify through the Spotify Web API and App Remote SDK. Lyrics are provided by LRCLIB (lrclib.net).</string>
+    <string name="settings_attribution">Spotineil is a student project. It is not affiliated with, endorsed or sponsored by YouTube, Jamendo, Audius, the Internet Archive, Spotify or any other service it plays from. YouTube songs play in YouTube\'s official player, under YouTube\'s Terms of Service. Music, artwork and metadata belong to their artists and are provided by each source. Lyrics are provided by LRCLIB (lrclib.net).</string>
 </resources>

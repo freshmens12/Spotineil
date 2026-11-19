@@ -148,17 +148,11 @@ fun SettingsRoute(
                     modifier = Modifier.clickable { dialog = "language" },
                 )
             }
-            item {
-                if (loggedIn) {
+            if (loggedIn) {
+                item {
                     ListItem(
                         headlineContent = { Text(stringResource(R.string.settings_logout), color = MaterialTheme.colorScheme.error) },
                         modifier = Modifier.clickable { dialog = "logout" },
-                    )
-                } else {
-                    ListItem(
-                        headlineContent = { Text(stringResource(R.string.settings_login_spotify), color = MaterialTheme.colorScheme.primary) },
-                        supportingContent = { Text(stringResource(R.string.settings_login_spotify_desc)) },
-                        modifier = Modifier.clickable { viewModel.goToSpotifyLogin() },
                     )
                 }
             }

@@ -27,6 +27,9 @@ data class UserSettings(
     val language: AppLanguage = AppLanguage.System,
     val librarySort: LibrarySort = LibrarySort.Recent,
     val libraryGrid: Boolean = false,
-    /** Use Spotineil without a Spotify account (free sources, radio, local files only). */
-    val guestMode: Boolean = true,
+    /**
+     * The free, no-account app is in use. False only on the very first launch, when the Welcome
+     * screen is shown; its "Get started" button turns this on.
+     */
+    val guestMode: Boolean = false,
 )

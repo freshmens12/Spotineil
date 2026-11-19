@@ -67,7 +67,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.spotineil.app.MainViewModel
 import com.spotineil.app.R
-import com.spotineil.app.auth.LoginScreen
 import com.spotineil.app.auth.openSpotifyInPlayStore
 import com.spotineil.core.designsystem.theme.LocalBottomContentPadding
 import com.spotineil.core.designsystem.theme.LocalPipState
@@ -134,22 +133,22 @@ private val freeTabs = listOf(
 private val NavBarHeight = 64.dp
 private val MiniPlayerHeight = 64.dp
 
-private enum class AppMode { Login, Spotify, Free }
+private enum class AppMode { Welcome, Spotify, Free }
 
 @Composable
 fun SpotineilApp(isLoggedIn: Boolean, guestMode: Boolean, mainViewModel: MainViewModel) {
-    // guestMode is on by default: the app opens straight into the free app. The Spotify login
-    // screen only appears when chosen in Settings.
+    // First launch shows the Welcome screen once; after "Get started" the app opens straight into
+    // the free app. (The Spotify mode is only reachable by an existing Spotify login.)
     val mode = when {
         isLoggedIn -> AppMode.Spotify
         guestMode -> AppMode.Free
-        else -> AppMode.Login
+        else -> AppMode.Welcome
     }
     AnimatedContent(mode, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "auth") { m ->
         when (m) {
             AppMode.Spotify -> MainShell(mainViewModel, free = false)
             AppMode.Free -> MainShell(mainViewModel, free = true)
-            AppMode.Login -> LoginScreen()
+            AppMode.Welcome -> WelcomeScreen(onGetStarted = { mainViewModel.finishWelcome() })
         }
     }
 }

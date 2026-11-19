@@ -65,7 +65,4 @@ class SettingsViewModel @Inject constructor(
         settings.setGuestMode(true)
         auth.logout()
     }
-
-    /** Leaves guest mode; the app then shows the Spotify login screen. */
-    fun goToSpotifyLogin() = viewModelScope.launch { settings.setGuestMode(false) }
 }

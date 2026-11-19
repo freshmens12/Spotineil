@@ -31,7 +31,7 @@ It does **not** block ads, rip or download audio from YouTube, Spotify or any ot
 
 | Area | What you get |
 |---|---|
-| **Login** | Branded splash screen and "Log in with Spotify" (PKCE in a Custom Tab). Detects whether the Spotify app is installed and links to Google Play if it isn't. |
+| **Welcome** | Shown once on first launch: what Spotineil offers and a single **Get started** button. No account or sign-in. |
 | **Home** | Time-of-day greeting, quick picks, recently played, top artists and tracks, your playlists, new releases, saved albums. Pull-to-refresh, skeleton loaders, offline cache. |
 | **Search** | Debounced search across songs, artists, albums, playlists and podcasts. Filter chips with fully paginated results, recent searches, and a browse-categories grid. |
 | **Library** | Playlists, albums, artists and podcasts tabs. Sort by recent, A–Z or creator. Grid/list toggle, Liked Songs, local files. |

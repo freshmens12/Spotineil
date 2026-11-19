@@ -6,6 +6,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Changed — first launch
+- New **Welcome** screen on first launch: the app's three main features and one **Get started** button. It shows once; after that the app opens straight into Home.
+- Removed "Log in with Spotify" (Welcome screen and Settings) and "Get Spotify on Google Play". The free app needs no account.
+- Settings → About text now describes the free sources instead of the Spotify Web API.
+
 ### Added — YouTube that feels like a music app
 - **Song-style results:** official "Artist – Topic" audio tracks (studio version with album cover) are ranked up in search, lyric re-uploads, live versions, covers and karaoke sink (unless that's what you searched for), and duplicate versions of the same song collapse into the best one. Rows say **Song** or **Video**.
 - **Start radio** button on the YouTube player: Up next becomes songs by the current artist and similar artists (from Last.fm), mixed so the same artist doesn't play twice in a row. One YouTube search per station (cached for a day).

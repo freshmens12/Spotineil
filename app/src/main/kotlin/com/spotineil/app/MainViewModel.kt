@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 sealed interface MainUiState {
     data object Loading : MainUiState
@@ -26,7 +27,7 @@ sealed interface MainUiState {
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    settings: SettingsRepository,
+    private val settings: SettingsRepository,
     private val auth: AuthRepository,
     player: PlaybackController,
 ) : ViewModel() {
@@ -41,6 +42,9 @@ class MainViewModel @Inject constructor(
     val playerEvents: SharedFlow<PlayerEvent> = player.events
 
     fun isLoggedInNow(): Boolean = auth.isLoggedInNow()
+
+    /** Welcome screen's "Get started": open the app (remembered, so Welcome shows only once). */
+    fun finishWelcome() = viewModelScope.launch { settings.setGuestMode(true) }
 }
 
 @Composable

@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">Spotineil</string>
-    <string name="login_tagline">Your music, your way.</string>
-    <string name="login_button">Log in with Spotify</string>
-    <string name="login_cancelled">Login was cancelled.</string>
-    <string name="login_spotify_missing">The Spotify app is required for playback on this phone. You can still browse your library without it.</string>
-    <string name="login_get_spotify">Get Spotify on Google Play</string>
-    <string name="login_not_configured">This build has no Spotify Client ID. Add SPOTIFY_CLIENT_ID to local.properties and rebuild (see README).</string>
-    <string name="login_disclaimer">Spotineil is an unofficial app and is not affiliated with Spotify. You sign in on Spotify\'s own page — Spotineil never sees your password.</string>
-    <string name="login_guest">Continue without Spotify</string>
-    <string name="login_guest_hint">Free music, internet radio, song previews and music on your phone. No account needed.</string>
+    <string name="welcome_tagline">Your music, your way.</string>
+    <string name="welcome_feature_music">Full songs from YouTube, Jamendo, Audius and the Internet Archive</string>
+    <string name="welcome_feature_radio">Live radio, podcasts and the music on your phone</string>
+    <string name="welcome_feature_free">Free, with no account and no sign-in</string>
+    <string name="welcome_get_started">Get started</string>
+    <string name="welcome_note">A student project. Not affiliated with the music services it plays from.</string>
     <string name="nav_discover">Discover</string>
     <string name="nav_your_music">Your music</string>
     <string name="nav_home">Home</string>
