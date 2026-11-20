@@ -230,10 +230,15 @@ class DefaultPlaybackController @Inject constructor(
 
     override fun addToQueue(uri: String) = command {
         when (route()) {
-            Route.Local -> _events.tryEmit(PlayerEvent.Error("Spotify tracks can't be queued during local playback"))
+            Route.Local -> if (uri.startsWith("ytmusic:")) local.addToQueue(uri)
+                else _events.tryEmit(PlayerEvent.Error("Spotify tracks can't be queued during local playback"))
             Route.Remote -> remote.queue(uri)
             Route.Connect -> connectRepository.addToQueue(uri)
         }
+    }
+
+    override fun setUpNext(items: List<PlayableMedia>) = command {
+        if (route() == Route.Local) local.setUpNext(items)
     }
 
     override suspend fun queue(): PlaybackQueue =

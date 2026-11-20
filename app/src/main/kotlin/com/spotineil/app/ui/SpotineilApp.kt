@@ -86,6 +86,7 @@ import com.spotineil.feature.discover.free.FreeNavigation
 import com.spotineil.feature.discover.free.FreeSearchTab
 import com.spotineil.feature.discover.free.LikedMediaRoute
 import com.spotineil.feature.discover.free.YouTubePlayerRoute
+import com.spotineil.feature.discover.free.HistoryRoute
 import com.spotineil.feature.discover.free.freeScreens
 import com.spotineil.feature.discover.free.toRoute
 import androidx.compose.ui.graphics.Brush
@@ -193,7 +194,11 @@ private fun MainShell(mainViewModel: MainViewModel, free: Boolean) {
     }
 
     val navInsets = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-    val bottomPadding = NavBarHeight + navInsets + if (hasTrack) MiniPlayerHeight else 0.dp
+    // The full player screen already shows the song, so the mini player is hidden there.
+    val currentEntry by navController.currentBackStackEntryAsState()
+    val onFullPlayer = currentEntry?.destination?.hasRoute(YouTubePlayerRoute::class) == true
+    val showMini = hasTrack && !onFullPlayer
+    val bottomPadding = NavBarHeight + navInsets + if (showMini) MiniPlayerHeight else 0.dp
 
     Box(Modifier.fillMaxSize()) {
         Scaffold(
@@ -207,7 +212,7 @@ private fun MainShell(mainViewModel: MainViewModel, free: Boolean) {
         // In the floating PiP window only the YouTube video is shown: no bar, mini player or sheets.
         if (!LocalPipState.current.isInPip) {
             BottomBar(navController, tabs, Modifier.align(Alignment.BottomCenter))
-            PlayerHost(
+            if (!onFullPlayer || playerExpanded) PlayerHost(
                 expanded = playerExpanded,
                 onExpandedChange = { playerExpanded = it },
                 onArtistClick = { navController.navigateToArtist(it) },
@@ -283,6 +288,7 @@ private fun AppNavHost(navController: NavHostController, onMessage: (String) -> 
             onCollection = { navController.navigate(it.toRoute()) },
             onBrowse = { navController.navigate(it) },
             onLikedSongs = { navController.navigate(LikedMediaRoute) },
+            onHistory = { navController.navigate(HistoryRoute) },
             onYouTubePlayer = { navController.navigate(YouTubePlayerRoute) { launchSingleTop = true } },
             onLocalMusic = { navController.navigateToLocalFiles() },
             onSettings = { navController.navigateToSettings() },

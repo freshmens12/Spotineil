@@ -69,6 +69,7 @@ import com.spotineil.core.model.RecentSearch
 import com.spotineil.core.model.SearchResult
 import com.spotineil.core.model.SearchResults
 import com.spotineil.core.model.SearchType
+import com.spotineil.core.model.Track
 import com.spotineil.core.ui.TrackActionTarget
 import com.spotineil.core.ui.TrackActionsSheet
 import com.spotineil.core.ui.toActionTarget
@@ -98,6 +99,7 @@ fun SearchRoute(callbacks: SearchCallbacks, viewModel: SearchViewModel = hiltVie
         onRemoveRecent = { viewModel.removeRecent(it) },
         onClearRecents = { viewModel.clearRecents() },
         onPlay = viewModel::play,
+        onPlayTrack = viewModel::playTrack,
         onPlayContext = viewModel::playContext,
         onOpen = { viewModel.commitQuery() },
         callbacks = callbacks,
@@ -118,6 +120,7 @@ fun SearchScreen(
     onClearRecents: () -> Unit,
     onPlay: (String) -> Unit,
     onPlayContext: (String) -> Unit,
+    onPlayTrack: (Track) -> Unit = {},
     onOpen: () -> Unit,
     callbacks: SearchCallbacks,
 ) {
@@ -168,7 +171,7 @@ fun SearchScreen(
                 }
                 state is SearchUiState.Results && filter == null -> topResults(
                     state.results,
-                    onTrackClick = { open { onPlay(it) } },
+                    onTrackClick = { open { onPlayTrack(it) } },
                     onTrackMore = { actionTarget = it },
                     onArtistClick = { open { callbacks.onArtistClick(it) } },
                     onAlbumClick = { open { callbacks.onAlbumClick(it) } },
@@ -178,7 +181,7 @@ fun SearchScreen(
                 )
                 state is SearchUiState.Results && paged != null -> pagedContent(
                     paged,
-                    onTrackClick = { open { onPlay(it) } },
+                    onTrackClick = { open { onPlayTrack(it) } },
                     onTrackMore = { actionTarget = it },
                     onArtistClick = { open { callbacks.onArtistClick(it) } },
                     onAlbumClick = { open { callbacks.onAlbumClick(it) } },
@@ -293,7 +296,7 @@ private fun CategoryTile(category: Category, index: Int, modifier: Modifier, onC
 
 private fun LazyListScope.topResults(
     results: SearchResults,
-    onTrackClick: (String) -> Unit,
+    onTrackClick: (Track) -> Unit,
     onTrackMore: (TrackActionTarget) -> Unit,
     onArtistClick: (String) -> Unit,
     onAlbumClick: (String) -> Unit,
@@ -308,7 +311,7 @@ private fun LazyListScope.topResults(
         header("hTracks", R.string.search_filter_songs, SearchType.Track)
         items(results.tracks.take(5), key = { "t" + it.id }) { t ->
             TrackRow(
-                t.name, t.artistNames, onClick = { onTrackClick(t.uri) },
+                t.name, t.artistNames, onClick = { onTrackClick(t) },
                 imageUrl = rememberImageUrl(t.images, 120), explicit = t.explicit,
                 onMore = { onTrackMore(t.toActionTarget()) },
                 modifier = Modifier.testTag("track_${t.id}"),
@@ -343,7 +346,7 @@ private fun LazyListScope.topResults(
 
 private fun LazyListScope.pagedContent(
     paged: LazyPagingItems<SearchResult>,
-    onTrackClick: (String) -> Unit,
+    onTrackClick: (Track) -> Unit,
     onTrackMore: (TrackActionTarget) -> Unit,
     onArtistClick: (String) -> Unit,
     onAlbumClick: (String) -> Unit,
@@ -362,7 +365,7 @@ private fun LazyListScope.pagedContent(
     items(paged.itemCount, key = { i -> paged.peek(i)?.let { "${it::class.simpleName}:${it.id}:$i" } ?: i }) { i ->
         when (val r = paged[i]) {
             is SearchResult.TrackResult -> TrackRow(
-                r.track.name, r.track.artistNames, onClick = { onTrackClick(r.track.uri) },
+                r.track.name, r.track.artistNames, onClick = { onTrackClick(r.track) },
                 imageUrl = rememberImageUrl(r.track.images, 120), explicit = r.track.explicit,
                 onMore = { onTrackMore(r.track.toActionTarget()) },
             )

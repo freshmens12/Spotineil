@@ -42,6 +42,7 @@ sealed interface SearchResult {
     data class ShowResult(val show: com.spotineil.core.model.Show) : SearchResult { override val id get() = show.id }
 }
 
+@kotlinx.serialization.Serializable
 data class SearchResults(
     val tracks: List<Track> = emptyList(),
     val artists: List<Artist> = emptyList(),

@@ -33,6 +33,7 @@ class SearchScreenTest {
         onQueryChange: (String) -> Unit = {},
         onFilterChange: (SearchType?) -> Unit = {},
         onPlay: (String) -> Unit = {},
+        onPlayTrack: (com.spotineil.core.model.Track) -> Unit = {},
     ) {
         compose.setContent {
             SpotineilTheme {
@@ -48,6 +49,7 @@ class SearchScreenTest {
                     onRemoveRecent = {},
                     onClearRecents = {},
                     onPlay = onPlay,
+                    onPlayTrack = onPlayTrack,
                     onPlayContext = {},
                     onOpen = {},
                     callbacks = noop,
@@ -74,7 +76,7 @@ class SearchScreenTest {
     fun resultsShowTracksAndTappingPlays() {
         val played = mutableListOf<String>()
         val track = TestData.track(1)
-        setContent("test", SearchUiState.Results("test", SearchResults(tracks = listOf(track))), onPlay = { played += it })
+        setContent("test", SearchUiState.Results("test", SearchResults(tracks = listOf(track))), onPlayTrack = { played += it.uri })
 
         compose.onNodeWithText(track.name).assertIsDisplayed()
         compose.onNodeWithTag("track_${track.id}").performClick()

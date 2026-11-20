@@ -4,11 +4,9 @@
     <string name="discover_settings">Ajustes</string>
     <string name="discover_tab_free">Música gratis</string>
     <string name="discover_tab_radio">Radio</string>
-    <string name="discover_tab_previews">Avances</string>
     <string name="discover_clear">Borrar</string>
     <string name="discover_free_hint">Buscar música gratis</string>
     <string name="discover_radio_hint">Buscar emisoras</string>
-    <string name="discover_previews_hint">Buscar cualquier canción</string>
     <string name="discover_trending_audius">Tendencias en Audius</string>
     <string name="discover_on_audius">En Audius</string>
     <string name="discover_popular_jamendo">Popular en Jamendo</string>
@@ -16,7 +14,6 @@
     <string name="discover_no_results">Sin resultados</string>
     <string name="discover_no_stations">No se encontraron emisoras</string>
     <string name="discover_free_footnote">Canciones completas compartidas gratis por artistas independientes en Audius y Jamendo. El botón de descarga solo aparece si el artista lo permite.</string>
-    <string name="discover_jamendo_disabled">Jamendo está desactivado: añade un JAMENDO_CLIENT_ID gratuito a local.properties para activarlo (ver README).</string>
     <string name="discover_download">Descargar</string>
     <string name="discover_download_started">Descargando en Música/Spotineil…</string>
     <string name="discover_download_failed">Esta canción no se puede descargar.</string>
@@ -26,8 +23,6 @@
     <string name="discover_radio_footnote">Directorio de emisoras de Radio Browser (radio-browser.info). El audio llega directamente de cada emisora.</string>
     <string name="discover_favorite">Guardar emisora</string>
     <string name="discover_unfavorite">Quitar emisora</string>
-    <string name="discover_previews_note">Avances oficiales de 30 segundos de Deezer e iTunes. Inicia sesión con Spotify Premium para canciones completas.</string>
-    <string name="discover_preview_badge">Avance · 30 s</string>
     <string name="discover_charts">Lo más escuchado</string>
     <string name="discover_results">Resultados</string>
     <!-- App gratis: Inicio / Buscar / Biblioteca -->
@@ -37,7 +32,6 @@
     <string name="free_filter_podcasts">Pódcasts</string>
     <string name="free_filter_albums">Álbumes</string>
     <string name="free_filter_songs">Canciones</string>
-    <string name="free_filter_previews">Avances</string>
     <string name="free_filter_stations">Emisoras</string>
     <string name="free_settings">Ajustes</string>
     <string name="free_liked_songs">Canciones que te gustan</string>
@@ -47,13 +41,15 @@
         <item quantity="other">Lista • %1$d canciones</item>
     </plurals>
     <string name="free_liked_empty">Las canciones que te gusten aparecerán aquí. Toca + en el reproductor para guardar una.</string>
+    <string name="free_history">Historial</string>
+    <string name="free_history_desc">Canciones que reprodujiste</string>
+    <string name="free_history_empty">Las canciones que reproduzcas aparecerán aquí.</string>
+    <string name="free_history_clear">Borrar historial</string>
     <string name="free_on_device">En este dispositivo</string>
     <string name="free_on_device_desc">Archivos de música de tu teléfono</string>
     <string name="free_trending">Tendencias</string>
     <string name="free_rising">Artistas en ascenso</string>
     <string name="free_jamendo">Lo más popular en Jamendo</string>
-    <string name="free_charts">Listas de éxitos · avances</string>
-    <string name="free_lastfm">Lo más escuchado en Last.fm · avances</string>
     <string name="free_concerts">Conciertos en vivo</string>
     <string name="free_albums">Álbumes gratis</string>
     <string name="free_ccmixter">Selección Creative Commons</string>
@@ -89,7 +85,7 @@
     <string name="free_more">Ver más</string>
     <string name="free_no_tracks">No hay canciones reproducibles.</string>
     <!-- YouTube (catálogo principal) -->
-    <string name="yt_now_playing">Reproduciendo desde YouTube</string>
+    <string name="yt_now_playing">Reproduciendo</string>
     <string name="yt_like">Añadir a Canciones que te gustan</string>
     <string name="yt_unlike">Quitar de Canciones que te gustan</string>
     <string name="yt_previous">Anterior</string>
@@ -97,23 +93,20 @@
     <string name="yt_pause">Pausar</string>
     <string name="yt_lyrics">Letra</string>
     <string name="yt_up_next">A continuación</string>
-    <string name="yt_player_note">Se reproduce en el reproductor oficial de YouTube. Mantenlo en pantalla: YouTube no permite reproducir en segundo plano ni solo audio, y puede mostrar sus anuncios.</string>
-    <string name="yt_trending">Tendencias en YouTube</string>
-    <string name="yt_songs">Canciones en YouTube</string>
-    <string name="yt_genre">%1$s en YouTube</string>
-    <string name="yt_quota_left">YouTube: quedan %1$d de %2$d búsquedas hoy</string>
-    <string name="yt_error_embed">Esta canción no se puede reproducir fuera de YouTube. Saltando.</string>
-    <string name="yt_error_missing">Este video ya no está disponible. Saltando.</string>
-    <string name="yt_error_generic">YouTube no pudo reproducir esta canción. Saltando.</string>
+    <string name="yt_trending">Tendencias</string>
+    <string name="yt_songs">Canciones</string>
+    <string name="yt_genre">%1$s</string>
+    <string name="yt_error_embed">Esta canción no se puede reproducir ahora. Saltando.</string>
+    <string name="yt_error_missing">Esta canción ya no está disponible. Saltando.</string>
+    <string name="yt_error_generic">No se pudo reproducir esta canción. Saltando.</string>
     <string name="yt_start_radio">Iniciar radio</string>
     <string name="yt_play_similar">Similares</string>
     <string name="yt_radio_started">Radio activa: a continuación, canciones de %1$s y artistas parecidos</string>
     <string name="yt_radio_empty">No se pudo crear una radio para esta canción ahora</string>
-    <string name="yt_radio_quota">Las búsquedas de YouTube de hoy se agotaron. La radio vuelve mañana.</string>
-    <string name="yt_similar_started">Reproduciendo canciones de %1$s de Audius y Jamendo. Siguen sonando con la pantalla apagada.</string>
+    <string name="yt_similar_started">Reproduciendo canciones parecidas a %1$s</string>
     <string name="yt_similar_empty">No se encontraron canciones parecidas en las fuentes gratuitas</string>
     <string name="yt_kind_song">Canción</string>
-    <string name="yt_kind_video">Video</string>
+    <string name="yt_kind_video">Canción</string>
     <string name="free_continue_listening">Seguir escuchando</string>
     <string name="free_continue_at">%1$s • desde %2$s</string>
 </resources>

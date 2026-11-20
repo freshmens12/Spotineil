@@ -44,10 +44,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.spotineil.core.data.repository.ArchiveRepository
 import com.spotineil.core.data.repository.CcMixterRepository
 import com.spotineil.core.data.repository.FreeMusicRepository
-import com.spotineil.core.data.repository.LastFmRepository
 import com.spotineil.core.data.repository.LikedMediaRepository
 import com.spotineil.core.data.repository.PodcastRepository
-import com.spotineil.core.data.repository.PreviewRepository
 import com.spotineil.core.data.repository.RadioRepository
 import com.spotineil.core.data.repository.RecentsRepository
 import com.spotineil.core.data.repository.YouTubeRepository
@@ -82,8 +80,6 @@ data class HomeRemote(
     val trending: List<StreamTrack>? = null,
     val rising: List<StreamTrack>? = null,
     val jamendo: List<StreamTrack>? = null,
-    val charts: List<StreamTrack>? = null,
-    val lastFm: List<StreamTrack>? = null,
     val ccMixter: List<StreamTrack>? = null,
     val concerts: List<ArchiveCollection>? = null,
     val albums: List<ArchiveCollection>? = null,
@@ -92,7 +88,7 @@ data class HomeRemote(
     /** Set when every source failed (likely offline). */
     val error: Throwable? = null,
 ) {
-    val isLoading: Boolean get() = youTube == null && trending == null && charts == null && concerts == null && stationsNear == null && podcasts == null
+    val isLoading: Boolean get() = youTube == null && trending == null && concerts == null && stationsNear == null && podcasts == null
 }
 
 data class FreeHomeUiState(
@@ -115,8 +111,6 @@ enum class HomeFilter(val label: Int) {
 @HiltViewModel
 class FreeHomeViewModel @Inject constructor(
     private val music: FreeMusicRepository,
-    private val previews: PreviewRepository,
-    private val lastFm: LastFmRepository,
     private val ccMixter: CcMixterRepository,
     private val archive: ArchiveRepository,
     private val radio: RadioRepository,
@@ -187,8 +181,6 @@ class FreeHomeViewModel @Inject constructor(
             launch { shelf({ music.trending() }) { copy(trending = it) } },
             launch { shelf({ music.underground() }) { copy(rising = it) } },
             launch { shelf({ music.jamendoPopular() }) { copy(jamendo = it) } },
-            launch { shelf({ previews.charts() }) { copy(charts = it) } },
-            launch { shelf({ if (lastFm.isEnabled) lastFm.topTracks() else emptyList() }) { copy(lastFm = it) } },
             launch { shelf({ ccMixter.featured() }) { copy(ccMixter = it) } },
             launch { shelf({ archive.concerts() }) { copy(concerts = it) } },
             launch { shelf({ archive.albums() }) { copy(albums = it) } },
@@ -229,6 +221,7 @@ data class FreeNavigation(
     val onCollection: (ArchiveCollection) -> Unit,
     val onBrowse: (BrowseRoute) -> Unit,
     val onLikedSongs: () -> Unit,
+    val onHistory: () -> Unit,
     /** Opens YouTube's player (after [FreePlayer.playYouTube] set the queue). */
     val onYouTubePlayer: () -> Unit,
     val onLocalMusic: () -> Unit,
@@ -326,14 +319,12 @@ fun FreeHomeRoute(nav: FreeNavigation, viewModel: FreeHomeViewModel = hiltViewMo
                             subtitle = v.artist,
                             imageUrl = v.thumbnailUrl,
                             onClick = { viewModel.playYouTube(videos, videos.indexOf(v)); nav.onYouTubePlayer() },
-                            badge = "YouTube",
                         )
                     }
                 }
             }
             if (music) {
                 item(key = "trending") { trackShelf(R.string.free_trending, r.trending) }
-                item(key = "charts") { trackShelf(R.string.free_charts, r.charts) }
             }
             if (radioOn) {
                 item(key = "yourStations") { stationShelf(stringResource(R.string.free_your_stations), state.favoriteStations) }
@@ -347,7 +338,6 @@ fun FreeHomeRoute(nav: FreeNavigation, viewModel: FreeHomeViewModel = hiltViewMo
                 item(key = "concerts") { collectionShelf(R.string.free_concerts, r.concerts) }
                 item(key = "rising") { trackShelf(R.string.free_rising, r.rising) }
                 item(key = "jamendo") { trackShelf(R.string.free_jamendo, r.jamendo) }
-                item(key = "lastfm") { trackShelf(R.string.free_lastfm, r.lastFm) }
                 item(key = "albums") { collectionShelf(R.string.free_albums, r.albums) }
                 item(key = "cc") { trackShelf(R.string.free_ccmixter, r.ccMixter) }
             }

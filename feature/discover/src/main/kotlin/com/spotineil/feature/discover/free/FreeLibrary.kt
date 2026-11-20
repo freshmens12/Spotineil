@@ -95,6 +95,9 @@ fun FreeLibraryRoute(nav: FreeNavigation, viewModel: FreeLibraryViewModel = hilt
                     LikedArt(m)
                 }
             }
+            item(key = "history") {
+                LibraryRow(stringResource(R.string.free_history), stringResource(R.string.free_history_desc), nav.onHistory) { m -> HistoryArt(m) }
+            }
             item(key = "device") {
                 LibraryRow(stringResource(R.string.free_on_device), stringResource(R.string.free_on_device_desc), nav.onLocalMusic) { m ->
                     Box(m.background(MaterialTheme.colorScheme.surfaceContainerHighest), contentAlignment = Alignment.Center) {

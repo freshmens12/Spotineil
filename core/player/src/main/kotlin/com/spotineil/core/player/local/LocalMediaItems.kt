@@ -22,7 +22,11 @@ internal const val EXTRA_DURATION_MS = "spotineil.duration_ms"
 internal fun LocalTrack.toMediaItem(): MediaItem = toPlayable().toMediaItem()
 
 internal fun PlayableMedia.toMediaItem(): MediaItem {
-    val uri = Uri.parse(this.uri)
+    val uri = if (uri.startsWith("ytmusic:video:")) {
+        Uri.parse("ytmusic://video/${uri.substringAfter("ytmusic:video:")}")
+    } else {
+        Uri.parse(uri)
+    }
     return MediaItem.Builder()
         .setMediaId(mediaId)
         .setUri(uri)

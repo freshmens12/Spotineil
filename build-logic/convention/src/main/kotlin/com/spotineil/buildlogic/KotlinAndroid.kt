@@ -1,6 +1,7 @@
 package com.spotineil.buildlogic
 
-import com.android.build.api.dsl.CommonExtension
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalog
@@ -20,30 +21,49 @@ fun VersionCatalog.version(alias: String): String = findVersion(alias).get().req
 fun VersionCatalog.lib(alias: String) = findLibrary(alias).get()
 
 /** Shared Android + Kotlin configuration for every Android module. */
-internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, *, *, *, *, *>) {
-    commonExtension.apply {
-        compileSdk = libs.version("compileSdk").toInt()
-        defaultConfig {
-            minSdk = libs.version("minSdk").toInt()
-            testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-            vectorDrawables.useSupportLibrary = true
-        }
-        compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_17
-            targetCompatibility = JavaVersion.VERSION_17
-        }
-        testOptions {
-            unitTests.isIncludeAndroidResources = true
-            unitTests.isReturnDefaultValues = true
-        }
-        packaging {
-            resources.excludes += setOf(
-                "/META-INF/{AL2.0,LGPL2.1}",
-                "/META-INF/LICENSE*",
-                "/META-INF/NOTICE*",
-            )
-        }
+internal fun Project.configureKotlinAndroid(application: ApplicationExtension) {
+    application.compileSdk = libs.version("compileSdk").toInt()
+    application.defaultConfig {
+        minSdk = libs.version("minSdk").toInt()
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
+    application.compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    application.testOptions {
+        unitTests.isIncludeAndroidResources = true
+        unitTests.isReturnDefaultValues = true
+    }
+    application.packaging {
+        resources.excludes += setOf("/META-INF/{AL2.0,LGPL2.1}", "/META-INF/LICENSE*", "/META-INF/NOTICE*")
+    }
+    configureKotlinAndroidCompiler()
+}
+
+internal fun Project.configureKotlinAndroid(library: LibraryExtension) {
+    library.compileSdk = libs.version("compileSdk").toInt()
+    library.defaultConfig {
+        minSdk = libs.version("minSdk").toInt()
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+    }
+    library.compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    library.testOptions {
+        unitTests.isIncludeAndroidResources = true
+        unitTests.isReturnDefaultValues = true
+    }
+    library.packaging {
+        resources.excludes += setOf("/META-INF/{AL2.0,LGPL2.1}", "/META-INF/LICENSE*", "/META-INF/NOTICE*")
+    }
+    configureKotlinAndroidCompiler()
+}
+
+private fun Project.configureKotlinAndroidCompiler() {
     extensions.configure<KotlinAndroidProjectExtension> {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)

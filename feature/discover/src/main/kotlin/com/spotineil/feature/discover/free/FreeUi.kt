@@ -79,6 +79,8 @@ class FreePlayer @Inject constructor(
     private val radio: RadioRepository,
     private val downloads: DownloadRepository,
     private val youTubeSessions: YouTubeSessionStore,
+    private val youTube: com.spotineil.core.data.repository.YouTubeRepository,
+    private val lastFm: com.spotineil.core.data.repository.LastFmRepository,
     @ApplicationScope private val scope: CoroutineScope,
 ) {
 
@@ -87,46 +89,67 @@ class FreePlayer @Inject constructor(
 
     fun playTracks(tracks: List<StreamTrack>, index: Int) = playMedia(tracks.map { it.toPlayable() }, index)
 
-    /** Plays on-device media; YouTube items in the list are skipped (they play in YouTube's player). */
+    /** Plays on-device media (songs, radio, podcasts, local files). */
     fun playMedia(items: List<PlayableMedia>, index: Int) {
-        val target = items.getOrNull(index)
-        val playable = items.filterNot { it.isYouTube }
-        if (playable.isEmpty()) return
-        val start = playable.indexOf(target).coerceAtLeast(0)
-        player.playMedia(playable, start)
-        scope.launch { recents.record(RecentItem.Song(playable[start])) }
+        if (items.isEmpty()) return
+        val start = index.coerceIn(0, items.lastIndex)
+        player.playMedia(items, start)
+        scope.launch { recents.record(RecentItem.Song(items[start])) }
     }
 
-    // ---------------- YouTube: queue for the official embedded player ----------------
+    // ---------------- Main songs: the queue shown on the player screen ----------------
 
     private val _youTubeQueue = MutableStateFlow<List<YouTubeVideo>>(emptyList())
     val youTubeQueue: StateFlow<List<YouTubeVideo>> = _youTubeQueue.asStateFlow()
     private val _youTubeIndex = MutableStateFlow(0)
     val youTubeIndex: StateFlow<Int> = _youTubeIndex.asStateFlow()
 
-    /** Sets the YouTube queue and pauses on-device playback; then navigate to the YouTube player. */
+    /** What the audio player is doing (position, play/pause) for the player screen. */
+    val playback = player.state
+
+    /** Sets the queue and starts it in the audio player; then navigate to the player screen. */
     fun playYouTube(videos: List<YouTubeVideo>, index: Int) {
         if (videos.isEmpty()) return
         _youTubeQueue.value = videos
         selectYouTube(index)
-        player.pause()
     }
 
+    /** Jumps to [index] of the queue and plays it. */
     fun selectYouTube(index: Int) {
         val list = _youTubeQueue.value
         if (list.isEmpty()) return
         val i = index.coerceIn(0, list.lastIndex)
         _youTubeIndex.value = i
+        player.playMedia(list.map { it.toPlayable() }, i)
         scope.launch { recents.record(RecentItem.Song(list[i].toPlayable())) }
         saveYouTubePosition(0)
     }
+
+    fun togglePlayPause() = player.togglePlayPause()
+    fun nextYouTube() = player.next()
+    fun previousYouTube() = player.previous()
+    fun seekTo(positionMs: Long) = player.seekTo(positionMs)
 
     /** Replaces everything after the current song (Start radio / autoplay). */
     fun setYouTubeUpNext(videos: List<YouTubeVideo>) {
         val kept = _youTubeQueue.value.take(_youTubeIndex.value + 1)
         val keptIds = kept.mapTo(HashSet()) { it.id }
-        _youTubeQueue.value = kept + videos.filter { it.id !in keptIds }
+        val added = videos.filter { it.id !in keptIds }
+        _youTubeQueue.value = kept + added
+        player.setUpNext(added.map { it.toPlayable() })
         saveYouTubePosition(lastSavedPosition)
+    }
+
+    /** The player moved on by itself (song ended, notification/headset button): follow it. */
+    private fun followPlayer(mediaId: String?) {
+        if (mediaId == null || !mediaId.startsWith(YOUTUBE_MEDIA_PREFIX)) return
+        val id = mediaId.removePrefix(YOUTUBE_MEDIA_PREFIX)
+        val list = _youTubeQueue.value
+        val i = list.indexOfFirst { it.id == id }
+        if (i < 0 || i == _youTubeIndex.value) return
+        _youTubeIndex.value = i
+        scope.launch { recents.record(RecentItem.Song(list[i].toPlayable())) }
+        saveYouTubePosition(0)
     }
 
     // ---------------- "Continue listening": the saved YouTube session ----------------
@@ -137,6 +160,8 @@ class FreePlayer @Inject constructor(
     /** Song id → position to continue from, set when a saved session is restored. */
     private var resumeAt: Pair<String, Long>? = null
     private var lastSavedPosition = 0L
+    /** Songs whose radio was already fetched for autoplay (one search each). */
+    private val autoplayedFor = HashSet<String>()
 
     /** Where to start [videoId]: the saved position the first time it's opened, otherwise 0. */
     fun takeResumePosition(videoId: String): Long {
@@ -148,10 +173,11 @@ class FreePlayer @Inject constructor(
     /** Opens the saved session again (the caller then navigates to the YouTube player). */
     fun continueYouTube(session: YouTubeSession) {
         if (session.queue.isEmpty()) return
-        player.pause()
         _youTubeQueue.value = session.queue
-        _youTubeIndex.value = session.index.coerceIn(0, session.queue.lastIndex)
+        val i = session.index.coerceIn(0, session.queue.lastIndex)
+        _youTubeIndex.value = i
         resumeAt = session.resumePoint()
+        player.playMedia(session.queue.map { it.toPlayable() }, i)
     }
 
     /** The saved song and position; a song saved in its last seconds starts over instead. */
@@ -199,6 +225,19 @@ class FreePlayer @Inject constructor(
 
     // Last in the class, so every field above is initialised before it runs.
     init {
+        scope.launch { nowPlayingId.collect(::followPlayer) }
+        // Autoplay: when the last song in the queue starts, line up a radio after it so the music keeps going.
+        scope.launch {
+            kotlinx.coroutines.flow.combine(_youTubeQueue, _youTubeIndex) { q, i -> q.getOrNull(i)?.takeIf { i == q.lastIndex } }
+                .distinctUntilChanged()
+                .collect { last ->
+                    if (last == null || !autoplayedFor.add(last.id)) return@collect
+                    val similar = runCatching { lastFm.similarArtists(last.artist, limit = 6) }.getOrDefault(emptyList())
+                    val songs = runCatching { youTube.radio(last, similar.take(com.spotineil.core.data.repository.DefaultYouTubeRepository.RADIO_ARTISTS - 1)) }.getOrDefault(emptyList())
+                    val stillCurrent = _youTubeQueue.value.getOrNull(_youTubeIndex.value)?.id == last.id
+                    if (songs.isNotEmpty() && stillCurrent) setYouTubeUpNext(songs)
+                }
+        }
         // Bring back the last YouTube queue (and where the song was) after the app was closed.
         scope.launch {
             val saved = runCatching { youTubeSessions.load() }.getOrNull() ?: return@launch

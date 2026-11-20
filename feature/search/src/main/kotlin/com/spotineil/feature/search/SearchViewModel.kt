@@ -29,6 +29,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import com.spotineil.core.model.PlayableMedia
+import com.spotineil.core.model.Track
 
 sealed interface SearchUiState {
     data class Idle(val recents: List<RecentSearch>, val categories: List<Category>) : SearchUiState
@@ -103,7 +105,40 @@ class SearchViewModel @Inject constructor(
 
     fun play(uri: String) {
         commitQuery()
-        player.play(PlayRequest(uri = uri))
+        if (uri.startsWith("ytmusic:video:")) {
+            val id = uri.substringAfter("ytmusic:video:")
+            player.playMedia(
+                listOf(
+                    PlayableMedia(
+                        mediaId = "innertube:$id",
+                        uri = uri,
+                        title = "",
+                        artist = "",
+                    ),
+                ),
+                startIndex = 0,
+            )
+        } else {
+            player.play(PlayRequest(uri = uri))
+        }
+    }
+
+    fun playTrack(track: Track) {
+        commitQuery()
+        player.playMedia(
+            listOf(
+                PlayableMedia(
+                    mediaId = "innertube:${track.id}",
+                    uri = track.uri,
+                    title = track.name,
+                    artist = track.artistNames,
+                    album = track.album?.name,
+                    artworkUrl = track.images.firstOrNull()?.url,
+                    durationMs = track.durationMs,
+                ),
+            ),
+            startIndex = 0,
+        )
     }
 
     fun playContext(uri: String) {

@@ -210,7 +210,7 @@ fun LocalTrack.toPlayable() = PlayableMedia(
 )
 
 // ---------------------------------------------------------------------------------------------
-// YouTube (main catalog): metadata from the Data API, playback in YouTube's official player
+// Main song catalog
 // ---------------------------------------------------------------------------------------------
 
 @Serializable
@@ -244,13 +244,12 @@ data class YouTubeSession(
 
 const val YOUTUBE_MEDIA_PREFIX = "youtube:"
 
-/** Saved in Liked Songs / history; [PlayableMedia.uri] is the watch URL (never played by Media3). */
+/** Saved in Liked Songs / history, and played by the on-device player through the `ytmusic:video:` URI. */
 fun YouTubeVideo.toPlayable() = PlayableMedia(
     mediaId = YOUTUBE_MEDIA_PREFIX + id,
-    uri = "https://www.youtube.com/watch?v=$id",
+    uri = "ytmusic:video:$id",
     title = songTitle,
     artist = artist,
-    album = "YouTube",
     artworkUrl = thumbnailUrl,
     durationMs = durationMs,
 )

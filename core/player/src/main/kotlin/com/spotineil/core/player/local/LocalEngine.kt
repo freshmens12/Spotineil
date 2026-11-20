@@ -118,6 +118,25 @@ class LocalEngine @Inject constructor(
         c.moveMediaItem(base + from, base + to)
     }
 
+    suspend fun addToQueue(uri: String) = withContext(Dispatchers.Main) {
+        val c = controller()
+        val id = uri.substringAfter("ytmusic:video:", uri)
+        val item = PlayableMedia(
+            mediaId = "innertube:$id",
+            uri = uri,
+            title = id,
+            artist = "YouTube Music",
+        ).toMediaItem()
+        c.addMediaItem(item)
+    }
+
+    suspend fun setUpNext(items: List<PlayableMedia>) = withContext(Dispatchers.Main) {
+        val c = controller()
+        val next = c.currentMediaItemIndex + 1
+        if (next < c.mediaItemCount) c.removeMediaItems(next, c.mediaItemCount)
+        c.addMediaItems(items.map { it.toMediaItem() })
+    }
+
     private fun publish(player: Player) {
         mediaItemCount = player.mediaItemCount
         val item = player.currentMediaItem

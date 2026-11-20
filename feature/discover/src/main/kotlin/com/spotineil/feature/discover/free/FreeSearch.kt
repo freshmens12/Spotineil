@@ -53,7 +53,6 @@ import com.spotineil.core.data.repository.ArchiveRepository
 import com.spotineil.core.data.repository.CcMixterRepository
 import com.spotineil.core.data.repository.FreeMusicRepository
 import com.spotineil.core.data.repository.PodcastRepository
-import com.spotineil.core.data.repository.PreviewRepository
 import com.spotineil.core.data.repository.RadioRepository
 import com.spotineil.core.data.repository.YouTubeRepository
 import com.spotineil.core.model.YouTubeVideo
@@ -94,9 +93,8 @@ data class FreeSearchResults(
     val collections: List<ArchiveCollection> = emptyList(),
     val stations: List<RadioStation> = emptyList(),
     val podcasts: List<Podcast> = emptyList(),
-    val previews: List<StreamTrack> = emptyList(),
 ) {
-    val isEmpty get() = youTube.isEmpty() && songs.isEmpty() && collections.isEmpty() && stations.isEmpty() && podcasts.isEmpty() && previews.isEmpty()
+    val isEmpty get() = youTube.isEmpty() && songs.isEmpty() && collections.isEmpty() && stations.isEmpty() && podcasts.isEmpty()
 }
 
 enum class SearchFilter(val label: Int) {
@@ -105,7 +103,6 @@ enum class SearchFilter(val label: Int) {
     Albums(R.string.free_filter_albums),
     Radio(R.string.free_filter_stations),
     Podcasts(R.string.free_filter_podcasts),
-    Previews(R.string.free_filter_previews),
 }
 
 @HiltViewModel
@@ -115,15 +112,10 @@ class FreeSearchViewModel @Inject constructor(
     private val archive: ArchiveRepository,
     private val radio: RadioRepository,
     private val podcasts: PodcastRepository,
-    private val previews: PreviewRepository,
     private val youTube: YouTubeRepository,
     val freePlayer: FreePlayer,
 ) : ViewModel() {
 
-    /** Searches left today (each costs ~101 quota units), for the small note under the search box. */
-    val youTubeSearchesLeft: StateFlow<Pair<Int, Int>?> = youTube.quota
-        .map { q -> if (!youTube.isEnabled) null else (q?.remaining ?: DEFAULT_BUDGET) / SEARCH_UNITS to (q?.budget ?: DEFAULT_BUDGET) / SEARCH_UNITS }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), if (youTube.isEnabled) DEFAULT_BUDGET / SEARCH_UNITS to DEFAULT_BUDGET / SEARCH_UNITS else null)
 
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query.asStateFlow()
@@ -145,8 +137,7 @@ class FreeSearchViewModel @Inject constructor(
         val collections = async { runCatching { archive.search(q) } }
         val stations = async { runCatching { radio.search(q, limit = 20) } }
         val shows = async { runCatching { podcasts.search(q) } }
-        val clips = async { runCatching { previews.search(q) } }
-        val all = listOf(yt.await(), songs.await(), cc.await(), collections.await(), stations.await(), shows.await(), clips.await())
+        val all = listOf(yt.await(), songs.await(), cc.await(), collections.await(), stations.await(), shows.await())
         if (all.all { it.isFailure }) throw all.first().exceptionOrNull()!!
         FreeSearchResults(
             youTube = yt.await().getOrDefault(emptyList()),
@@ -155,7 +146,6 @@ class FreeSearchViewModel @Inject constructor(
             collections = collections.await().getOrDefault(emptyList()),
             stations = stations.await().getOrDefault(emptyList()),
             podcasts = shows.await().getOrDefault(emptyList()),
-            previews = clips.await().getOrDefault(emptyList()),
         )
     }
 
@@ -170,8 +160,6 @@ class FreeSearchViewModel @Inject constructor(
     fun playYouTube(videos: List<YouTubeVideo>, index: Int) = freePlayer.playYouTube(videos, index)
 
     private companion object {
-        const val SEARCH_UNITS = 101
-        const val DEFAULT_BUDGET = 9_000
     }
 }
 
@@ -208,7 +196,6 @@ fun FreeSearchRoute(nav: FreeNavigation, viewModel: FreeSearchViewModel = hiltVi
     val results by viewModel.results.collectAsStateWithLifecycle()
     val favorites by viewModel.favorites.collectAsStateWithLifecycle()
     val nowPlaying by viewModel.nowPlayingId.collectAsStateWithLifecycle()
-    val searchesLeft by viewModel.youTubeSearchesLeft.collectAsStateWithLifecycle()
     var filter by rememberSaveable { mutableStateOf(SearchFilter.All) }
     LaunchedEffect(query) { if (query.isBlank()) filter = SearchFilter.All }
     val context = LocalContext.current
@@ -229,16 +216,6 @@ fun FreeSearchRoute(nav: FreeNavigation, viewModel: FreeSearchViewModel = hiltVi
             ScreenTitle(stringResource(R.string.free_search_title), nav.onSettings, Modifier.statusBarsPadding())
         }
         item(span = { GridItemSpan(2) }, key = "field") { SearchField(query, viewModel::onQueryChange) }
-        searchesLeft?.let { (left, total) ->
-            item(span = { GridItemSpan(2) }, key = "quota") {
-                Text(
-                    stringResource(R.string.yt_quota_left, left, total),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 2.dp),
-                )
-            }
-        }
 
         when (val s = results) {
             LoadState.Loading -> items(8, span = { GridItemSpan(2) }) { SkeletonTrackRow() }
@@ -329,13 +306,6 @@ fun FreeSearchRoute(nav: FreeNavigation, viewModel: FreeSearchViewModel = hiltVi
                                     }
                                 }
                             }
-                        }
-                    }
-                    if (show(SearchFilter.Previews)) {
-                        val clips = data.previews.take(limit(4))
-                        items(clips.size, span = { GridItemSpan(2) }, key = { "pv$it" }) { i ->
-                            val t = clips[i]
-                            StreamTrackRow(t, nowPlaying == t.toPlayable().mediaId, { viewModel.playTracks(data.previews, i) }, null)
                         }
                     }
                 }

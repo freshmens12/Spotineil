@@ -9,9 +9,6 @@ import com.spotineil.core.model.StreamSource
 import com.spotineil.core.model.StreamTrack
 import com.spotineil.core.network.api.AudiusApi
 import com.spotineil.core.network.api.AudiusTrackDto
-import com.spotineil.core.network.api.DeezerApi
-import com.spotineil.core.network.api.DeezerTrackDto
-import com.spotineil.core.network.api.ItunesApi
 import com.spotineil.core.network.api.JamendoApi
 import com.spotineil.core.network.api.JamendoTrackDto
 import com.spotineil.core.network.api.RadioBrowserApi
@@ -238,63 +235,6 @@ class DefaultRadioRepository @Inject constructor(
             countryCode = countrycode,
             codec = codec,
             bitrate = bitrate,
-        )
-    }
-}
-
-// ---------------------------------------------------------------------------------------------
-// 30-second previews: Deezer, falling back to iTunes
-// ---------------------------------------------------------------------------------------------
-
-interface PreviewRepository {
-    suspend fun charts(): List<StreamTrack>
-    suspend fun search(query: String): List<StreamTrack>
-}
-
-@Singleton
-class DefaultPreviewRepository @Inject constructor(
-    private val deezer: DeezerApi,
-    private val itunes: ItunesApi,
-) : PreviewRepository {
-
-    override suspend fun charts(): List<StreamTrack> =
-        apiCall { deezer.chart() }.tracks.data.mapNotNull { it.toModel() }
-
-    override suspend fun search(query: String): List<StreamTrack> {
-        val fromDeezer = runCatching { apiCall { deezer.search(query) }.data.mapNotNull { it.toModel() } }
-        fromDeezer.getOrNull()?.takeIf { it.isNotEmpty() }?.let { return it }
-        val country = Locale.getDefault().country.takeIf { it.length == 2 } ?: "US"
-        return try {
-            apiCall { itunes.search(query, country) }.results.mapNotNull { t ->
-                val preview = t.previewUrl ?: return@mapNotNull null
-                StreamTrack(
-                    id = (t.trackId ?: preview.hashCode().toLong()).toString(),
-                    source = StreamSource.ITunes,
-                    title = t.trackName.orEmpty(),
-                    artist = t.artistName.orEmpty(),
-                    album = t.collectionName,
-                    // iTunes serves any size by rewriting the dimensions in the URL.
-                    artworkUrl = t.artworkUrl100?.replace("100x100bb", "600x600bb"),
-                    durationMs = t.trackTimeMillis ?: 0L,
-                    streamUrl = preview,
-                )
-            }
-        } catch (e: SpotineilException) {
-            fromDeezer.getOrNull() ?: throw e
-        }
-    }
-
-    private fun DeezerTrackDto.toModel(): StreamTrack? {
-        val url = preview?.takeIf { it.isNotBlank() && readable } ?: return null
-        return StreamTrack(
-            id = id.toString(),
-            source = StreamSource.Deezer,
-            title = title,
-            artist = artist.name,
-            album = album.title,
-            artworkUrl = album.coverXl ?: album.coverMedium,
-            durationMs = duration * 1000L,
-            streamUrl = url,
         )
     }
 }

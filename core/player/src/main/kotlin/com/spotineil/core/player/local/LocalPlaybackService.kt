@@ -24,6 +24,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.datasource.DefaultDataSource
+import com.spotineil.core.player.youtube.RoutingDataSourceFactory
+import com.spotineil.core.player.youtube.YouTubeStreamDataSourceFactory
 
 /**
  * Plays audio files from the device with ExoPlayer. Media3 provides the media notification,
@@ -61,6 +65,7 @@ internal class SkipUnplayableListener(private val player: ExoPlayer) : Player.Li
 class LocalPlaybackService : MediaLibraryService() {
 
     @Inject lateinit var localMedia: LocalMediaRepository
+    @Inject lateinit var youTubeStreamFactory: YouTubeStreamDataSourceFactory
 
     private var session: MediaLibrarySession? = null
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -68,6 +73,7 @@ class LocalPlaybackService : MediaLibraryService() {
     override fun onCreate() {
         super.onCreate()
         val player = ExoPlayer.Builder(this)
+            .setMediaSourceFactory(DefaultMediaSourceFactory(RoutingDataSourceFactory(DefaultDataSource.Factory(this), youTubeStreamFactory)))
             .setAudioAttributes(
                 AudioAttributes.Builder()
                     .setUsage(C.USAGE_MEDIA)

@@ -50,6 +50,5 @@ object AppModule {
         com.spotineil.core.common.FreeSourcesConfig(
             jamendoClientId = BuildConfig.JAMENDO_CLIENT_ID,
             lastFmApiKey = BuildConfig.LASTFM_API_KEY,
-            youTubeApiKey = BuildConfig.YOUTUBE_API_KEY,
         )
 }

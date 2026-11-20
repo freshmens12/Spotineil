@@ -64,10 +64,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.spotineil.core.data.repository.ArchiveRepository
 import com.spotineil.core.data.repository.FreeMusicRepository
-import com.spotineil.core.data.repository.LastFmRepository
 import com.spotineil.core.data.repository.LikedMediaRepository
 import com.spotineil.core.data.repository.PodcastRepository
-import com.spotineil.core.data.repository.PreviewRepository
 import com.spotineil.core.data.repository.RadioRepository
 import com.spotineil.core.data.repository.YouTubeRepository
 import com.spotineil.core.model.YouTubeVideo
@@ -410,8 +408,6 @@ class BrowseViewModel @Inject constructor(
     private val radio: RadioRepository,
     private val archive: ArchiveRepository,
     private val podcasts: PodcastRepository,
-    private val previews: PreviewRepository,
-    private val lastFm: LastFmRepository,
     private val youTube: YouTubeRepository,
     private val freePlayer: FreePlayer,
 ) : ViewModel() {
@@ -451,12 +447,7 @@ class BrowseViewModel @Inject constructor(
                 BrowseContent(stations = (near.await() + top.await()).distinctBy { it.id })
             }
             BrowseKind.Podcasts -> BrowseContent(podcasts = podcasts.top(50))
-            BrowseKind.Charts -> {
-                val videos = async { runCatching { youTube.trending() }.getOrDefault(emptyList()) }
-                val chart = async { previews.charts() }
-                val lfm = async { runCatching { lastFm.topTracks(30) }.getOrDefault(emptyList()) }
-                BrowseContent(videos = videos.await(), tracks = (chart.await() + lfm.await()).distinctBy { it.id })
-            }
+            BrowseKind.Charts -> BrowseContent(videos = youTube.trending())
         }
     }
 

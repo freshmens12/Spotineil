@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.spotineil.core.data.repository.DownloadRepository
 import com.spotineil.core.data.repository.FreeMusicRepository
 import com.spotineil.core.data.repository.FreeMusicSections
-import com.spotineil.core.data.repository.PreviewRepository
 import com.spotineil.core.data.repository.RadioRepository
 import com.spotineil.core.model.RadioStation
 import com.spotineil.core.model.StreamTrack
@@ -165,27 +164,4 @@ class RadioViewModel @Inject constructor(
         private const val TAG_PREFIX = "tag:"
         val TAGS = listOf("pop", "rock", "news", "jazz", "dance", "chillout", "hiphop", "classical", "opm", "talk")
     }
-}
-
-// ---------------------------------------------------------------------------------------------
-
-@HiltViewModel
-class PreviewsViewModel @Inject constructor(
-    private val repository: PreviewRepository,
-    private val player: PlaybackController,
-) : ViewModel() {
-
-    private val _query = MutableStateFlow("")
-    val query: StateFlow<String> = _query.asStateFlow()
-    private val retry = MutableStateFlow(0)
-
-    val state: StateFlow<LoadState<List<StreamTrack>>> =
-        searchFlow(_query, retry) { q -> if (q.isEmpty()) repository.charts() else repository.search(q) }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LoadState.Loading)
-
-    val nowPlayingId = player.nowPlayingId(viewModelScope)
-
-    fun onQueryChange(q: String) { _query.value = q }
-    fun retry() { retry.value++ }
-    fun play(list: List<StreamTrack>, index: Int) = player.playMedia(list.map { it.toPlayable() }, index)
 }

@@ -77,6 +77,9 @@ interface PlaybackController {
     fun cycleRepeat()
     fun addToQueue(uri: String)
 
+    /** Replaces everything after the current item (Start radio / autoplay) without interrupting it. */
+    fun setUpNext(items: List<com.spotineil.core.model.PlayableMedia>)
+
     suspend fun queue(): PlaybackQueue
     /** Only effective for reorderable (local) queues; indices are within `upcoming`. */
     fun moveQueueItem(from: Int, to: Int)

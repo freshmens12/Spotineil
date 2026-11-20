@@ -18,6 +18,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://jitpack.io")
         // The Spotify App Remote SDK is distributed only as an AAR on GitHub releases.
         // Resolve it straight from the official release so no binary is committed to this repo.
         ivy {

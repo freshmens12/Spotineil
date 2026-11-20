@@ -103,7 +103,7 @@ class DefaultRecentsRepository @Inject constructor(
 
     override suspend fun clear() = dao.clear()
 
-    private companion object { const val KEEP = 100 }
+    private companion object { const val KEEP = 500 }
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -322,12 +322,11 @@ class DefaultCcMixterRepository @Inject constructor(private val api: CcMixterApi
 }
 
 // ---------------------------------------------------------------------------------------------
-// Last.fm charts → played as official 30-second Deezer previews
+// Last.fm: metadata only (similar artists and tags), used to build radio and "similar" queues
 // ---------------------------------------------------------------------------------------------
 
 interface LastFmRepository {
     val isEnabled: Boolean
-    suspend fun topTracks(limit: Int = 20): List<StreamTrack>
 
     /** Artists that sound like [artist] (empty without a Last.fm key or when unknown). */
     suspend fun similarArtists(artist: String, limit: Int = 8): List<String> = emptyList()
@@ -339,29 +338,10 @@ interface LastFmRepository {
 @Singleton
 class DefaultLastFmRepository @Inject constructor(
     private val api: LastFmApi,
-    private val previews: PreviewRepository,
     private val config: FreeSourcesConfig,
 ) : LastFmRepository {
     override val isEnabled: Boolean get() = config.isLastFmEnabled
 
-    /**
-     * Last.fm hosts no audio (only charts and metadata), so each charting song is matched to its
-     * official preview. Unmatched songs are skipped.
-     */
-    override suspend fun topTracks(limit: Int): List<StreamTrack> {
-        if (!isEnabled) return emptyList()
-        val chart = apiCall { api.topTracks(config.lastFmApiKey, limit = limit) }.tracks.track
-        val gate = Semaphore(4)
-        return coroutineScope {
-            chart.map { t ->
-                async {
-                    gate.withPermit {
-                        runCatching { previews.search("${t.artist.name} ${t.name}").firstOrNull() }.getOrNull()
-                    }
-                }
-            }.awaitAll().filterNotNull().distinctBy { it.id }
-        }
-    }
 
     override suspend fun similarArtists(artist: String, limit: Int): List<String> {
         if (!isEnabled || artist.isBlank()) return emptyList()

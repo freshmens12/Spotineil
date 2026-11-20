@@ -7,6 +7,7 @@ plugins {
 
 android {
     namespace = "com.spotineil.core.data"
+    buildFeatures { buildConfig = true }
 }
 
 room {
@@ -28,6 +29,11 @@ dependencies {
     implementation(libs.androidx.datastore)
     implementation(libs.tink.android)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.innertubex)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
 
     testImplementation(project(":core:testing"))
     testImplementation(libs.okhttp.mockwebserver)

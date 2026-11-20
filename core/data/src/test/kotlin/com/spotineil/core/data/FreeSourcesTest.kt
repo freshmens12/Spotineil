@@ -4,12 +4,9 @@ import com.spotineil.core.common.FreeSourcesConfig
 import com.spotineil.core.data.db.FavoriteStationDao
 import com.spotineil.core.data.db.FavoriteStationEntity
 import com.spotineil.core.data.repository.DefaultFreeMusicRepository
-import com.spotineil.core.data.repository.DefaultPreviewRepository
 import com.spotineil.core.data.repository.DefaultRadioRepository
 import com.spotineil.core.model.StreamSource
 import com.spotineil.core.network.api.AudiusApi
-import com.spotineil.core.network.api.DeezerApi
-import com.spotineil.core.network.api.ItunesApi
 import com.spotineil.core.network.api.JamendoApi
 import com.spotineil.core.network.api.RadioBrowserApi
 import com.spotineil.core.network.di.SpotineilJson
@@ -157,32 +154,4 @@ class FreeSourcesTest {
         assertTrue(repo.favorites.first().isEmpty())
     }
 
-    @Test
-    fun `previews come from Deezer and fall back to iTunes when Deezer has nothing`() = runTest {
-        route { req ->
-            when {
-                req.path!!.startsWith("/search?q=") -> MockResponse().setBody("""{"data":[]}""")
-                req.path!!.startsWith("/search?term=") -> MockResponse().setBody(
-                    """{"results":[{"trackId":7,"trackName":"Tune","artistName":"Band","artworkUrl100":"https://a/100x100bb.jpg",
-                       "previewUrl":"https://p/7.m4a","trackTimeMillis":210000},{"trackId":8,"trackName":"No preview"}]}""",
-                )
-                req.path!!.startsWith("/chart/") -> MockResponse().setBody(
-                    """{"tracks":{"data":[{"id":1,"title":"Hit","duration":200,"preview":"https://p/1.mp3","artist":{"name":"Star"},"album":{"title":"A","cover_xl":"https://c/xl.jpg"}},
-                       {"id":2,"title":"Unavailable","preview":"","artist":{"name":"Y"}}]}}""",
-                )
-                else -> MockResponse().setResponseCode(404)
-            }
-        }
-        val repo = DefaultPreviewRepository(api<DeezerApi>(), api<ItunesApi>())
-
-        val chart = repo.charts()
-        assertEquals(listOf("Hit"), chart.map { it.title })
-        assertTrue(chart.single().isPreview)
-        assertFalse("previews are never downloadable", chart.single().canDownload)
-
-        val results = repo.search("tune")
-        assertEquals(listOf("Tune"), results.map { it.title })
-        assertEquals(StreamSource.ITunes, results.single().source)
-        assertEquals("https://a/600x600bb.jpg", results.single().artworkUrl)
-    }
 }

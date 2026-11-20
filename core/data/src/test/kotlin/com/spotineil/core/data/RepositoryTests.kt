@@ -109,7 +109,7 @@ class RepositoryTests {
 
     @Test
     fun `recent searches are de-duplicated, newest first, and trimmed`() = runTest {
-        val repo = DefaultSearchRepository(retrofit<SpotifyApi>("/v1/"), FakeRecentSearchDao(), TickingClock())
+        val repo = DefaultSearchRepository(retrofit<SpotifyApi>("/v1/"), FakeRecentSearchDao(), TickingClock(), FakeCatalog(), JsonCache(FakeCachedResponseDao(), SpotineilJson, TickingClock()))
 
         repo.addRecentSearch("  alpha ")
         repo.addRecentSearch("beta")
@@ -124,22 +124,22 @@ class RepositoryTests {
     }
 
     @Test
-    fun `search maps all result types and skips null entries`() = runTest {
-        route {
-            MockResponse().setBody(
-                """{"tracks":{"items":[{"id":"t1","name":"Song","uri":"spotify:track:t1"}],"total":1},
-                    "artists":{"items":[{"id":"a1","name":"Band","uri":"spotify:artist:a1"}],"total":1},
-                    "playlists":{"items":[null],"total":1}}""",
-            )
-        }
-        val repo = DefaultSearchRepository(retrofit<SpotifyApi>("/v1/"), FakeRecentSearchDao(), TickingClock())
+    fun `search returns song catalog results filtered by the requested types`() = runTest {
+        val catalog = FakeCatalog(
+            com.spotineil.core.model.SearchResults(
+                tracks = listOf(com.spotineil.core.model.Track(id = "t1", uri = "ytmusic:video:t1", name = "Song", artists = emptyList(), album = null, durationMs = 1000)),
+                artists = listOf(com.spotineil.core.model.Artist(id = "a1", uri = "ytmusic:channel:a1", name = "Band")),
+            ),
+        )
+        val repo = DefaultSearchRepository(retrofit<SpotifyApi>("/v1/"), FakeRecentSearchDao(), TickingClock(), catalog, JsonCache(FakeCachedResponseDao(), SpotineilJson, TickingClock()))
 
-        val results = repo.search("song", com.spotineil.core.model.SearchType.entries.toSet())
+        val all = repo.search("song", com.spotineil.core.model.SearchType.entries.toSet())
+        assertEquals("Song", all.tracks.single().name)
+        assertEquals("Band", all.artists.single().name)
 
-        assertEquals("Song", results.tracks.single().name)
-        assertEquals("Band", results.artists.single().name)
-        assertTrue(results.playlists.isEmpty())
-        assertEquals("track,artist,album,playlist,show", server.takeRequest().requestUrl!!.queryParameter("type"))
+        val tracksOnly = repo.search("song", setOf(com.spotineil.core.model.SearchType.Track))
+        assertEquals(1, tracksOnly.tracks.size)
+        assertTrue(tracksOnly.artists.isEmpty())
     }
 
     // ---------- Home: graceful degradation ----------
@@ -172,4 +172,14 @@ class RepositoryTests {
         val cache = JsonCache(FakeCachedResponseDao(), SpotineilJson, TickingClock())
         DefaultHomeRepository(retrofit<SpotifyApi>("/v1/"), cache).refresh()
     }
+}
+
+/** Search now runs through the song catalog; tests feed it a canned answer. */
+private class FakeCatalog(private val results: com.spotineil.core.model.SearchResults = com.spotineil.core.model.SearchResults()) :
+    com.spotineil.core.data.innertube.InnerTubeCatalogRepository {
+    override suspend fun search(query: String) = Result.success(results)
+    override suspend fun searchSongs(query: String) = Result.success(emptyList<com.spotineil.core.model.YouTubeVideo>())
+    override suspend fun charts() = Result.success(emptyList<com.spotineil.core.model.YouTubeVideo>())
+    override suspend fun resolveStream(videoId: String): Result<com.spotineil.core.data.innertube.ResolvedYouTubeStream> =
+        Result.failure(UnsupportedOperationException())
 }

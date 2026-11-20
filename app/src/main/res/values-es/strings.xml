@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="welcome_tagline">Tu música, a tu manera.</string>
-    <string name="welcome_feature_music">Canciones completas de YouTube, Jamendo, Audius e Internet Archive</string>
+    <string name="welcome_feature_music">Millones de canciones completas, listas para reproducir</string>
     <string name="welcome_feature_radio">Radio en vivo, podcasts y la música de tu teléfono</string>
     <string name="welcome_feature_free">Gratis, sin cuenta y sin iniciar sesión</string>
     <string name="welcome_get_started">Comenzar</string>
-    <string name="welcome_note">Un proyecto escolar. No está afiliado a los servicios de música que reproduce.</string>
+    <string name="welcome_note">Spotineil. Toda la música pertenece a sus artistas y titulares de derechos.</string>
     <string name="nav_discover">Descubrir</string>
     <string name="nav_your_music">Tu música</string>
     <string name="nav_home">Inicio</string>

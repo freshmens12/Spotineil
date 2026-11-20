@@ -85,7 +85,7 @@ fun DiscoverRoute(onSettingsClick: () -> Unit, onMessage: (String) -> Unit) {
             IconButton(onClick = onSettingsClick) { Icon(Icons.Rounded.Settings, stringResource(R.string.discover_settings)) }
         }
         PrimaryTabRow(selectedTabIndex = tab, containerColor = Color.Transparent) {
-            listOf(R.string.discover_tab_free, R.string.discover_tab_radio, R.string.discover_tab_previews).forEachIndexed { i, label ->
+            listOf(R.string.discover_tab_free, R.string.discover_tab_radio).forEachIndexed { i, label ->
                 Tab(
                     selected = tab == i,
                     onClick = { tab = i },
@@ -98,7 +98,7 @@ fun DiscoverRoute(onSettingsClick: () -> Unit, onMessage: (String) -> Unit) {
         when (tab) {
             0 -> FreeMusicTab(onMessage)
             1 -> RadioTab()
-            else -> PreviewsTab()
+            else -> Unit
         }
     }
 }
@@ -141,7 +141,6 @@ private fun FreeMusicTab(onMessage: (String) -> Unit, viewModel: FreeMusicViewMo
                         onDownload = viewModel::download,
                     )
                     item { Footnote(stringResource(R.string.discover_free_footnote)) }
-                    if (!data.jamendoEnabled) item { Footnote(stringResource(R.string.discover_jamendo_disabled)) }
                 }
             }
         }
@@ -190,8 +189,7 @@ fun StreamTrackRow(track: StreamTrack, isCurrent: Boolean, onClick: () -> Unit, 
             )
             val meta = listOfNotNull(
                 track.artist.takeIf { it.isNotBlank() },
-                if (track.isPreview) stringResource(R.string.discover_preview_badge) else track.source.label,
-                track.durationMs.takeIf { it > 0 && !track.isPreview }?.let { formatDuration(it) },
+                track.durationMs.takeIf { it > 0 }?.let { formatDuration(it) },
             ).joinToString(" • ")
             Text(meta, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
@@ -303,34 +301,6 @@ internal fun StationRow(station: RadioStation, isFavorite: Boolean, isCurrent: B
 }
 
 // ---------------------------------------------------------------------------------------------
-
-@Composable
-private fun PreviewsTab(viewModel: PreviewsViewModel = hiltViewModel()) {
-    val query by viewModel.query.collectAsStateWithLifecycle()
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val nowPlaying by viewModel.nowPlayingId.collectAsStateWithLifecycle()
-    Column {
-        DiscoverSearchField(query, viewModel::onQueryChange, stringResource(R.string.discover_previews_hint))
-        LazyColumn(contentPadding = PaddingValues(bottom = LocalBottomContentPadding.current + 16.dp)) {
-            item { Footnote(stringResource(R.string.discover_previews_note)) }
-            when (val s = state) {
-                LoadState.Loading -> loadingRows()
-                is LoadState.Failed -> item { ErrorState(s.error, onRetry = viewModel::retry) }
-                is LoadState.Loaded -> {
-                    if (s.data.isEmpty()) item { MessageState(Icons.Rounded.SearchOff, stringResource(R.string.discover_no_results), null) }
-                    trackSection(
-                        key = "previews",
-                        title = if (query.isBlank()) R.string.discover_charts else R.string.discover_results,
-                        tracks = s.data,
-                        nowPlaying = nowPlaying,
-                        onPlay = viewModel::play,
-                        onDownload = null,
-                    )
-                }
-            }
-        }
-    }
-}
 
 // ---------------------------------------------------------------------------------------------
 

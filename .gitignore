@@ -12,3 +12,8 @@ build/
 *.keystore
 keystore.properties
 bin/
+
+# local editor settings and JVM crash dumps
+.vscode/
+hs_err_pid*.log
+replay_pid*.log

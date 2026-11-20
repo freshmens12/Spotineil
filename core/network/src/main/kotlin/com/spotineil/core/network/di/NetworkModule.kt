@@ -5,8 +5,6 @@ import com.spotineil.core.common.SpotifyAppConfig
 import com.spotineil.core.network.BuildConfig
 import com.spotineil.core.network.RateLimitInterceptor
 import com.spotineil.core.network.api.AudiusApi
-import com.spotineil.core.network.api.DeezerApi
-import com.spotineil.core.network.api.ItunesApi
 import com.spotineil.core.network.api.JamendoApi
 import com.spotineil.core.network.api.LrclibApi
 import com.spotineil.core.network.api.RadioBrowserApi
@@ -139,12 +137,6 @@ object NetworkModule {
         freeApi("https://de1.api.radio-browser.info/", client, json)
 
     @Provides @Singleton
-    fun deezerApi(@BaseClient client: OkHttpClient, json: Json): DeezerApi = freeApi("https://api.deezer.com/", client, json)
-
-    @Provides @Singleton
-    fun itunesApi(@BaseClient client: OkHttpClient, json: Json): ItunesApi = freeApi("https://itunes.apple.com/", client, json)
-
-    @Provides @Singleton
     fun applePodcastsApi(@BaseClient client: OkHttpClient, json: Json): com.spotineil.core.network.api.ApplePodcastsApi =
         freeApi("https://itunes.apple.com/", client, json)
 
@@ -155,19 +147,6 @@ object NetworkModule {
     @Provides @Singleton
     fun ccMixterApi(@BaseClient client: OkHttpClient, json: Json): com.spotineil.core.network.api.CcMixterApi =
         freeApi("https://ccmixter.org/", client, json)
-
-    /**
-     * YouTube client: shares the base client's connection pool and cache, sends the app-identity
-     * headers for key restrictions, and drops the debug logger so the API key never lands in logs.
-     */
-    @Provides @Singleton
-    fun youTubeApi(@ApplicationContext context: Context, @BaseClient base: OkHttpClient, json: Json): com.spotineil.core.network.api.YouTubeApi {
-        val client = base.newBuilder()
-            .apply { interceptors().removeAll { it is HttpLoggingInterceptor } }
-            .addInterceptor(com.spotineil.core.network.AndroidAppIdentityInterceptor(context))
-            .build()
-        return freeApi("https://www.googleapis.com/youtube/v3/", client, json)
-    }
 
     @Provides @Singleton
     fun lastFmApi(@BaseClient client: OkHttpClient, json: Json): com.spotineil.core.network.api.LastFmApi =

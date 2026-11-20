@@ -43,6 +43,7 @@ class FakePlaybackController : PlaybackController {
     override fun toggleShuffle() { commands += "shuffle" }
     override fun cycleRepeat() { commands += "repeat" }
     override fun addToQueue(uri: String) { commands += "queue:$uri" }
+    override fun setUpNext(items: List<com.spotineil.core.model.PlayableMedia>) { commands += "upnext:${items.size}" }
     override suspend fun queue(): PlaybackQueue = queueResult
     override fun moveQueueItem(from: Int, to: Int) { commands += "move:$from->$to" }
     override suspend fun devices(): List<Device> = devicesResult

@@ -1,4 +1,4 @@
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.LibraryExtension
 import com.spotineil.buildlogic.configureKotlinAndroid
 import com.spotineil.buildlogic.lib
 import com.spotineil.buildlogic.libs
@@ -11,7 +11,8 @@ import org.gradle.kotlin.dsl.dependencies
 class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) = with(target) {
         pluginManager.apply("com.android.library")
-        pluginManager.apply("org.jetbrains.kotlin.android")
+        // Gradle 9 fails modules that have no tests; that is fine here.
+        tasks.withType(org.gradle.api.tasks.testing.Test::class.java).configureEach { failOnNoDiscoveredTests.set(false) }
         extensions.configure<LibraryExtension> {
             configureKotlinAndroid(this)
             testOptions.targetSdk = libs.version("targetSdk").toInt()

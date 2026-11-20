@@ -33,6 +33,8 @@ import com.spotineil.core.data.repository.SearchRepository
 import com.spotineil.core.data.repository.SettingsRepository
 import com.spotineil.core.data.repository.StatsRepository
 import com.spotineil.core.data.repository.UserRepository
+import com.spotineil.core.data.innertube.DefaultInnerTubeCatalogRepository
+import com.spotineil.core.data.innertube.InnerTubeCatalogRepository
 import com.spotineil.core.network.auth.AuthTokenStore
 import dagger.Binds
 import dagger.Module
@@ -81,7 +83,6 @@ abstract class RepositoryModule {
     @Binds abstract fun localMedia(impl: MediaStoreRepository): LocalMediaRepository
     @Binds abstract fun freeMusic(impl: com.spotineil.core.data.repository.DefaultFreeMusicRepository): com.spotineil.core.data.repository.FreeMusicRepository
     @Binds abstract fun radio(impl: com.spotineil.core.data.repository.DefaultRadioRepository): com.spotineil.core.data.repository.RadioRepository
-    @Binds abstract fun previews(impl: com.spotineil.core.data.repository.DefaultPreviewRepository): com.spotineil.core.data.repository.PreviewRepository
     @Binds abstract fun liked(impl: com.spotineil.core.data.repository.DefaultLikedMediaRepository): com.spotineil.core.data.repository.LikedMediaRepository
     @Binds abstract fun recents(impl: com.spotineil.core.data.repository.DefaultRecentsRepository): com.spotineil.core.data.repository.RecentsRepository
     @Binds abstract fun podcasts(impl: com.spotineil.core.data.repository.DefaultPodcastRepository): com.spotineil.core.data.repository.PodcastRepository
@@ -90,4 +91,5 @@ abstract class RepositoryModule {
     @Binds abstract fun youTube(impl: com.spotineil.core.data.repository.DefaultYouTubeRepository): com.spotineil.core.data.repository.YouTubeRepository
     @Binds abstract fun lastFm(impl: com.spotineil.core.data.repository.DefaultLastFmRepository): com.spotineil.core.data.repository.LastFmRepository
     @Binds abstract fun downloads(impl: com.spotineil.core.data.repository.SystemDownloadRepository): com.spotineil.core.data.repository.DownloadRepository
+    @Binds abstract fun innerTubeCatalog(impl: DefaultInnerTubeCatalogRepository): InnerTubeCatalogRepository
 }

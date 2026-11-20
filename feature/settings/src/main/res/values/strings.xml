@@ -26,5 +26,5 @@
     <string name="settings_about">About</string>
     <string name="settings_version">Version</string>
     <string name="settings_licenses">Open-source licenses</string>
-    <string name="settings_attribution">Spotineil is a student project. It is not affiliated with, endorsed or sponsored by YouTube, Jamendo, Audius, the Internet Archive, Spotify or any other service it plays from. YouTube songs play in YouTube\'s official player, under YouTube\'s Terms of Service. Music, artwork and metadata belong to their artists and are provided by each source. Lyrics are provided by LRCLIB (lrclib.net).</string>
+    <string name="settings_attribution">Spotineil is a music player. All music, artwork and lyrics belong to their respective artists and rights holders.</string>
 </resources>

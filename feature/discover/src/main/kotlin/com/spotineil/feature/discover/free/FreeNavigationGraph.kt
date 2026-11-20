@@ -13,6 +13,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object FreeLibraryTab
 
 @Serializable data object LikedMediaRoute
+@Serializable data object HistoryRoute
 
 /** YouTube's official player; the queue lives in [FreePlayer]. */
 @Serializable data object YouTubePlayerRoute
@@ -40,6 +41,7 @@ fun NavGraphBuilder.freeScreens(nav: FreeNavigation) {
     composable<FreeSearchTab> { FreeSearchRoute(nav) }
     composable<FreeLibraryTab> { FreeLibraryRoute(nav) }
     composable<LikedMediaRoute> { LikedMediaScreen(nav) }
+    composable<HistoryRoute> { HistoryScreen(nav) }
     composable<PodcastRoute> { PodcastScreen(nav) }
     composable<CollectionRoute> { CollectionScreen(nav) }
     composable<BrowseRoute> { BrowseScreen(nav) }

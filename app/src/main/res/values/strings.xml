@@ -2,11 +2,11 @@
 <resources>
     <string name="app_name" translatable="false">Spotineil</string>
     <string name="welcome_tagline">Your music, your way.</string>
-    <string name="welcome_feature_music">Full songs from YouTube, Jamendo, Audius and the Internet Archive</string>
+    <string name="welcome_feature_music">Millions of full-length songs, ready to play</string>
     <string name="welcome_feature_radio">Live radio, podcasts and the music on your phone</string>
     <string name="welcome_feature_free">Free, with no account and no sign-in</string>
     <string name="welcome_get_started">Get started</string>
-    <string name="welcome_note">A student project. Not affiliated with the music services it plays from.</string>
+    <string name="welcome_note">Spotineil. All music belongs to its artists and rights holders.</string>
     <string name="nav_discover">Discover</string>
     <string name="nav_your_music">Your music</string>
     <string name="nav_home">Home</string>

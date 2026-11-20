@@ -21,4 +21,5 @@ dependencies {
     api(libs.androidx.media3.session)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.process)
+    implementation(libs.kotlinx.coroutines.core)
 }

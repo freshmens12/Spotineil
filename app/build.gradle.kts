@@ -27,7 +27,6 @@ android {
         // Optional free key from https://devportal.jamendo.com — Jamendo is hidden without it.
         buildConfigField("String", "JAMENDO_CLIENT_ID", "\"${secret("JAMENDO_CLIENT_ID") ?: ""}\"")
         buildConfigField("String", "LASTFM_API_KEY", "\"${secret("LASTFM_API_KEY") ?: ""}\"")
-        buildConfigField("String", "YOUTUBE_API_KEY", "\"${secret("YOUTUBE_API_KEY") ?: ""}\"")
         // AppAuth's RedirectUriReceiverActivity listens on this scheme.
         manifestPlaceholders["appAuthRedirectScheme"] = "spotineil"
     }

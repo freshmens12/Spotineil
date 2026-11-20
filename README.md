@@ -17,7 +17,7 @@ It does **not** block ads, rip or download audio from YouTube, Spotify or any ot
 
 ## Install on your phone
 
-1. On your phone, open [`apk/Spotineil-debug.apk`](apk/Spotineil-debug.apk) in this repo and tap **Download** (or **View raw**).
+1. On your phone, open [`apk/Spotineil.apk`](apk/Spotineil.apk) (or the latest file under [Releases](../../releases)) in this repo and tap **Download** (or **View raw**).
 2. Open the downloaded file. If Android asks, allow **Install unknown apps** for your browser or Files app.
 3. Tap **Install**, then open **Spotineil**. Android 10 or newer is required.
 
