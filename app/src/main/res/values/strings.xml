@@ -27,4 +27,16 @@
     <string name="pip_play">Play</string>
     <string name="pip_pause">Pause</string>
     <string name="pip_next">Next</string>
+    <string name="update_title">Update available</string>
+    <string name="update_message">Spotineil %1$s is ready to download. You have %2$s.</string>
+    <string name="update_now">Update</string>
+    <string name="update_later">Later</string>
+    <string name="update_cancel">Cancel</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_permission_title">Allow updates</string>
+    <string name="update_permission_message">To install the update, allow Spotineil to install apps in Settings, then come back. The download starts automatically.</string>
+    <string name="update_open_settings">Open Settings</string>
+    <string name="update_failed_title">Update failed</string>
+    <string name="update_failed_message">The update could not be downloaded. Check your connection and try again.</string>
+    <string name="update_retry">Try again</string>
 </resources>

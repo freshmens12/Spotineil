@@ -5,7 +5,7 @@
     <string name="ds_error_premium">This needs Spotify Premium.</string>
     <string name="ds_error_unavailable">This isn\'t available for this app.</string>
     <string name="ds_error_not_found">Not found.</string>
-    <string name="ds_error_session">Your session expired. Please log in again.</string>
+    <string name="ds_error_session">The connection was refused. If you are on Wi-Fi that needs a sign-in (school, hotel, public), open your browser, log in to the Wi-Fi, then try again.</string>
     <string name="ds_error_server">The music service is having trouble. Try again later.</string>
     <string name="ds_error_youtube_quota">YouTube searches are used up for today. Showing free music instead — try YouTube again tomorrow.</string>
     <string name="ds_error_generic">Something went wrong.</string>

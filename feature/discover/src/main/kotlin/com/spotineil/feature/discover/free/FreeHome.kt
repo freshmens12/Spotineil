@@ -294,7 +294,7 @@ fun FreeHomeRoute(nav: FreeNavigation, viewModel: FreeHomeViewModel = hiltViewMo
             if (music) {
                 item(key = "continue") {
                     val session by viewModel.youTubeSession.collectAsStateWithLifecycle()
-                    session?.takeIf { it.current != null }?.let { s ->
+                    session?.takeIf { it.current != null && state.nowPlayingId == null }?.let { s ->
                         ContinueListeningCard(s) {
                             viewModel.continueYouTube(s)
                             nav.onYouTubePlayer()

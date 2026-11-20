@@ -152,6 +152,7 @@ fun SpotineilApp(isLoggedIn: Boolean, guestMode: Boolean, mainViewModel: MainVie
             AppMode.Welcome -> WelcomeScreen(onGetStarted = { mainViewModel.finishWelcome() })
         }
     }
+    UpdateDialog()
 }
 
 @Composable

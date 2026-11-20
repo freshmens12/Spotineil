@@ -82,6 +82,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 data class FreeSearchResults(
@@ -119,15 +120,18 @@ class FreeSearchViewModel @Inject constructor(
 
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query.asStateFlow()
-    private val retry = MutableStateFlow(0)
 
     val favorites = radio.favorites.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     val nowPlayingId = freePlayer.nowPlayingId.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    /** null = nothing typed (show "Browse all"). */
-    val results: StateFlow<LoadState<FreeSearchResults?>> = searchFlow(_query, retry) { q ->
-        if (q.isEmpty()) null else searchAll(q)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LoadState.Loaded(null))
+    /**
+     * What the last search found; null = nothing searched (show "Browse all"). It only changes
+     * when the user presses the keyboard's search button, so coming back from a song shows the
+     * same results instead of searching again.
+     */
+    private val _results = MutableStateFlow<LoadState<FreeSearchResults?>>(LoadState.Loaded(null))
+    val results: StateFlow<LoadState<FreeSearchResults?>> = _results.asStateFlow()
+    private var searchJob: Job? = null
 
     /** All sources in parallel; only fails if every one of them failed. */
     private suspend fun searchAll(q: String): FreeSearchResults = coroutineScope {
@@ -149,8 +153,36 @@ class FreeSearchViewModel @Inject constructor(
         )
     }
 
-    fun onQueryChange(q: String) { _query.value = q }
-    fun retry() { retry.value++ }
+    /** Typing never searches; clearing the box goes back to "Browse all". */
+    fun onQueryChange(q: String) {
+        _query.value = q
+        if (q.isBlank()) {
+            searchJob?.cancel()
+            _results.value = LoadState.Loaded(null)
+        }
+    }
+
+    /** The keyboard's search button (or "Try again"). */
+    fun submit() {
+        val q = _query.value.trim()
+        searchJob?.cancel()
+        if (q.isEmpty()) {
+            _results.value = LoadState.Loaded(null)
+            return
+        }
+        _results.value = LoadState.Loading
+        searchJob = viewModelScope.launch {
+            _results.value = try {
+                LoadState.Loaded(searchAll(q))
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                LoadState.Failed(e)
+            }
+        }
+    }
+
+    fun retry() = submit()
     fun playTracks(list: List<StreamTrack>, index: Int) = freePlayer.playTracks(list, index)
     fun playStation(station: RadioStation) = freePlayer.playStation(station)
     fun toggleFavorite(station: RadioStation) = viewModelScope.launch {
@@ -207,15 +239,15 @@ fun FreeSearchRoute(nav: FreeNavigation, viewModel: FreeSearchViewModel = hiltVi
         nav.onMessage(context.getString(if (ok) R.string.discover_download_started else R.string.discover_download_failed))
     }
 
+    Column(Modifier.fillMaxSize()) {
+    // Title and search box stay put; only the results scroll under them.
+    ScreenTitle(stringResource(R.string.free_search_title), nav.onSettings, Modifier.statusBarsPadding())
+    SearchField(query, viewModel::onQueryChange, onSearch = viewModel::submit)
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxWidth().weight(1f),
         contentPadding = PaddingValues(bottom = bottom),
     ) {
-        item(span = { GridItemSpan(2) }, key = "title") {
-            ScreenTitle(stringResource(R.string.free_search_title), nav.onSettings, Modifier.statusBarsPadding())
-        }
-        item(span = { GridItemSpan(2) }, key = "field") { SearchField(query, viewModel::onQueryChange) }
 
         when (val s = results) {
             LoadState.Loading -> items(8, span = { GridItemSpan(2) }) { SkeletonTrackRow() }
@@ -312,14 +344,21 @@ fun FreeSearchRoute(nav: FreeNavigation, viewModel: FreeSearchViewModel = hiltVi
             }
         }
     }
+    }
 }
 
 @Composable
-private fun SearchField(value: String, onChange: (String) -> Unit) {
+private fun SearchField(value: String, onChange: (String) -> Unit, onSearch: () -> Unit) {
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
     TextField(
         value = value,
         onValueChange = onChange,
         singleLine = true,
+        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Search),
+        keyboardActions = androidx.compose.foundation.text.KeyboardActions(onSearch = {
+            onSearch()
+            focusManager.clearFocus()
+        }),
         placeholder = { Text(stringResource(R.string.free_search_hint), color = Color(0xFF535353)) },
         leadingIcon = { Icon(Icons.Rounded.Search, null, tint = Color.Black) },
         trailingIcon = {

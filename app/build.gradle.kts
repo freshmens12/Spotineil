@@ -19,11 +19,14 @@ android {
 
     defaultConfig {
         applicationId = "com.spotineil.app"
-        versionCode = 1
-        versionName = "1.0.0"
+        // Releases bump these; -PappVersionName / -PappVersionCode override them (used to test updates).
+        versionCode = (findProperty("appVersionCode") as String?)?.toInt() ?: 4
+        versionName = (findProperty("appVersionName") as String?) ?: "1.3.0"
 
         buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${secret("SPOTIFY_CLIENT_ID") ?: ""}\"")
         buildConfigField("String", "SPOTIFY_REDIRECT_URI", "\"spotineil://callback\"")
+        // Where the app looks for new versions (public releases of Spotineil-releases).
+        buildConfigField("String", "UPDATE_URL", "\"https://api.github.com/repos/freshmens12/Spotineil-releases/releases/latest\"")
         // Optional free key from https://devportal.jamendo.com — Jamendo is hidden without it.
         buildConfigField("String", "JAMENDO_CLIENT_ID", "\"${secret("JAMENDO_CLIENT_ID") ?: ""}\"")
         buildConfigField("String", "LASTFM_API_KEY", "\"${secret("LASTFM_API_KEY") ?: ""}\"")
@@ -50,7 +53,6 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
         }
         release {
             isMinifyEnabled = true

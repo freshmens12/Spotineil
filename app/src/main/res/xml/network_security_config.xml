@@ -19,5 +19,8 @@
         <domain includeSubdomains="true">archive.org</domain>
         <domain includeSubdomains="true">apple.com</domain>
         <domain includeSubdomains="true">audioscrobbler.com</domain>
+        <domain includeSubdomains="true">github.com</domain>
+        <domain includeSubdomains="true">githubusercontent.com</domain>
+        <domain includeSubdomains="true">api.github.com</domain>
     </domain-config>
 </network-security-config>
