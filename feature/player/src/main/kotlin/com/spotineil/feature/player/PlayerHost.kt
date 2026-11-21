@@ -111,7 +111,7 @@ fun PlayerHost(
 
     when (sheet) {
         "queue" -> QueueSheet(viewModel) { sheet = null }
-        "devices" -> DevicesSheet(viewModel) { sheet = null }
+        "devices" -> DevicesSheet { sheet = null }
         "sleep" -> SleepTimerSheet(state.sleepTimer, viewModel::setSleepTimer) { sheet = null }
     }
 }

@@ -83,6 +83,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 data class FreeSearchResults(
@@ -153,27 +154,51 @@ class FreeSearchViewModel @Inject constructor(
         )
     }
 
-    /** Typing never searches; clearing the box goes back to "Browse all". */
+    /** The text of the search currently shown (or being fetched). */
+    private var searchedQuery: String? = null
+
+    /**
+     * Searches as you type, shortly after the last key. Only an actual change of the text
+     * searches: coming back from a song, or tapping the box without editing, keeps the results.
+     */
     fun onQueryChange(q: String) {
         _query.value = q
-        if (q.isBlank()) {
+        val text = q.trim()
+        if (text.isEmpty()) {
             searchJob?.cancel()
-            _results.value = LoadState.Loaded(null)
-        }
-    }
-
-    /** The keyboard's search button (or "Try again"). */
-    fun submit() {
-        val q = _query.value.trim()
-        searchJob?.cancel()
-        if (q.isEmpty()) {
+            searchedQuery = null
             _results.value = LoadState.Loaded(null)
             return
         }
-        _results.value = LoadState.Loading
+        if (text == searchedQuery) return
+        search(text, debounce = true)
+    }
+
+    /** The keyboard's search button: search now (nothing new happens if these results are already shown). */
+    fun submit() {
+        val text = _query.value.trim()
+        if (text.isEmpty()) {
+            onQueryChange("")
+            return
+        }
+        if (text == searchedQuery && _results.value !is LoadState.Failed) return
+        search(text, debounce = false)
+    }
+
+    /** "Try again" after a failed search. */
+    fun retry() {
+        val text = _query.value.trim()
+        if (text.isNotEmpty()) search(text, debounce = false)
+    }
+
+    private fun search(text: String, debounce: Boolean) {
+        searchJob?.cancel()
+        searchedQuery = text
         searchJob = viewModelScope.launch {
+            if (debounce) delay(TYPING_PAUSE_MS)
+            _results.value = LoadState.Loading
             _results.value = try {
-                LoadState.Loaded(searchAll(q))
+                LoadState.Loaded(searchAll(text))
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -182,7 +207,6 @@ class FreeSearchViewModel @Inject constructor(
         }
     }
 
-    fun retry() = submit()
     fun playTracks(list: List<StreamTrack>, index: Int) = freePlayer.playTracks(list, index)
     fun playStation(station: RadioStation) = freePlayer.playStation(station)
     fun toggleFavorite(station: RadioStation) = viewModelScope.launch {
@@ -192,6 +216,8 @@ class FreeSearchViewModel @Inject constructor(
     fun playYouTube(videos: List<YouTubeVideo>, index: Int) = freePlayer.playYouTube(videos, index)
 
     private companion object {
+        /** Wait for a pause in typing before searching. */
+        const val TYPING_PAUSE_MS = 450L
     }
 }
 

@@ -99,11 +99,15 @@ class DefaultPlaybackController @Inject constructor(
         if (inForeground && !remote.isConnected) connect.startPolling() else connect.stopPolling()
     }
 
-    private enum class Route { Local, Remote, Connect }
+    private enum class Route { Local, Remote, Connect, None }
 
     private fun route(): Route = when {
-        localActive.value && local.hasMedia -> Route.Local
+        // Once the user started a song in Spotineil, its own player handles every control, even
+        // for the moment while the next song is still loading and has no media yet.
+        localActive.value -> Route.Local
         remote.isConnected -> Route.Remote
+        // No Spotify account (the free app): there is nothing to remote-control.
+        !connect.isAvailable -> Route.None
         else -> Route.Connect
     }
 
@@ -179,6 +183,7 @@ class DefaultPlaybackController @Inject constructor(
         when (routeEnsuringRemote()) {
             Route.Local -> local.togglePlayPause()
             Route.Remote -> if (playing) remote.pause() else remote.resume()
+            Route.None -> Unit
             Route.Connect -> {
                 if (playing) connectRepository.pause() else connectRepository.resume()
                 connect.refreshSoon()
@@ -190,6 +195,7 @@ class DefaultPlaybackController @Inject constructor(
         when (routeEnsuringRemote()) {
             Route.Local -> local.next()
             Route.Remote -> remote.next()
+            Route.None -> Unit
             Route.Connect -> { connectRepository.next(); connect.refreshSoon() }
         }
     }
@@ -198,6 +204,7 @@ class DefaultPlaybackController @Inject constructor(
         when (routeEnsuringRemote()) {
             Route.Local -> local.previous()
             Route.Remote -> remote.previous()
+            Route.None -> Unit
             Route.Connect -> { connectRepository.previous(); connect.refreshSoon() }
         }
     }
@@ -206,6 +213,7 @@ class DefaultPlaybackController @Inject constructor(
         when (route()) {
             Route.Local -> local.seekTo(positionMs)
             Route.Remote -> remote.seekTo(positionMs)
+            Route.None -> Unit
             Route.Connect -> { connectRepository.seek(positionMs); connect.refreshSoon() }
         }
     }
@@ -215,6 +223,7 @@ class DefaultPlaybackController @Inject constructor(
         when (route()) {
             Route.Local -> local.toggleShuffle()
             Route.Remote -> remote.setShuffle(enabled)
+            Route.None -> Unit
             Route.Connect -> { connectRepository.setShuffle(enabled); connect.refreshSoon() }
         }
     }
@@ -224,6 +233,7 @@ class DefaultPlaybackController @Inject constructor(
         when (route()) {
             Route.Local -> local.cycleRepeat()
             Route.Remote -> remote.setRepeat(mode)
+            Route.None -> Unit
             Route.Connect -> { connectRepository.setRepeat(mode); connect.refreshSoon() }
         }
     }
@@ -233,6 +243,7 @@ class DefaultPlaybackController @Inject constructor(
             Route.Local -> if (uri.startsWith("ytmusic:")) local.addToQueue(uri)
                 else _events.tryEmit(PlayerEvent.Error("Spotify tracks can't be queued during local playback"))
             Route.Remote -> remote.queue(uri)
+            Route.None -> Unit
             Route.Connect -> connectRepository.addToQueue(uri)
         }
     }
@@ -291,6 +302,7 @@ class DefaultPlaybackController @Inject constructor(
             when (route()) {
                 Route.Local -> local.pause()
                 Route.Remote -> remote.pause()
+                Route.None -> Unit
                 Route.Connect -> connectRepository.pause()
             }
         }

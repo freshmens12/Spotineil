@@ -135,7 +135,7 @@ fun LyricsPreviewCard(state: LyricsUiState, positionMs: Long, onClick: () -> Uni
     if (shown.isEmpty()) return
     androidx.compose.material3.Surface(
         onClick = onClick,
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
         shape = MaterialTheme.shapes.medium,
         modifier = modifier.fillMaxWidth().testTag("lyrics_preview"),
     ) {

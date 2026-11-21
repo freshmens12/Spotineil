@@ -345,8 +345,6 @@ fun YouTubePlayerScreen(nav: FreeNavigation, viewModel: YouTubePlayerViewModel =
             Text(stringResource(R.string.yt_now_playing), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
         }
 
-        ArtworkFrame(video, modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp))
-
         Column(
             Modifier
                 .weight(1f)
@@ -354,6 +352,9 @@ fun YouTubePlayerScreen(nav: FreeNavigation, viewModel: YouTubePlayerViewModel =
                 .verticalScroll(rememberScrollState())
                 .padding(bottom = LocalBottomContentPadding.current + 16.dp),
         ) {
+            // Inside the scrolling area: a pinned cover would sit on top of the lyrics as they scroll by.
+            ArtworkFrame(video, modifier = Modifier.padding(top = 8.dp))
+
             Row(Modifier.fillMaxWidth().padding(start = 24.dp, end = 12.dp, top = 20.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(
@@ -513,7 +514,7 @@ private fun YouTubeLyricsCard(lyrics: Lyrics, positionMs: Long, expanded: Boolea
     val lines = if (expanded) lyrics.lines else lyrics.lines.drop(current).filter { it.text.isNotBlank() }.take(2)
     Surface(
         onClick = onToggle,
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).testTag("yt_lyrics"),
     ) {

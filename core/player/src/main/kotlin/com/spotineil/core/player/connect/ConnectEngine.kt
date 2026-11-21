@@ -31,6 +31,9 @@ class ConnectEngine @Inject constructor(
 
     private var pollJob: Job? = null
 
+    /** False without a Spotify login: the Web API would only answer "session expired". */
+    val isAvailable: Boolean get() = auth.isLoggedInNow()
+
     fun startPolling() {
         // Without a Spotify login (the free app) there is nothing to poll.
         if (pollJob?.isActive == true || !auth.isLoggedInNow()) return

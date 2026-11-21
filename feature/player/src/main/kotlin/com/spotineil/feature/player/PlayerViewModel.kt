@@ -7,7 +7,6 @@ import com.spotineil.core.data.repository.LikedMediaRepository
 import com.spotineil.core.data.repository.LyricsQuery
 import com.spotineil.core.data.repository.LyricsRepository
 import com.spotineil.core.data.repository.UserRepository
-import com.spotineil.core.model.Device
 import com.spotineil.core.model.Lyrics
 import com.spotineil.core.model.NowPlayingTrack
 import com.spotineil.core.model.PlaybackQueue
@@ -84,8 +83,6 @@ class PlayerViewModel @Inject constructor(
         PlayerUiState(playback, position, isLiked, freeNotice, connection, sleep)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PlayerUiState())
 
-    private val _devices = MutableStateFlow<List<Device>?>(null)
-    val devices: StateFlow<List<Device>?> = _devices.asStateFlow()
 
     private val _queue = MutableStateFlow<PlaybackQueue?>(null)
     val queue: StateFlow<PlaybackQueue?> = _queue.asStateFlow()
@@ -137,12 +134,6 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun loadDevices() = viewModelScope.launch {
-        _devices.value = null
-        _devices.value = runCatching { player.devices() }.getOrDefault(emptyList())
-    }
-
-    fun transferTo(device: Device) = player.transferTo(device)
 
     fun loadQueue() = viewModelScope.launch {
         _queueError.value = null

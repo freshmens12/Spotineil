@@ -18,10 +18,13 @@
     <string name="player_queue_empty">No hay nada en cola.</string>
     <string name="player_drag">Arrastra para reordenar</string>
     <string name="player_connect_device">Conectar a un dispositivo</string>
-    <string name="player_connect_hint">El control con Spotify Connect requiere Spotify Premium.</string>
-    <string name="player_no_devices">No hay dispositivos. Abre Spotify en otro dispositivo para verlo aquí.</string>
-    <string name="player_listening_on">Escuchando en</string>
-    <string name="player_refresh">Actualizar</string>
+    <string name="player_connect_hint">Reproduce Spotineil en un altavoz Bluetooth, auriculares, una TV o un dispositivo de transmisión.</string>
+    <string name="player_no_outputs">Solo está disponible este teléfono. Activa Bluetooth y vincula un altavoz o auriculares para verlos aquí.</string>
+    <string name="player_this_phone">Este teléfono</string>
+    <string name="player_available_now">Disponibles ahora</string>
+    <string name="player_choose_output">Elegir dónde reproducir</string>
+    <string name="player_pair_device">Vincular un dispositivo Bluetooth</string>
+    <string name="player_cast">Transmitir a una pantalla o altavoz</string>
     <string name="player_sleep_timer">Temporizador</string>
     <string name="player_sleep_minutes">%1$d minutos</string>
     <string name="player_sleep_end_of_track">Al terminar la canción</string>

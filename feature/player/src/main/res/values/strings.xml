@@ -18,10 +18,13 @@
     <string name="player_queue_empty">Nothing queued.</string>
     <string name="player_drag">Drag to reorder</string>
     <string name="player_connect_device">Connect to a device</string>
-    <string name="player_connect_hint">Spotify Connect control requires Spotify Premium.</string>
-    <string name="player_no_devices">No devices found. Open Spotify on another device to see it here.</string>
-    <string name="player_listening_on">Listening on</string>
-    <string name="player_refresh">Refresh</string>
+    <string name="player_connect_hint">Play Spotineil on a Bluetooth speaker, headphones, a TV or a cast device.</string>
+    <string name="player_no_outputs">Only this phone is available right now. Turn on Bluetooth and pair a speaker or headphones to see it here.</string>
+    <string name="player_this_phone">This phone</string>
+    <string name="player_available_now">Available now</string>
+    <string name="player_choose_output">Choose where to play</string>
+    <string name="player_pair_device">Pair a Bluetooth device</string>
+    <string name="player_cast">Cast to a screen or speaker</string>
     <string name="player_sleep_timer">Sleep timer</string>
     <string name="player_sleep_minutes">%1$d minutes</string>
     <string name="player_sleep_end_of_track">End of track</string>
