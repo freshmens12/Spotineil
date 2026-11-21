@@ -67,6 +67,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.spotineil.app.MainViewModel
 import com.spotineil.app.R
+import com.spotineil.app.widget.WidgetLink
 import com.spotineil.app.auth.openSpotifyInPlayStore
 import com.spotineil.core.designsystem.theme.LocalBottomContentPadding
 import com.spotineil.core.designsystem.theme.LocalPipState
@@ -190,6 +191,21 @@ private fun MainShell(mainViewModel: MainViewModel, free: Boolean) {
                     }
                 }
                 is PlayerEvent.Error -> snackbar.showSnackbar(event.message ?: msgGeneric)
+            }
+        }
+    }
+
+    // A home-screen widget asked for a screen (only the free app has these screens).
+    LaunchedEffect(navController, free) {
+        if (!free) return@LaunchedEffect
+        mainViewModel.openRequests.collect { destination ->
+            when (destination) {
+                WidgetLink.SEARCH -> navController.switchTab(FreeSearchTab)
+                WidgetLink.LIBRARY -> navController.switchTab(FreeLibraryTab)
+                WidgetLink.LIKED -> navController.navigate(LikedMediaRoute) { launchSingleTop = true }
+                WidgetLink.HISTORY -> navController.navigate(HistoryRoute) { launchSingleTop = true }
+                WidgetLink.PLAYER -> navController.navigate(YouTubePlayerRoute) { launchSingleTop = true }
+                WidgetLink.EXPAND -> playerExpanded = true
             }
         }
     }
@@ -327,5 +343,14 @@ private fun AppNavHost(navController: NavHostController, onMessage: (String) -> 
         playlistScreen(back, toArtist, toAlbum, onOwnerClick = { navController.navigateToProfile(it) }, onMessage)
         profileScreen(back, toArtist)
         settingsScreens(navController, onMessage)
+    }
+}
+
+/** Same as tapping the tab in the bottom bar. */
+private fun NavHostController.switchTab(route: Any) {
+    navigate(route) {
+        popUpTo(graph.findStartDestination().id) { saveState = true }
+        launchSingleTop = true
+        restoreState = true
     }
 }

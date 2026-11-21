@@ -27,6 +27,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.spotineil.app.ui.SpotineilApp
+import com.spotineil.app.widget.WidgetLink
 import com.spotineil.core.designsystem.theme.SpotineilTheme
 import com.spotineil.core.model.AppLanguage
 import com.spotineil.core.player.PlaybackController
@@ -87,6 +88,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // Not again after the system re-created the activity: that intent was already handled.
+        if (savedInstanceState == null) handleWidgetIntent(intent)
+
         setContent {
             val state = viewModel.uiState.collectAsStateValue()
             val ready = state as? MainUiState.Ready
@@ -106,6 +110,19 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleWidgetIntent(intent)
+    }
+
+    /** A home-screen widget button asked to open a screen (see WidgetLink). */
+    private fun handleWidgetIntent(intent: Intent?) {
+        val destination = intent?.getStringExtra(WidgetLink.EXTRA_OPEN) ?: return
+        intent.removeExtra(WidgetLink.EXTRA_OPEN)
+        viewModel.openFromWidget(destination)
     }
 
     /** Android 10–11: no auto-enter, so enter PiP manually when the user presses Home / Recents. */

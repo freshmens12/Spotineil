@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,6 +26,10 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.ui.platform.LocalContext
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
+import android.content.Context
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -79,6 +84,8 @@ fun SettingsRoute(
     val loggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
     var dialog by rememberSaveable { mutableStateOf<String?>(null) }
     val clearedMsg = stringResource(R.string.settings_cache_cleared)
+    val context = LocalContext.current
+    val widgetFallbackMsg = stringResource(R.string.settings_widgets_fallback)
     LaunchedEffect(Unit) { viewModel.cacheCleared.collect { onMessage(clearedMsg) } }
 
     Scaffold(
@@ -155,6 +162,24 @@ fun SettingsRoute(
                         modifier = Modifier.clickable { dialog = "logout" },
                     )
                 }
+            }
+
+            item { Header(stringResource(R.string.settings_widgets)) }
+            item {
+                Text(
+                    stringResource(R.string.settings_widgets_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                )
+            }
+            items(HomeWidgets, key = { it.receiver }) { widget ->
+                ListItem(
+                    headlineContent = { Text(stringResource(widget.label)) },
+                    supportingContent = { Text(stringResource(widget.description)) },
+                    trailingContent = { Icon(Icons.Rounded.Add, null) },
+                    modifier = Modifier.clickable { if (!pinWidget(context, widget.receiver)) onMessage(widgetFallbackMsg) },
+                )
             }
 
             item { Header(stringResource(R.string.settings_about)) }
@@ -295,4 +320,22 @@ fun LicensesScreen(onBack: () -> Unit) {
             }
         }
     }
+}
+
+/** The widgets of the app; [receiver] is the class name in the app module (no code dependency needed). */
+private class HomeWidget(val receiver: String, val label: Int, val description: Int)
+
+private val HomeWidgets = listOf(
+    HomeWidget("PlayerWidgetReceiver", R.string.settings_widget_player, R.string.settings_widget_player_desc),
+    HomeWidget("NowPlayingWidgetReceiver", R.string.settings_widget_now_playing, R.string.settings_widget_now_playing_desc),
+    HomeWidget("MiniWidgetReceiver", R.string.settings_widget_mini, R.string.settings_widget_mini_desc),
+    HomeWidget("ShortcutsWidgetReceiver", R.string.settings_widget_shortcuts, R.string.settings_widget_shortcuts_desc),
+    HomeWidget("RecentWidgetReceiver", R.string.settings_widget_recent, R.string.settings_widget_recent_desc),
+)
+
+/** Asks the launcher to place the widget on the Home screen (the user confirms). False if the launcher can't. */
+private fun pinWidget(context: Context, receiver: String): Boolean {
+    val manager = AppWidgetManager.getInstance(context)
+    if (!manager.isRequestPinAppWidgetSupported) return false
+    return manager.requestPinAppWidget(ComponentName(context.packageName, "com.spotineil.app.widget.$receiver"), null, null)
 }
