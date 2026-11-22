@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_play">I-play</string>
+    <string name="player_pause">I-pause</string>
+    <string name="player_next">Susunod</string>
+    <string name="player_previous">Nakaraan</string>
+    <string name="player_shuffle">Shuffle</string>
+    <string name="player_repeat">Ulitin</string>
+    <string name="player_like">Idagdag sa Mga Paboritong Kanta</string>
+    <string name="player_unlike">Alisin sa Mga Paboritong Kanta</string>
+    <string name="player_collapse">I-minimize ang player</string>
+    <string name="player_now_playing">Kasalukuyang tumutugtog</string>
+    <string name="player_devices">Mga device</string>
+    <string name="player_lyrics">Lyrics</string>
+    <string name="player_queue">Pila</string>
+    <string name="player_next_up">Susunod</string>
+    <string name="player_next_up_reorder">Susunod · i-drag para ayusin</string>
+    <string name="player_queue_empty">Walang nakapila.</string>
+    <string name="player_drag">I-drag para ayusin</string>
+    <string name="player_connect_device">Kumonekta sa device</string>
+    <string name="player_connect_hint">Patugtugin ang Spotineil sa Bluetooth speaker, headphones, TV o cast device.</string>
+    <string name="player_no_outputs">Ang telepono lang na ito ang available ngayon. I-on ang Bluetooth at i-pair ang speaker o headphones para lumabas dito.</string>
+    <string name="player_this_phone">Ang teleponong ito</string>
+    <string name="player_available_now">Available ngayon</string>
+    <string name="player_choose_output">Piliin kung saan magpapatugtog</string>
+    <string name="player_pair_device">Mag-pair ng Bluetooth device</string>
+    <string name="player_cast">I-cast sa screen o speaker</string>
+    <string name="player_sleep_timer">Sleep timer</string>
+    <string name="player_sleep_minutes">%1$d minuto</string>
+    <string name="player_sleep_end_of_track">Dulo ng track</string>
+    <string name="player_sleep_end_of_track_active">Titigil sa dulo ng track na ito</string>
+    <string name="player_sleep_remaining">Titigil sa loob ng humigit-kumulang %1$d min</string>
+    <string name="player_sleep_off">I-off ang timer</string>
+    <string name="player_lyrics_unavailable">Walang available na lyrics</string>
+    <string name="player_lyrics_instrumental">Instrumental — i-enjoy ang musika</string>
+    <string name="player_lyrics_source">Lyrics</string>
+</resources>

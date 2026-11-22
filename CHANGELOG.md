@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.8.0] - 2026-11-22
+
+### Added
+- **Song transition** (Settings → Playback): Off, **Crossfade** (6 s) or **AutoMix** (a longer, smoother blend on an equal-power curve; it does not match beats).
+- **Tagalog** language, and the language setting now reads **Automatic** (follows the phone) by default.
+- **On this device:** delete a song from the phone (the ⋮ button or a long press). Android asks you to confirm.
+- **Share Spotineil** in Settings: opens the share sheet with the download link.
+- **About** screen: version, source code (GitHub) and open-source licenses.
+- **Recent searches** under the search box (tap to search again, ✕ to remove one, Clear all).
+- **Songs continue where you left them:** play a song again and it picks up from where you stopped (songs left in their last 10 seconds start over).
+
+### Fixed
+- Soft glass: the full player no longer shows the page behind it, and its play/pause icon is visible.
+- Lyrics now use one look: the large, spaced lines of the full lyrics view (the cramped preview under the controls is gone).
+
 ## [1.7.0] - 2026-11-22
 
 ### Added

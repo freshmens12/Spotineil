@@ -63,9 +63,9 @@ class LocalEngine @Inject constructor(
         c
     }
 
-    suspend fun play(items: List<PlayableMedia>, startIndex: Int) = withContext(Dispatchers.Main) {
+    suspend fun play(items: List<PlayableMedia>, startIndex: Int, startPositionMs: Long = 0L) = withContext(Dispatchers.Main) {
         val c = controller()
-        c.setMediaItems(items.map { it.toMediaItem() }, startIndex.coerceIn(0, (items.size - 1).coerceAtLeast(0)), 0L)
+        c.setMediaItems(items.map { it.toMediaItem() }, startIndex.coerceIn(0, (items.size - 1).coerceAtLeast(0)), startPositionMs.coerceAtLeast(0L))
         c.prepare()
         c.play()
     }

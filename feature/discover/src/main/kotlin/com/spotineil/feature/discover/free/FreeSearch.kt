@@ -29,6 +29,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,6 +52,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
+import com.spotineil.core.data.db.RecentSearchDao
+import com.spotineil.core.data.db.RecentSearchEntity
+import androidx.compose.material.icons.rounded.History
 import com.spotineil.core.data.repository.ArchiveRepository
 import com.spotineil.core.data.repository.CcMixterRepository
 import com.spotineil.core.data.repository.FreeMusicRepository
@@ -115,6 +121,7 @@ class FreeSearchViewModel @Inject constructor(
     private val radio: RadioRepository,
     private val podcasts: PodcastRepository,
     private val youTube: YouTubeRepository,
+    private val recentDao: RecentSearchDao,
     val freePlayer: FreePlayer,
 ) : ViewModel() {
 
@@ -181,8 +188,9 @@ class FreeSearchViewModel @Inject constructor(
             onQueryChange("")
             return
         }
-        if (text == searchedQuery && _results.value !is LoadState.Failed) return
+        if (text == searchedQuery && _results.value !is LoadState.Failed) { rememberQuery(); return }
         search(text, debounce = false)
+        rememberQuery()
     }
 
     /** "Try again" after a failed search. */
@@ -207,17 +215,42 @@ class FreeSearchViewModel @Inject constructor(
         }
     }
 
-    fun playTracks(list: List<StreamTrack>, index: Int) = freePlayer.playTracks(list, index)
-    fun playStation(station: RadioStation) = freePlayer.playStation(station)
+    /** Searches that were run, newest first, so they need not be typed again. */
+    val recentSearches: StateFlow<List<String>> = recentDao.observe(RECENT_LIMIT)
+        .map { list -> list.map { it.query } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    /** Keeps the search being shown in the history (after Search was pressed or a result was opened). */
+    fun rememberQuery() {
+        val text = searchedQuery ?: return
+        viewModelScope.launch {
+            recentDao.upsert(RecentSearchEntity(text, System.currentTimeMillis()))
+            recentDao.trim(RECENT_LIMIT)
+        }
+    }
+
+    /** A recent search was tapped: put it in the box and search now. */
+    fun searchRecent(text: String) {
+        _query.value = text
+        search(text, debounce = false)
+        rememberQuery()
+    }
+
+    fun removeRecent(text: String) { viewModelScope.launch { recentDao.delete(text) } }
+    fun clearRecents() { viewModelScope.launch { recentDao.clear() } }
+
+    fun playTracks(list: List<StreamTrack>, index: Int) { rememberQuery(); freePlayer.playTracks(list, index) }
+    fun playStation(station: RadioStation) { rememberQuery(); freePlayer.playStation(station) }
     fun toggleFavorite(station: RadioStation) = viewModelScope.launch {
         radio.setFavorite(station, favorite = favorites.value.none { it.id == station.id })
     }
     fun download(track: StreamTrack): Boolean = freePlayer.download(track)
-    fun playYouTube(videos: List<YouTubeVideo>, index: Int) = freePlayer.playYouTube(videos, index)
+    fun playYouTube(videos: List<YouTubeVideo>, index: Int) { rememberQuery(); freePlayer.playYouTube(videos, index) }
 
     private companion object {
         /** Wait for a pause in typing before searching. */
         const val TYPING_PAUSE_MS = 450L
+        const val RECENT_LIMIT = 12
     }
 }
 
@@ -254,6 +287,7 @@ fun FreeSearchRoute(nav: FreeNavigation, viewModel: FreeSearchViewModel = hiltVi
     val results by viewModel.results.collectAsStateWithLifecycle()
     val favorites by viewModel.favorites.collectAsStateWithLifecycle()
     val nowPlaying by viewModel.nowPlayingId.collectAsStateWithLifecycle()
+    val recents by viewModel.recentSearches.collectAsStateWithLifecycle()
     var filter by rememberSaveable { mutableStateOf(SearchFilter.All) }
     LaunchedEffect(query) { if (query.isBlank()) filter = SearchFilter.All }
     val context = LocalContext.current
@@ -281,6 +315,35 @@ fun FreeSearchRoute(nav: FreeNavigation, viewModel: FreeSearchViewModel = hiltVi
             is LoadState.Loaded -> {
                 val data = s.data
                 if (data == null) {
+                    if (recents.isNotEmpty()) {
+                        item(span = { GridItemSpan(2) }, key = "recentH") {
+                            Row(
+                                Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    stringResource(R.string.free_recent_searches),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                TextButton(onClick = viewModel::clearRecents) { Text(stringResource(R.string.free_recent_clear)) }
+                            }
+                        }
+                        items(recents.size, span = { GridItemSpan(2) }, key = { "recent_${recents[it]}" }) { i ->
+                            val text = recents[i]
+                            Row(
+                                Modifier.fillMaxWidth().clickable { viewModel.searchRecent(text) }.padding(start = 16.dp, end = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Icon(Icons.Rounded.History, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(text, Modifier.weight(1f).padding(horizontal = 16.dp, vertical = 12.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                IconButton(onClick = { viewModel.removeRecent(text) }) {
+                                    Icon(Icons.Rounded.Close, stringResource(R.string.free_recent_remove), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+                        }
+                    }
                     item(span = { GridItemSpan(2) }, key = "browseH") {
                         Text(
                             stringResource(R.string.free_browse_all),
@@ -335,10 +398,10 @@ fun FreeSearchRoute(nav: FreeNavigation, viewModel: FreeSearchViewModel = hiltVi
                         item(span = { GridItemSpan(2) }, key = "albums") {
                             if (filter == SearchFilter.All) {
                                 Shelf(stringResource(R.string.free_filter_albums), data.collections, key = { it.id }) { c ->
-                                    BigCard(c.title, c.creator, c.artworkUrl, { nav.onCollection(c) }, placeholderIcon = Icons.Rounded.Album)
+                                    BigCard(c.title, c.creator, c.artworkUrl, { viewModel.rememberQuery(); nav.onCollection(c) }, placeholderIcon = Icons.Rounded.Album)
                                 }
                             } else {
-                                Column { data.collections.forEach { c -> CollectionRow(c) { nav.onCollection(c) } } }
+                                Column { data.collections.forEach { c -> CollectionRow(c) { viewModel.rememberQuery(); nav.onCollection(c) } } }
                             }
                         }
                     }
@@ -353,12 +416,12 @@ fun FreeSearchRoute(nav: FreeNavigation, viewModel: FreeSearchViewModel = hiltVi
                         item(span = { GridItemSpan(2) }, key = "podcasts") {
                             if (filter == SearchFilter.All) {
                                 Shelf(stringResource(R.string.free_filter_podcasts), data.podcasts, key = { it.feedUrl }) { p ->
-                                    BigCard(p.title, p.author, p.artworkUrl, { nav.onPodcast(p) }, placeholderIcon = Icons.Rounded.Podcasts)
+                                    BigCard(p.title, p.author, p.artworkUrl, { viewModel.rememberQuery(); nav.onPodcast(p) }, placeholderIcon = Icons.Rounded.Podcasts)
                                 }
                             } else {
                                 Column {
                                     data.podcasts.forEach { p ->
-                                        LibraryRow(p.title, stringResource(R.string.free_type_podcast, p.author), { nav.onPodcast(p) }) { m ->
+                                        LibraryRow(p.title, stringResource(R.string.free_type_podcast, p.author), { viewModel.rememberQuery(); nav.onPodcast(p) }) { m ->
                                             CoverImage(p.artworkUrl, null, m, placeholderIcon = Icons.Rounded.Podcasts)
                                         }
                                     }

@@ -11,6 +11,7 @@ import com.spotineil.core.model.AccentColor
 import com.spotineil.core.model.AppLanguage
 import com.spotineil.core.model.LibrarySort
 import com.spotineil.core.model.ThemeMode
+import com.spotineil.core.model.TransitionMode
 import com.spotineil.core.model.UserSettings
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -29,6 +30,7 @@ interface SettingsRepository {
     suspend fun setLibrarySort(sort: LibrarySort)
     suspend fun setLibraryGrid(grid: Boolean)
     suspend fun setGuestMode(enabled: Boolean)
+    suspend fun setTransition(mode: TransitionMode)
 }
 
 @Singleton
@@ -48,10 +50,12 @@ class DataStoreSettingsRepository @Inject constructor(
             librarySort = p[LIB_SORT].toEnum(defaults.librarySort),
             libraryGrid = p[LIB_GRID] ?: defaults.libraryGrid,
             guestMode = p[GUEST] ?: defaults.guestMode,
+            transition = p[TRANSITION].toEnum(defaults.transition),
         )
     }
 
     override suspend fun setGuestMode(enabled: Boolean) { store.edit { it[GUEST] = enabled } }
+    override suspend fun setTransition(mode: TransitionMode) { store.edit { it[TRANSITION] = mode.name } }
 
     override suspend fun setThemeMode(mode: ThemeMode) { store.edit { it[THEME] = mode.name } }
     override suspend fun setAccent(accent: AccentColor) { store.edit { it[ACCENT] = accent.name } }
@@ -71,5 +75,6 @@ class DataStoreSettingsRepository @Inject constructor(
         val LIB_SORT = stringPreferencesKey("library_sort")
         val LIB_GRID = booleanPreferencesKey("library_grid")
         val GUEST = booleanPreferencesKey("guest_mode")
+        val TRANSITION = stringPreferencesKey("transition")
     }
 }

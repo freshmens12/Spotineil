@@ -2,6 +2,7 @@ package com.spotineil.feature.player
 
 import com.spotineil.core.designsystem.theme.LocalGlass
 import com.spotineil.core.designsystem.theme.glassPanel
+import com.spotineil.core.designsystem.theme.opaqueBackground
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -189,13 +190,11 @@ fun FullPlayer(
     showLyrics: Boolean,
     lyricsContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    /** Shown under the controls while the artwork is visible (current lyric lines). */
-    lyricsPreview: @Composable () -> Unit = {},
     artworkModifier: Modifier = Modifier,
     titleModifier: Modifier = Modifier,
 ) {
     val track = state.track
-    val background = MaterialTheme.colorScheme.background
+    val background = opaqueBackground()
     val dominant by rememberDominantColor(track?.imageUrl, MaterialTheme.colorScheme.surfaceContainerHigh)
 
     Box(
@@ -295,7 +294,6 @@ fun FullPlayer(
                 }
                 IconButton(onClick = actions.onShowQueue) { Icon(Icons.AutoMirrored.Rounded.QueueMusic, stringResource(R.string.player_queue)) }
             }
-            if (!showLyrics) lyricsPreview()
         }
     }
 }
@@ -349,7 +347,7 @@ private fun Controls(state: PlayerUiState, actions: PlayerActions) {
             onClick = actions.onTogglePlay,
             modifier = Modifier.size(72.dp).testTag("full_play_pause"),
             shape = CircleShape,
-            colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.onSurface, contentColor = MaterialTheme.colorScheme.surface),
+            colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.onSurface, contentColor = MaterialTheme.colorScheme.inverseOnSurface),
         ) {
             Icon(
                 if (state.playback.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,

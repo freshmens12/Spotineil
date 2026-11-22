@@ -57,6 +57,9 @@
     <string name="free_top_podcasts">Top podcasts</string>
     <string name="free_your_podcasts">Your podcasts</string>
     <string name="free_recently_played">Recently played</string>
+    <string name="free_recent_searches">Recent searches</string>
+    <string name="free_recent_clear">Clear all</string>
+    <string name="free_recent_remove">Remove from recent searches</string>
     <string name="free_all_failed">Couldn\'t load music. Check your connection.</string>
     <string name="free_search_title">Search</string>
     <string name="free_search_hint">What do you want to listen to?</string>

@@ -31,11 +31,12 @@ A free Android music app, written in Kotlin with Jetpack Compose (Material 3). I
 | **Music** | Full-length songs from YouTube Music: trending music, search, charts, **Start radio**, **Play similar**, autoplay, and **Continue listening**. Audio only, with the screen off. |
 | **More free music** | Independent artists on Audius and Jamendo, Creative Commons remixes on ccMixter, and live concerts and free albums from the Internet Archive. |
 | **Radio and podcasts** | Thousands of live radio stations (Radio Browser) and the Apple Podcasts directory, with episodes from each show's own RSS feed. |
-| **Your library** | Liked Songs, History of every song you played, followed podcasts, saved stations, and the music files on your phone. All stored on the phone. |
+| **Your library** | Liked Songs, History of every song you played, recent searches, songs that continue where you left them, followed podcasts, saved stations, and the music files on your phone, which you can also delete from inside the app. All stored on the phone. |
 | **Lyrics** | Synced, line-by-line lyrics from LRCLIB, with a live lyrics card under the player. |
 | **Player** | Full player screen, mini player, queue, sleep timer, output-device picker (Bluetooth, wired, cast), notification, lock-screen and Bluetooth controls, Android Auto browsing. |
 | **Widgets** | Five home-screen widgets: **Player** (2×2), **Now playing** (4×1), **Mini player** (2×1), **Quick actions** (4×1) and **Recently played** (4×2). Long-press your Home screen, tap Widgets and pick Spotineil. |
-| **Themes** | System, Light, Dark, AMOLED black and **Soft glass**; 8 accent colours; English and Spanish. |
+| **Themes and language** | System, Light, Dark, AMOLED black and **Soft glass**; 8 accent colours; English, Spanish and Tagalog (or Automatic). |
+| **Transitions** | Off, **Crossfade** or **AutoMix** between songs (Settings → Playback). |
 | **Downloads** | A download button appears only on songs whose artist or licence allows it. |
 
 ## What Spotineil does *not* do

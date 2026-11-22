@@ -32,7 +32,7 @@ class FakePlaybackController : PlaybackController {
     override fun play(request: PlayRequest) { playRequests += request; commands += "play" }
     override fun playLocal(tracks: List<LocalTrack>, startIndex: Int) { commands += "playLocal:$startIndex" }
     val mediaRequests = mutableListOf<List<com.spotineil.core.model.PlayableMedia>>()
-    override fun playMedia(items: List<com.spotineil.core.model.PlayableMedia>, startIndex: Int) {
+    override fun playMedia(items: List<com.spotineil.core.model.PlayableMedia>, startIndex: Int, startPositionMs: Long) {
         mediaRequests += items
         commands += "playMedia:$startIndex"
     }

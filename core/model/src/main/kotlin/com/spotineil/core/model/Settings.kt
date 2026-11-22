@@ -14,10 +14,14 @@ enum class AccentColor(val argb: Long) {
     Yellow(0xFFFACC15),
 }
 
+/** How one song hands over to the next. */
+enum class TransitionMode { Off, Crossfade, AutoMix }
+
 enum class AppLanguage(val tag: String) {
     System(""),
     English("en"),
     Spanish("es"),
+    Tagalog("fil"),
 }
 
 data class UserSettings(
@@ -27,6 +31,7 @@ data class UserSettings(
     val language: AppLanguage = AppLanguage.System,
     val librarySort: LibrarySort = LibrarySort.Recent,
     val libraryGrid: Boolean = false,
+    val transition: TransitionMode = TransitionMode.Off,
     /**
      * The free, no-account app is in use. False only on the very first launch, when the Welcome
      * screen is shown; its "Get started" button turns this on.

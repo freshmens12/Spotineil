@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ds_error_offline">Offline ka. Tingnan ang iyong koneksyon.</string>
+    <string name="ds_error_unavailable">Hindi ito available para sa app na ito.</string>
+    <string name="ds_error_not_found">Hindi nahanap.</string>
+    <string name="ds_error_session">Tinanggihan ang koneksyon. Kung nasa Wi-Fi ka na nangangailangan ng sign-in (paaralan, hotel, pampubliko), buksan ang browser, mag-log in sa Wi-Fi, saka subukan muli.</string>
+    <string name="ds_error_server">May problema ang serbisyo ng musika. Subukan muli mamaya.</string>
+    <string name="ds_error_generic">May nangyaring mali.</string>
+    <string name="ds_retry">Subukan muli</string>
+    <string name="ds_play">I-play</string>
+    <string name="ds_shuffle_play">I-shuffle at i-play</string>
+    <string name="ds_back">Bumalik</string>
+</resources>

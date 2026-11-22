@@ -31,4 +31,7 @@
     <string name="library_shuffle">Shuffle</string>
     <string name="library_play">Play</string>
     <string name="library_songs">Songs</string>
+    <string name="library_delete">Delete from device</string>
+    <string name="library_delete_title">Delete this song?</string>
+    <string name="library_delete_body">\"%1$s\" will be permanently deleted from your phone. Android will ask you to confirm.</string>
 </resources>

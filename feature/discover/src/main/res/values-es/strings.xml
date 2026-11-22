@@ -58,6 +58,9 @@
     <string name="free_top_podcasts">Pódcasts más populares</string>
     <string name="free_your_podcasts">Tus pódcasts</string>
     <string name="free_recently_played">Escuchado recientemente</string>
+    <string name="free_recent_searches">Búsquedas recientes</string>
+    <string name="free_recent_clear">Borrar todo</string>
+    <string name="free_recent_remove">Quitar de las búsquedas recientes</string>
     <string name="free_all_failed">No se pudo cargar la música. Revisa tu conexión.</string>
     <string name="free_search_title">Buscar</string>
     <string name="free_search_hint">¿Qué quieres escuchar?</string>

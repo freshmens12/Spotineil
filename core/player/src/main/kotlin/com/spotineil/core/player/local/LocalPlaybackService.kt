@@ -16,6 +16,9 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
 import com.spotineil.core.data.repository.LocalMediaRepository
+import com.spotineil.core.data.repository.SettingsRepository
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import com.spotineil.core.model.LocalTrack
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -65,9 +68,11 @@ internal class SkipUnplayableListener(private val player: ExoPlayer) : Player.Li
 class LocalPlaybackService : MediaLibraryService() {
 
     @Inject lateinit var localMedia: LocalMediaRepository
+    @Inject lateinit var settings: SettingsRepository
     @Inject lateinit var youTubeStreamFactory: YouTubeStreamDataSourceFactory
 
     private var session: MediaLibrarySession? = null
+    private var transitions: TransitionController? = null
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     override fun onCreate() {
@@ -85,6 +90,23 @@ class LocalPlaybackService : MediaLibraryService() {
             .setWakeMode(C.WAKE_MODE_LOCAL)
             .build()
         player.addListener(SkipUnplayableListener(player))
+
+        // Crossfade / AutoMix between songs: a second player carries the end of the old song.
+        val sourceFactory = DefaultMediaSourceFactory(RoutingDataSourceFactory(DefaultDataSource.Factory(this), youTubeStreamFactory))
+        transitions = TransitionController(player) {
+            ExoPlayer.Builder(this)
+                .setMediaSourceFactory(sourceFactory)
+                .setAudioAttributes(
+                    AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).setContentType(C.AUDIO_CONTENT_TYPE_MUSIC).build(),
+                    /* handleAudioFocus = */ false,
+                )
+                .build()
+        }.also { controller ->
+            controller.start()
+            scope.launch {
+                settings.settings.map { it.transition }.distinctUntilChanged().collect { controller.mode = it }
+            }
+        }
 
         val builder = MediaLibrarySession.Builder(this, player, LibraryCallback())
         packageManager.getLaunchIntentForPackage(packageName)?.let { launch ->
@@ -104,6 +126,8 @@ class LocalPlaybackService : MediaLibraryService() {
     }
 
     override fun onDestroy() {
+        transitions?.release()
+        transitions = null
         session?.run {
             player.release()
             release()

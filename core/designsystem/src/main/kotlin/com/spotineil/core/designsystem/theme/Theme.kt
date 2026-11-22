@@ -171,6 +171,14 @@ fun Modifier.glassPanel(shape: Shape, fill: Float = 0.12f, scrim: Float = 0f): M
         .background(GlassTint.copy(alpha = fill))
         .border(1.dp, Brush.verticalGradient(listOf(GlassTint.copy(alpha = 0.38f), GlassTint.copy(alpha = 0.08f))), shape)
 
+/**
+ * The colour to paint under a full-screen layer that must hide what is behind it (the full player).
+ * In Soft glass the theme's own background is transparent, so a screen drawn on top would show the
+ * page underneath through it; this is the solid base colour of the glass backdrop instead.
+ */
+@Composable
+fun opaqueBackground(): Color = if (LocalGlass.current) GlassBase else MaterialTheme.colorScheme.background
+
 // Dialogs, sheets and menus sit over content, so in the glass theme they get a dark, mostly opaque glass.
 private val GlassOverlay = Color(0xFF22224A).copy(alpha = 0.94f)
 

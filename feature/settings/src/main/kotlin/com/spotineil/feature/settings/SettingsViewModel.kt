@@ -12,6 +12,7 @@ import com.spotineil.core.data.repository.SettingsRepository
 import com.spotineil.core.model.AccentColor
 import com.spotineil.core.model.AppLanguage
 import com.spotineil.core.model.ThemeMode
+import com.spotineil.core.model.TransitionMode
 import com.spotineil.core.model.UserSettings
 import com.spotineil.core.player.PlaybackController
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,6 +48,7 @@ class SettingsViewModel @Inject constructor(
     fun setAccent(accent: AccentColor) = viewModelScope.launch { settings.setAccent(accent) }
     fun setDataSaver(enabled: Boolean) = viewModelScope.launch { settings.setDataSaver(enabled) }
     fun setLanguage(language: AppLanguage) = viewModelScope.launch { settings.setLanguage(language) }
+    fun setTransition(mode: TransitionMode) = viewModelScope.launch { settings.setTransition(mode) }
 
     @OptIn(ExperimentalCoilApi::class)
     fun clearCache() = viewModelScope.launch {

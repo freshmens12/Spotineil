@@ -63,25 +63,33 @@ import com.spotineil.core.designsystem.theme.LocalBottomContentPadding
 import com.spotineil.core.model.AccentColor
 import com.spotineil.core.model.AppLanguage
 import com.spotineil.core.model.ThemeMode
+import com.spotineil.core.model.TransitionMode
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
+import androidx.compose.material.icons.rounded.Code
+import androidx.compose.material.icons.rounded.Description
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Share
 import kotlinx.serialization.Serializable
 
 @Serializable data object SettingsRoute
 @Serializable data object LicensesRoute
+@Serializable data object AboutRoute
 
 fun NavController.navigateToSettings() = navigate(SettingsRoute)
 
 fun NavGraphBuilder.settingsScreens(navController: NavController, onMessage: (String) -> Unit) {
     composable<SettingsRoute> {
-        SettingsRoute(onBack = { navController.popBackStack() }, onLicenses = { navController.navigate(LicensesRoute) }, onMessage = onMessage)
+        SettingsRoute(onBack = { navController.popBackStack() }, onAbout = { navController.navigate(AboutRoute) }, onMessage = onMessage)
     }
     composable<LicensesRoute> { LicensesScreen(onBack = { navController.popBackStack() }) }
+    composable<AboutRoute> { AboutScreen(onBack = { navController.popBackStack() }, onLicenses = { navController.navigate(LicensesRoute) }) }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsRoute(
     onBack: () -> Unit,
-    onLicenses: () -> Unit,
+    onAbout: () -> Unit,
     onMessage: (String) -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -134,6 +142,16 @@ fun SettingsRoute(
                 }
             }
 
+            item { Header(stringResource(R.string.settings_playback)) }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_transition)) },
+                    supportingContent = { Text(stringResource(settings.transition.description())) },
+                    trailingContent = { Text(stringResource(settings.transition.label()), color = MaterialTheme.colorScheme.primary) },
+                    modifier = Modifier.clickable { dialog = "transition" },
+                )
+            }
+
             item { Header(stringResource(R.string.settings_data)) }
             item {
                 ListItem(
@@ -159,6 +177,14 @@ fun SettingsRoute(
                     modifier = Modifier.clickable { dialog = "language" },
                 )
             }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_share)) },
+                    supportingContent = { Text(stringResource(R.string.settings_share_desc)) },
+                    leadingContent = { Icon(Icons.Rounded.Share, null) },
+                    modifier = Modifier.clickable { shareApp(context) },
+                )
+            }
             if (loggedIn) {
                 item {
                     ListItem(
@@ -168,17 +194,13 @@ fun SettingsRoute(
                 }
             }
 
-            item { Header(stringResource(R.string.settings_about)) }
             item {
                 ListItem(
-                    headlineContent = { Text(stringResource(R.string.settings_version)) },
-                    supportingContent = { Text(viewModel.appVersion) },
-                )
-            }
-            item {
-                ListItem(
-                    headlineContent = { Text(stringResource(R.string.settings_licenses)) },
-                    modifier = Modifier.clickable(onClick = onLicenses),
+                    headlineContent = { Text(stringResource(R.string.settings_about)) },
+                    supportingContent = { Text(stringResource(R.string.settings_about_desc)) },
+                    leadingContent = { Icon(Icons.Rounded.Info, null) },
+                    trailingContent = { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, null) },
+                    modifier = Modifier.clickable(onClick = onAbout),
                 )
             }
             item {
@@ -224,6 +246,15 @@ fun SettingsRoute(
             onSelect = { viewModel.setLanguage(it); dialog = null },
             onDismiss = { dialog = null },
         )
+        "transition" -> ChoiceDialog(
+            title = stringResource(R.string.settings_transition),
+            options = TransitionMode.entries.toList(),
+            selected = settings.transition,
+            label = { stringResource(it.label()) },
+            hint = { stringResource(it.description()) },
+            onSelect = { viewModel.setTransition(it); dialog = null },
+            onDismiss = { dialog = null },
+        )
         "logout" -> AlertDialog(containerColor = dialogContainer(), 
             onDismissRequest = { dialog = null },
             title = { Text(stringResource(R.string.settings_logout)) },
@@ -246,6 +277,19 @@ private fun AppLanguage.label() = when (this) {
     AppLanguage.System -> R.string.settings_language_system
     AppLanguage.English -> R.string.settings_language_en
     AppLanguage.Spanish -> R.string.settings_language_es
+    AppLanguage.Tagalog -> R.string.settings_language_fil
+}
+
+private fun TransitionMode.label() = when (this) {
+    TransitionMode.Off -> R.string.settings_transition_off
+    TransitionMode.Crossfade -> R.string.settings_transition_crossfade
+    TransitionMode.AutoMix -> R.string.settings_transition_automix
+}
+
+private fun TransitionMode.description() = when (this) {
+    TransitionMode.Off -> R.string.settings_transition_off_desc
+    TransitionMode.Crossfade -> R.string.settings_transition_crossfade_desc
+    TransitionMode.AutoMix -> R.string.settings_transition_automix_desc
 }
 
 @Composable
@@ -266,6 +310,7 @@ private fun <T> ChoiceDialog(
     label: @Composable (T) -> String,
     onSelect: (T) -> Unit,
     onDismiss: () -> Unit,
+    hint: (@Composable (T) -> String)? = null,
 ) {
     AlertDialog(containerColor = dialogContainer(), 
         onDismissRequest = onDismiss,
@@ -278,7 +323,12 @@ private fun <T> ChoiceDialog(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         RadioButton(selected = option == selected, onClick = { onSelect(option) })
-                        Text(label(option))
+                        Column {
+                            Text(label(option))
+                            if (hint != null) {
+                                Text(hint(option), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
                     }
                 }
             }
@@ -379,5 +429,74 @@ private fun openSupportPage(context: Context) {
         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(SUPPORT_URL)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     } catch (_: ActivityNotFoundException) {
         // No browser installed: nothing more to do.
+    }
+}
+
+private const val SOURCE_URL = "https://github.com/freshmens12/Spotineil"
+private const val APP_PAGE_URL = "https://github.com/freshmens12/Spotineil/releases/latest"
+
+/** About: the version, a link to the source code, and the open-source licenses. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AboutScreen(onBack: () -> Unit, onLicenses: () -> Unit, viewModel: SettingsViewModel = hiltViewModel()) {
+    val context = LocalContext.current
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.settings_about)) },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, null) } },
+            )
+        },
+    ) { padding ->
+        LazyColumn(
+            Modifier.fillMaxSize().padding(top = padding.calculateTopPadding()),
+            contentPadding = PaddingValues(bottom = LocalBottomContentPadding.current + 24.dp),
+        ) {
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_licenses)) },
+                    supportingContent = { Text(stringResource(R.string.settings_licenses_desc)) },
+                    leadingContent = { Icon(Icons.Rounded.Description, null) },
+                    modifier = Modifier.clickable(onClick = onLicenses),
+                )
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_source_code)) },
+                    supportingContent = { Text(stringResource(R.string.settings_source_code_desc)) },
+                    leadingContent = { Icon(Icons.Rounded.Code, null) },
+                    modifier = Modifier.clickable { openUrl(context, SOURCE_URL) },
+                )
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_version)) },
+                    supportingContent = { Text(viewModel.appVersion) },
+                    leadingContent = { Icon(Icons.Rounded.Info, null) },
+                )
+            }
+        }
+    }
+}
+
+private fun openUrl(context: Context, url: String) {
+    try {
+        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    } catch (_: ActivityNotFoundException) {
+        // No browser installed: nothing more to do.
+    }
+}
+
+/** Opens Android's share sheet so the app's page can be sent through any app that accepts text. */
+private fun shareApp(context: Context) {
+    val send = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.settings_share_subject))
+        putExtra(Intent.EXTRA_TEXT, context.getString(R.string.settings_share_text, APP_PAGE_URL))
+    }
+    try {
+        context.startActivity(Intent.createChooser(send, context.getString(R.string.settings_share)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    } catch (_: ActivityNotFoundException) {
+        // Nothing can receive shared text.
     }
 }

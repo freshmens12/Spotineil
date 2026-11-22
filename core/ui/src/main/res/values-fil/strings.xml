@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ui_add_liked">Idagdag sa Mga Paboritong Kanta</string>
+    <string name="ui_remove_liked">Alisin sa Mga Paboritong Kanta</string>
+    <string name="ui_added_liked">Naidagdag sa Mga Paboritong Kanta</string>
+    <string name="ui_removed_liked">Naalis sa Mga Paboritong Kanta</string>
+    <string name="ui_add_queue">Idagdag sa pila</string>
+    <string name="ui_added_queue">Naidagdag sa pila</string>
+    <string name="ui_add_playlist">Idagdag sa playlist</string>
+    <string name="ui_added_playlist">Naidagdag sa playlist</string>
+    <string name="ui_choose_playlist">Pumili ng playlist</string>
+    <string name="ui_share">I-share</string>
+    <string name="ui_action_failed">Hindi ito natapos. Subukan muli.</string>
+</resources>

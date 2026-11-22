@@ -128,6 +128,11 @@ class LocalFilesViewModel @Inject constructor(
         viewModelScope.launch { _state.value = LocalFilesUiState.Loaded(localMedia.tracks()) }
     }
 
+    /** Reads the files again (after one was deleted). */
+    fun reload() {
+        viewModelScope.launch { _state.value = LocalFilesUiState.Loaded(localMedia.tracks()) }
+    }
+
     fun play(tracks: List<LocalTrack>, index: Int) {
         if (tracks.isNotEmpty()) player.playLocal(tracks, index)
     }

@@ -31,4 +31,7 @@
     <string name="library_shuffle">Aleatorio</string>
     <string name="library_play">Reproducir</string>
     <string name="library_songs">Canciones</string>
+    <string name="library_delete">Eliminar del dispositivo</string>
+    <string name="library_delete_title">¿Eliminar esta canción?</string>
+    <string name="library_delete_body">\"%1$s\" se eliminará de forma permanente de tu teléfono. Android te pedirá confirmar.</string>
 </resources>

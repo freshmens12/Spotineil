@@ -520,16 +520,15 @@ private fun YouTubeLyricsCard(lyrics: Lyrics, positionMs: Long, expanded: Boolea
     ) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
             Text(stringResource(R.string.yt_lyrics), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+            // Same look as the full lyrics view: big lines with room between them, whole lines (no cut-off).
             lines.forEachIndexed { i, line ->
                 val active = if (expanded) lyrics.isSynced && i == current else i == 0
                 Text(
                     line.text.ifBlank { "♪" },
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = if (active) FontWeight.ExtraBold else FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (active || !lyrics.isSynced) 1f else 0.5f),
-                    maxLines = if (expanded) 3 else 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = 4.dp),
+                    modifier = Modifier.padding(top = 10.dp),
                 )
             }
         }

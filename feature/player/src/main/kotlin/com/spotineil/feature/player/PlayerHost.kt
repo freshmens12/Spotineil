@@ -96,10 +96,6 @@ fun PlayerHost(
                     },
                     artworkModifier = artwork,
                     titleModifier = title,
-                    lyricsPreview = {
-                        val lyrics by lyricsViewModel.state.collectAsStateWithLifecycle()
-                        LyricsPreviewCard(lyrics, state.positionMs, onClick = { showLyrics = true }, modifier = Modifier.padding(bottom = 8.dp))
-                    },
                 )
             } else {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {

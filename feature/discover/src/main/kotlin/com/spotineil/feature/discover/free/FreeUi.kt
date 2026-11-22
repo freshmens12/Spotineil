@@ -79,6 +79,7 @@ class FreePlayer @Inject constructor(
     private val radio: RadioRepository,
     private val downloads: DownloadRepository,
     private val youTubeSessions: YouTubeSessionStore,
+    private val positions: com.spotineil.core.data.repository.SongPositionStore,
     private val youTube: com.spotineil.core.data.repository.YouTubeRepository,
     private val lastFm: com.spotineil.core.data.repository.LastFmRepository,
     @ApplicationScope private val scope: CoroutineScope,
@@ -93,7 +94,7 @@ class FreePlayer @Inject constructor(
     fun playMedia(items: List<PlayableMedia>, index: Int) {
         if (items.isEmpty()) return
         val start = index.coerceIn(0, items.lastIndex)
-        player.playMedia(items, start)
+        player.playMedia(items, start, positions.resumePoint(items[start].mediaId, items[start].durationMs))
         scope.launch { recents.record(RecentItem.Song(items[start])) }
     }
 
@@ -120,7 +121,8 @@ class FreePlayer @Inject constructor(
         if (list.isEmpty()) return
         val i = index.coerceIn(0, list.lastIndex)
         _youTubeIndex.value = i
-        player.playMedia(list.map { it.toPlayable() }, i)
+        val song = list[i].toPlayable()
+        player.playMedia(list.map { it.toPlayable() }, i, positions.resumePoint(song.mediaId, song.durationMs))
         scope.launch { recents.record(RecentItem.Song(list[i].toPlayable())) }
         saveYouTubePosition(0)
     }
@@ -187,6 +189,14 @@ class FreePlayer @Inject constructor(
         return song.id to if (nearEnd) 0L else positionMs
     }
 
+    /** Stores the current song's position for [SongPositionStore]; live radio has none. */
+    private fun rememberPosition() {
+        val s = player.state.value
+        val track = s.track ?: return
+        if (track.durationMs <= 0 || track.isLive) return
+        positions.save(track.uri, s.estimatedPosition(System.currentTimeMillis()))
+    }
+
     /** Saves the queue, the song and [positionMs] (runs in the app scope, so it also works on exit). */
     fun saveYouTubePosition(positionMs: Long) {
         lastSavedPosition = positionMs
@@ -225,6 +235,14 @@ class FreePlayer @Inject constructor(
 
     // Last in the class, so every field above is initialised before it runs.
     init {
+        // Remember where each song is, so playing it again continues from there.
+        scope.launch {
+            while (true) {
+                kotlinx.coroutines.delay(POSITION_SAVE_EVERY_MS)
+                rememberPosition()
+            }
+        }
+        scope.launch { player.state.map { it.isPlaying }.distinctUntilChanged().collect { rememberPosition() } }
         scope.launch { nowPlayingId.collect(::followPlayer) }
         // Autoplay: when the last song in the queue starts, line up a radio after it so the music keeps going.
         scope.launch {
@@ -251,6 +269,7 @@ class FreePlayer @Inject constructor(
 
     private companion object {
         const val NEAR_END_MS = 10_000L
+        const val POSITION_SAVE_EVERY_MS = 5_000L
     }
 }
 

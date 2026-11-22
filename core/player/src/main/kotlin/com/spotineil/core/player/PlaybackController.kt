@@ -62,7 +62,7 @@ interface PlaybackController {
     fun playLocal(tracks: List<LocalTrack>, startIndex: Int)
 
     /** Plays non-Spotify media (free tracks, previews, radio, local files) on the device. */
-    fun playMedia(items: List<com.spotineil.core.model.PlayableMedia>, startIndex: Int)
+    fun playMedia(items: List<com.spotineil.core.model.PlayableMedia>, startIndex: Int, startPositionMs: Long = 0L)
     fun togglePlayPause()
 
     /** Pauses whatever is playing (e.g. before YouTube's own player starts a video). */

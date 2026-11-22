@@ -1,6 +1,14 @@
 package com.spotineil.feature.library
 
 import android.Manifest
+import android.app.Activity
+import android.app.RecoverableSecurityException
+import android.net.Uri
+import android.provider.MediaStore
+import androidx.activity.result.IntentSenderRequest
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import com.spotineil.core.designsystem.theme.dialogContainer
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.BackHandler
@@ -97,6 +105,53 @@ fun LocalFilesRoute(onBack: (() -> Unit)?, viewModel: LocalFilesViewModel = hilt
 
     val tracks = (state as? LocalFilesUiState.Loaded)?.tracks.orEmpty()
 
+    // Deleting a file the app does not own needs the user's OK; Android shows its own confirmation.
+    var toDelete by remember { mutableStateOf<LocalTrack?>(null) }
+    var pendingLegacyDelete by remember { mutableStateOf<Uri?>(null) }
+    val deleteLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+        val legacy = pendingLegacyDelete
+        pendingLegacyDelete = null
+        if (result.resultCode == Activity.RESULT_OK) {
+            // Android 10 only asks for access; the file is removed here. Android 11+ removes it itself.
+            if (legacy != null) runCatching { context.contentResolver.delete(legacy, null, null) }
+            openGroup = null
+            viewModel.reload()
+        }
+    }
+    fun askDelete(track: LocalTrack) { toDelete = track }
+    fun deleteConfirmed(track: LocalTrack) {
+        val uri = Uri.parse(track.contentUri)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val request = MediaStore.createDeleteRequest(context.contentResolver, listOf(uri))
+            deleteLauncher.launch(IntentSenderRequest.Builder(request.intentSender).build())
+        } else {
+            try {
+                context.contentResolver.delete(uri, null, null)
+                openGroup = null
+                viewModel.reload()
+            } catch (e: RecoverableSecurityException) {
+                pendingLegacyDelete = uri
+                deleteLauncher.launch(IntentSenderRequest.Builder(e.userAction.actionIntent.intentSender).build())
+            } catch (_: SecurityException) {
+                // No access to this file.
+            }
+        }
+    }
+    toDelete?.let { track ->
+        AlertDialog(
+            containerColor = dialogContainer(),
+            onDismissRequest = { toDelete = null },
+            title = { Text(stringResource(R.string.library_delete_title)) },
+            text = { Text(stringResource(R.string.library_delete_body, track.title)) },
+            confirmButton = {
+                TextButton(onClick = { toDelete = null; deleteConfirmed(track) }) {
+                    Text(stringResource(R.string.library_delete), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = { TextButton(onClick = { toDelete = null }) { Text(stringResource(R.string.library_cancel)) } },
+        )
+    }
+
     Scaffold(
         containerColor = Color.Transparent,
         topBar = {
@@ -129,7 +184,7 @@ fun LocalFilesRoute(onBack: (() -> Unit)?, viewModel: LocalFilesViewModel = hilt
                 LocalFilesUiState.Loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
                 is LocalFilesUiState.Loaded -> when {
                     s.tracks.isEmpty() -> MessageState(Icons.Rounded.FolderOff, stringResource(R.string.library_no_local), null)
-                    openGroup != null -> SongList(openGroup!!.tracks) { i -> viewModel.play(openGroup!!.tracks, i) }
+                    openGroup != null -> SongList(openGroup!!.tracks, ::askDelete) { i -> viewModel.play(openGroup!!.tracks, i) }
                     else -> Column {
                         PrimaryTabRow(selectedTabIndex = tab, containerColor = Color.Transparent) {
                             listOf(R.string.library_songs, R.string.library_albums, R.string.library_artists).forEachIndexed { i, label ->
@@ -143,7 +198,7 @@ fun LocalFilesRoute(onBack: (() -> Unit)?, viewModel: LocalFilesViewModel = hilt
                             }
                         }
                         when (tab) {
-                            0 -> SongList(s.tracks) { i -> viewModel.play(s.tracks, i) }
+                            0 -> SongList(s.tracks, ::askDelete) { i -> viewModel.play(s.tracks, i) }
                             1 -> GroupGrid(remember(s.tracks) { s.tracks.albums() }, circle = false) { openGroup = it }
                             else -> GroupGrid(remember(s.tracks) { s.tracks.artists() }, circle = true) { openGroup = it }
                         }
@@ -155,10 +210,13 @@ fun LocalFilesRoute(onBack: (() -> Unit)?, viewModel: LocalFilesViewModel = hilt
 }
 
 @Composable
-private fun SongList(tracks: List<LocalTrack>, onPlay: (Int) -> Unit) {
+private fun SongList(tracks: List<LocalTrack>, onDelete: (LocalTrack) -> Unit, onPlay: (Int) -> Unit) {
     LazyColumn(contentPadding = PaddingValues(bottom = LocalBottomContentPadding.current + 16.dp)) {
         itemsIndexed(tracks, key = { _, t -> t.id }) { i, t ->
-            TrackRow(t.title, "${t.artist} • ${formatDuration(t.durationMs)}", onClick = { onPlay(i) }, imageUrl = t.albumArtUri)
+            TrackRow(
+                t.title, "${t.artist} • ${formatDuration(t.durationMs)}", onClick = { onPlay(i) }, imageUrl = t.albumArtUri,
+                onMore = { onDelete(t) }, moreContentDescription = stringResource(R.string.library_delete),
+            )
         }
     }
 }

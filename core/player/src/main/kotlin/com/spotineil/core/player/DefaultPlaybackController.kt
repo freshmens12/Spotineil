@@ -171,11 +171,11 @@ class DefaultPlaybackController @Inject constructor(
     override fun playLocal(tracks: List<LocalTrack>, startIndex: Int) =
         playMedia(tracks.map { it.toPlayable() }, startIndex)
 
-    override fun playMedia(items: List<PlayableMedia>, startIndex: Int) = command {
+    override fun playMedia(items: List<PlayableMedia>, startIndex: Int, startPositionMs: Long) = command {
         if (items.isEmpty()) return@command
         if (remote.isConnected && remote.state.value?.isPlaying == true) runCatching { remote.pause() }
         localActive.value = true
-        local.play(items, startIndex)
+        local.play(items, startIndex, startPositionMs)
     }
 
     override fun togglePlayPause() = command {

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="library_title">Iyong Library</string>
+    <string name="library_playlists">Mga playlist</string>
+    <string name="library_albums">Mga album</string>
+    <string name="library_artists">Mga artist</string>
+    <string name="library_podcasts">Mga podcast</string>
+    <string name="library_sort_recent">Kamakailan</string>
+    <string name="library_sort_az">Alpabetikal</string>
+    <string name="library_sort_creator">Gumawa</string>
+    <string name="library_grid_view">Grid view</string>
+    <string name="library_list_view">List view</string>
+    <string name="library_liked_songs">Mga Paboritong Kanta</string>
+    <string name="library_songs_count">%1$d kanta</string>
+    <string name="library_playlist">Playlist</string>
+    <string name="library_local_files">Mga lokal na file</string>
+    <string name="library_local_files_sub">Musikang naka-save sa device na ito</string>
+    <string name="library_empty">Wala pa rito.</string>
+    <string name="library_no_liked">Dito lalabas ang mga kantang nagustuhan mo.</string>
+    <string name="library_no_local">Walang nahanap na audio file sa device na ito.</string>
+    <string name="library_permission_title">Payagan ang access sa iyong musika</string>
+    <string name="library_permission_body">Kailangan ng Spotineil ng pahintulot para mabasa ang mga audio file sa device na ito at mapatugtog ang mga ito.</string>
+    <string name="library_grant">Payagan</string>
+    <string name="library_create_playlist">Gumawa ng playlist</string>
+    <string name="library_name">Pangalan</string>
+    <string name="library_description">Paglalarawan (opsyonal)</string>
+    <string name="library_public">Pampubliko</string>
+    <string name="library_collaborative">Collaborative</string>
+    <string name="library_create">Gumawa</string>
+    <string name="library_cancel">Kanselahin</string>
+    <string name="library_shuffle">Shuffle</string>
+    <string name="library_play">I-play</string>
+    <string name="library_songs">Mga kanta</string>
+    <string name="library_delete">Burahin sa device</string>
+    <string name="library_delete_title">Burahin ang kantang ito?</string>
+    <string name="library_delete_body">Permanenteng buburahin ang \"%1$s\" sa iyong telepono. Hihingi ng kumpirmasyon ang Android.</string>
+</resources>
