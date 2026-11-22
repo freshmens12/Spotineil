@@ -1,5 +1,6 @@
 package com.spotineil.core.ui
 
+import com.spotineil.core.designsystem.theme.sheetContainer
 import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -167,7 +168,7 @@ fun TrackActionsSheet(
     LaunchedEffect(target.id) { viewModel.load(target) }
     LaunchedEffect(Unit) { viewModel.messages.collect { onMessage(context.getString(it)) } }
 
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
+    ModalBottomSheet(containerColor = sheetContainer(), onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(Modifier.navigationBarsPadding().padding(bottom = 8.dp)) {
             Row(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 CoverImage(target.imageUrl, null, Modifier.size(52.dp))

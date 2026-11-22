@@ -1,247 +1,117 @@
 # Spotineil
 
-A free Android music app, written in Kotlin with Jetpack Compose (Material 3). It opens straight into music, with no account needed.
+A free Android music app, written in Kotlin with Jetpack Compose (Material 3). It opens straight into music: **no account, no sign-in, no ads.**
 
-**Where the music comes from (all free and legal):**
-
-- **YouTube**: the main catalog. Trending music, search and genres, played in YouTube's official player, with picture-in-picture. Official studio versions ("Topic" tracks) come first, **Start radio** builds a station from similar artists, autoplay keeps the music going, and **Continue listening** picks up where you stopped. Need more than ~89 searches a day? See [docs/youtube-quota-extension.md](docs/youtube-quota-extension.md).
-- **Jamendo, Audius, Internet Archive (live concerts and netlabels), ccMixter**: full songs shared for free by artists.
-- **Deezer, iTunes, Last.fm charts**: official 30-second previews of mainstream hits.
-- **Radio Browser**: thousands of live radio stations.
-- **Apple Podcasts directory**: top shows, with episodes from each show's RSS feed.
-- **Your own music files** on the phone.
-- **Lyrics** from LRCLIB, plus Liked Songs and play history saved on the phone.
-- **Spotify (optional)**: log in from Settings with Spotify's official PKCE login.
-
-It does **not** block ads, rip or download audio from YouTube, Spotify or any other streaming service, or play YouTube in the background (YouTube's terms forbid it). Downloads are offered only where the artist or licence allows them.
+[**Download the latest version**](https://github.com/freshmens12/Spotineil/releases/latest) · [Privacy](docs/PRIVACY.md) · [License: GPL-3.0](LICENSE)
 
 ## Install on your phone
 
-1. On your phone, open [`apk/Spotineil.apk`](apk/Spotineil.apk) (or the latest file under [Releases](../../releases)) in this repo and tap **Download** (or **View raw**).
+1. On your phone, open the [latest release](https://github.com/freshmens12/Spotineil/releases/latest) and download **Spotineil.apk**.
 2. Open the downloaded file. If Android asks, allow **Install unknown apps** for your browser or Files app.
 3. Tap **Install**, then open **Spotineil**. Android 10 or newer is required.
 
-> This is a debug build for testing. Google Play Protect may warn that the app is from an unknown developer. Tap **Install anyway**.
+> Google Play Protect may show "App scan recommended" because the app isn't from the Play Store. Tap **More details → Install without scanning**.
 
-> **Disclaimer:** Spotineil is an independent, unofficial project. It is **not affiliated with, endorsed, or sponsored by Spotify AB**. "Spotify" is a trademark of Spotify AB. All Spotify content, metadata, and artwork are provided by Spotify. Lyrics are provided by [LRCLIB](https://lrclib.net).
+**Updates:** every time the app opens it checks this repository's latest release. If there is a newer version it asks you, and only downloads and installs it when you tap **Update**. Updates install over the app only if they are signed with the same key as the version you have, so always take updates from this page.
 
----
+## What you get
 
-## Features
-
-| Area | What you get |
+| | |
 |---|---|
-| **Welcome** | Shown once on first launch: what Spotineil offers and a single **Get started** button. No account or sign-in. |
-| **Home** | Time-of-day greeting, quick picks, recently played, top artists and tracks, your playlists, new releases, saved albums. Pull-to-refresh, skeleton loaders, offline cache. |
-| **Search** | Debounced search across songs, artists, albums, playlists and podcasts. Filter chips with fully paginated results, recent searches, and a browse-categories grid. |
-| **Library** | Playlists, albums, artists and podcasts tabs. Sort by recent, A–Z or creator. Grid/list toggle, Liked Songs, local files. |
-| **Detail pages** | Album, playlist, artist and profile pages with a collapsing header tinted by the artwork's color (Palette API), and play/shuffle buttons. |
-| **Track menu** | Add to queue, add to playlist, like/unlike, go to artist, go to album, share. |
-| **Player** | Mini player above the bottom nav expands into a full player with a shared-element transition. Blurred artwork background, seek bar, shuffle/repeat, like, queue sheet, Spotify Connect device picker, sleep timer. |
-| **Lyrics** | Synced line-by-line lyrics from LRCLIB, matched by track, artist, album and duration. Auto-scroll, tap a line to seek, and a "Lyrics not available" state. |
-| **Playlist management** | Create, rename, edit description, toggle public/collaborative, follow/unfollow, remove tracks, drag to reorder. |
-| **Stats** | Your top tracks and artists over 4 weeks, 6 months and all time. |
-| **Settings** | Theme (System / Light / Dark / AMOLED black), accent color, data saver, language (English / Español), clear cache, log out, About (version, licenses, attribution). |
-| **Extras** | Home-screen widget (Glance) with now playing and controls. Local-file playback with notification, lock-screen and Bluetooth controls, plus Android Auto browsing. |
-| **YouTube (main catalog)** | With a `YOUTUBE_API_KEY`, "Trending on YouTube" (the country's music chart) leads Home, YouTube songs lead Search, and every genre page has a YouTube shelf. Music only: category *Music*, embeddable, 1–15 minutes (no Shorts, mixes or livestreams). Songs play in **YouTube's official embedded player**, so the video stays on screen, there's no background or audio-only playback, and YouTube may show its own ads, as its terms require. Includes Up next, like, and live lyrics. The screen looks like a music player: the video sits in the album-art square, with Spotineil's own seek bar and controls. **Picture-in-picture:** press Home or open Recents and the song keeps playing in a floating video window with ⏯ / ⏭. Closing that window or turning the screen off pauses it. |
-| **Free app (default, no account)** | Opens straight into **Home / Search / Your Library**, no login needed. **Home:** filter chips (All / Music / Radio / Podcasts), "Jump back in" tiles, and shelves of big cover cards. **Search:** one search across every source, plus a colored "Browse all" grid of genres and categories. **Your Library:** Liked Songs, music on this device, followed podcasts, saved stations, recently opened albums. |
-| **Free full songs** | [Audius](https://audius.co) (trending, rising artists, genres), free live concerts from the [Internet Archive Live Music Archive](https://archive.org/details/etree) (bands that allow taping and sharing), free netlabel albums, [ccMixter](https://ccmixter.org) Creative Commons songs, and [Jamendo](https://www.jamendo.com) when a key is set. A download button appears only when the artist or licence allows it. |
-| **Podcasts** | Top shows and search through the Apple Podcasts directory. Full episodes stream from each show's own public RSS feed. Follow shows to keep them in Your Library. |
-| **Radio** | Thousands of live stations from [Radio Browser](https://www.radio-browser.info), popular stations in your country, genre radio, and saved favorites. |
-| **Previews & charts** | Official 30-second clips of mainstream hits from Deezer (iTunes as a fallback). With an optional Last.fm key, Last.fm's global chart is matched to these previews too. |
-| **Liked Songs without an account** | Tap **+** on the mini player or the heart on the full player to save any free song, preview or local file on the phone. |
-| **Lyrics** | Synced lyrics from LRCLIB for every kind of playback, with a live two-line lyrics card under the player controls and a full-screen view. Previews are matched by the full song's length, and their lyrics are shown unsynced because a clip starts mid-song. |
-| **Your music** | Songs / Albums / Artists views for audio files on your phone. |
+| **Music** | Full-length songs from YouTube Music: trending music, search, charts, **Start radio**, **Play similar**, autoplay, and **Continue listening**. Audio only, with the screen off. |
+| **More free music** | Independent artists on Audius and Jamendo, Creative Commons remixes on ccMixter, and live concerts and free albums from the Internet Archive. |
+| **Radio and podcasts** | Thousands of live radio stations (Radio Browser) and the Apple Podcasts directory, with episodes from each show's own RSS feed. |
+| **Your library** | Liked Songs, History of every song you played, followed podcasts, saved stations, and the music files on your phone. All stored on the phone. |
+| **Lyrics** | Synced, line-by-line lyrics from LRCLIB, with a live lyrics card under the player. |
+| **Player** | Full player screen, mini player, queue, sleep timer, output-device picker (Bluetooth, wired, cast), notification, lock-screen and Bluetooth controls, Android Auto browsing. |
+| **Widgets** | Five home-screen widgets: **Player** (2×2), **Now playing** (4×1), **Mini player** (2×1), **Quick actions** (4×1) and **Recently played** (4×2). Long-press your Home screen, tap Widgets and pick Spotineil. |
+| **Themes** | System, Light, Dark, AMOLED black and **Soft glass**; 8 accent colours; English and Spanish. |
+| **Downloads** | A download button appears only on songs whose artist or licence allows it. |
 
-### What Spotineil does *not* do
+## What Spotineil does *not* do
 
-Spotineil doesn't block or skip ads, rip or download Spotify (or YouTube or other) audio, or install third-party "extensions" that pull music from unlicensed sources. For ad-free, unlimited Spotify playback and offline downloads of Spotify songs, use **Spotify Premium** through the official app.
+Spotineil does not block ads, and it does not save or download YouTube audio as files. It is an independent, unofficial project: it is **not affiliated with, endorsed or sponsored by YouTube, Google, Spotify or any music service**, and all music, artwork and lyrics belong to their artists and rights holders. Accessing YouTube Music this way is not something Google officially supports, and Google's terms may restrict it, so use it for personal listening and at your own risk.
 
-## Screenshots
+## Build it yourself
 
-> _Add your own screenshots to `docs/screenshots/` and link them here._
-
-| Home | Search | Library | Player | Lyrics |
-|---|---|---|---|---|
-| _home.png_ | _search.png_ | _library.png_ | _player.png_ | _lyrics.png_ |
-
----
-
-## Setup
-
-### Requirements
-
-- Android Studio (Ladybug or newer) or a JDK 17 and the Android SDK (platform 35)
-- An Android device running Android 10 (API 29) or newer, with the **official Spotify app installed and logged in** (needed for playback through App Remote)
-- A Spotify account. Premium is recommended (see [Free vs Premium](#free-vs-premium))
-
-### 1. Create a Spotify developer app
-
-1. Go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) and click **Create app**.
-2. Under **Redirect URIs**, add exactly:
-   ```
-   spotineil://callback
-   ```
-3. Under **Which API/SDKs are you planning to use?**, select **Web API** and **Android**.
-4. In the app's settings, add your **Android packages**. Both variants need an entry:
-
-   | Package name | Variant |
-   |---|---|
-   | `com.spotineil.app.debug` | debug builds |
-   | `com.spotineil.app` | release builds |
-
-   Each entry needs the **SHA-1 fingerprint** of the key that signs that variant. To print it:
-   ```bash
-   ./gradlew :app:signingReport
-   # or, for the default debug keystore:
-   keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
-   ```
-   App Remote rejects connections from packages or signatures that aren't registered here.
-5. Copy the **Client ID**. You do **not** need the client secret, and you should never put it in the app.
-
-### 2. Configure the build
-
-Add the Client ID to `local.properties` in the project root. This file is git-ignored, so never commit it:
-
-```properties
-sdk.dir=/path/to/Android/sdk
-SPOTIFY_CLIENT_ID=your_client_id_here
-```
-
-The build reads it into `BuildConfig.SPOTIFY_CLIENT_ID`. CI reads the `SPOTIFY_CLIENT_ID` environment variable instead.
-
-**You can skip this step.** The app opens in the free, no-account mode by default (free songs, concerts, podcasts, radio, previews, local files, lyrics). Spotify is only used if you log in from **Settings → Log in with Spotify**. Spotify now requires the developer account to have **Premium** for Web API access.
-
-**Optional keys** (all free), also in `local.properties`:
-
-```properties
-JAMENDO_CLIENT_ID=your_jamendo_client_id   # https://devportal.jamendo.com — adds Jamendo songs
-LASTFM_API_KEY=your_lastfm_api_key         # https://www.last.fm/api/account/create — adds the Last.fm chart
-YOUTUBE_API_KEY=your_youtube_data_api_key  # Google Cloud Console → YouTube Data API v3 — the main catalog
-```
-
-**YouTube quota and the request gateway.** A YouTube key gets 10,000 quota units a day. The music chart costs 1 unit; a search costs about 101 (search + one details call). Spotineil's gateway keeps usage low:
-- It caches results in memory and Room (chart for 6 h, searches for 24 h).
-- Identical requests that are in flight share one call.
-- At most 2 calls run at once.
-- Units are counted per Pacific-time day, against a 9,000-unit budget.
-- When the budget or Google's quota runs out, it serves cached results and falls back to the other free sources. Search shows how many YouTube searches are left today.
-
-It does **not** rotate keys or projects, because Google's terms forbid getting around quota that way.
-
-**Restrict the key** in Google Cloud Console:
-- **Application restrictions → Android apps:** add `com.spotineil.app.debug` and `com.spotineil.app` with their SHA-1s. Spotineil sends the matching `X-Android-Package` / `X-Android-Cert` headers.
-- **API restrictions:** allow YouTube Data API v3 only.
-
-An APK always contains its key, so restriction is what keeps a copied key useless elsewhere.
-
-Last.fm hosts no audio, only charts and metadata, so its chart plays as official previews. Audius, the Internet Archive, ccMixter, Apple Podcasts, Radio Browser, Deezer, iTunes and LRCLIB need no keys.
-
-### 3. Build and run
+You need **JDK 21** (for example [Temurin 21](https://adoptium.net)) and the Android SDK (platform 37). Android Studio's bundled JDK 17 cannot build the project.
 
 ```bash
-./gradlew assembleDebug          # build the APK
-./gradlew installDebug           # install on a connected device
+./gradlew assembleDebug          # build the APK  → app/build/outputs/apk/debug/app-debug.apk
+./gradlew installDebug           # install on a connected phone
 ./gradlew testDebugUnitTest      # unit tests + Robolectric Compose UI tests
 ```
 
-The Spotify App Remote AAR isn't published to Maven. Gradle downloads it from the [official GitHub release](https://github.com/spotify/android-sdk/releases) through an Ivy repository declared in `settings.gradle.kts`, so no binary is committed to this repo. Your first build needs network access.
+### Optional API keys
 
-### Development mode: only allow-listed users can log in
+Two features use free third-party keys. Without them the app still builds and runs; those features are just hidden or limited. Put your own keys in `local.properties` in the project root. **That file is git-ignored; never commit it.**
 
-New Spotify apps start in **Development mode**. In this mode, only users you add under **User Management** in the dashboard can log in. Anyone else gets an error from Spotify's login page, even with a valid build.
+```properties
+sdk.dir=/path/to/Android/sdk
+LASTFM_API_KEY=your_lastfm_api_key         # https://www.last.fm/api/account/create (similar artists for radio and Play similar)
+JAMENDO_CLIENT_ID=your_jamendo_client_id   # https://devportal.jamendo.com (the Jamendo shelf)
+```
 
-- Add each tester's Spotify account email to **User Management**.
-- Spotify limits how many users a Development-mode app can have and may change the rules (including requirements for the app owner's account). Check the dashboard and [Spotify's quota-mode docs](https://developer.spotify.com/documentation/web-api/concepts/quota-modes) for the current limits.
-- To open the app to the public, request an **Extended Quota** review from Spotify.
+CI and other machines can use environment variables with the same names.
 
----
+### About keys and security
 
-## Free vs Premium
+- **No key, password or keystore is stored in this repository or its history.** `local.properties`, keystores and built APKs are git-ignored.
+- Any key an app needs at run time ends up inside its APK, and anyone can extract it from there. That is true of every Android app. For this reason only low-risk, free keys are used (a Last.fm API key and a Jamendo client id: no billing, no secret, no account access), and the downloads on the Releases page are built with the maintainer's keys. If you fork the project, use your own.
+- The code still contains an optional, now hidden Spotify mode (App Remote and Web API). It is not reachable from the app's screens, and building it needs a `SPOTIFY_CLIENT_ID` in `local.properties`.
 
-Spotineil reads your plan (`product`) from `/v1/me` and App Remote's `canPlayOnDemand` capability, and **respects Spotify's limits**:
+## Publishing a release (maintainers)
 
-| | Spotify Premium | Spotify Free |
-|---|---|---|
-| Browse, search, library, playlists, stats, lyrics | ✅ | ✅ |
-| Playback through the Spotify app (App Remote) | ✅ Full on-demand control | ⚠️ Spotify applies Free rules (shuffle-play contexts, limited skips) |
-| Spotify Connect control of other devices (Web API `/me/player`) | ✅ | ❌ Spotify returns `403 PREMIUM_REQUIRED` |
-| Local files on the device | ✅ | ✅ |
+1. Raise `versionCode` and `versionName` in `app/build.gradle.kts` and build the debug APK.
+2. Run `scripts/publish-release.sh <version> <apk> "what's new"`. It creates the GitHub release on this repository and uploads the APK as `Spotineil.apk`, using the GitHub sign-in git already has.
+3. Phones with an older version offer the update the next time the app opens.
 
-Free users see a short in-app notice wherever controls are limited. Spotineil never tries to bypass these restrictions.
-
-## Restricted Web API endpoints
-
-Spotify restricts several endpoints for apps created after late 2024, including recommendations, related artists, audio features/analysis, and featured or category playlists. **Spotineil doesn't depend on any of them.** Every optional section (for example new releases, browse categories, or an artist's top tracks) is wrapped so that a `403`/`404` hides that section instead of failing the screen.
-
----
+Updates only install over an existing app if they are signed with the same key, so keep building from the same machine (or back up `~/.android/debug.keystore`).
 
 ## Architecture
 
-MVVM + Clean Architecture, split into modules:
+MVVM + Clean Architecture, split into Gradle modules:
 
 ```
-:app                 Navigation, DI wiring, theming, login (AppAuth), Glance widget, Android Auto manifest
-:core:model          Plain Kotlin domain models (Track, Album, Artist, Playlist, User, Lyrics, …)
-:core:common         Dispatchers, application scope, Spotify app config
-:core:network        Retrofit/OkHttp + kotlinx.serialization: Web API, Accounts (PKCE), LRCLIB;
-                     auth interceptor, refresh Authenticator, 429 handling, error mapping
-:core:data           Repositories, Room cache (+ Paging RemoteMediator), DataStore settings,
-                     Tink-encrypted token store, LRC parser
-:core:player         PlaybackController façade over App Remote, Spotify Connect (Web API) and
-                     Media3 (ExoPlayer + MediaLibraryService for local files / Android Auto)
-:core:designsystem   Theme (dark-first, AMOLED, accent colors, Manrope), shared Compose components
-:core:ui             Shared feature UI (track context menu, Free-tier notice)
+:app                 Navigation, DI wiring, theming, in-app updater, home-screen widgets (Glance)
+:core:model          Plain Kotlin domain models
+:core:common         Dispatchers, application scope, shared config
+:core:network        Retrofit / OkHttp and kotlinx.serialization (LRCLIB, and the optional Spotify mode)
+:core:data           Repositories, the YouTube Music catalog (InnerTube X), free-source clients,
+                     Room cache, DataStore settings, LRC parser
+:core:player         PlaybackController over Media3 (ExoPlayer + MediaLibraryService), stream routing
+:core:designsystem   Themes (incl. Soft glass), Manrope font, shared Compose components
+:core:ui             Shared feature UI (track menu)
 :core:testing        Test fakes and rules
-:feature:home | search | library | player | artist | album | playlist | profile | settings | discover
+:feature:discover    The free app: Home, Search, Library, YouTube player, History, details
+:feature:player | settings | library | home | search | album | artist | playlist | profile
 ```
 
-- **DI:** Hilt. **Async:** Coroutines + Flow. **Images:** Coil. **Navigation:** Compose Navigation with type-safe `@Serializable` routes.
-- **Build:** Gradle Kotlin DSL, a version catalog (`gradle/libs.versions.toml`), and convention plugins in `build-logic/`. JDK 17.
-- **Offline-first:** Room caches the library, home feed, detail pages, lyrics and recent searches. Screens render cached data immediately and then refresh from the network.
-- **Reliability:** On `401`, a single synchronized token refresh runs, then the request is retried. On `429`, short `Retry-After` waits are retried transparently and long ones are shown as an error. Network errors show a retry UI. All list endpoints use Paging 3.
+- **DI:** Hilt. **Async:** Coroutines and Flow. **Images:** Coil. **Navigation:** Compose Navigation with type-safe routes.
+- **Build:** Gradle Kotlin DSL, a version catalog (`gradle/libs.versions.toml`), convention plugins in `build-logic/`.
+- **Offline-first:** Room caches song lists, charts, lyrics and recent searches; screens show cached data first, then refresh.
 
-### Playback routing
+### How a song plays
 
 ```
-PlaybackController
- ├─ local / free / radio?    → LocalEngine (Media3 MediaController → LocalPlaybackService)
- ├─ App Remote connected?    → SpotifyRemoteEngine (official Spotify app on this device)
- └─ otherwise                → Spotify Connect via Web API (/me/player/*), state polled while visible
+Search / Home / widget ──► FreePlayer ──► PlaybackController ──► LocalEngine (Media3)
+                                                                       │
+              ytmusic://video/<id>  ──►  RoutingDataSource ──► InnerTube X resolves the audio stream
+              any other address     ──►  the normal data source (radio, podcasts, local files, …)
 ```
 
 ## Testing
 
-| Layer | Tests |
-|---|---|
-| Network | Token refresh through the `Authenticator` (MockWebServer), proactive refresh, rejected refresh token, 429 `Retry-After`, error mapping, lenient JSON parsing |
-| Data | LRC parser, LRCLIB matching and caching, recent searches, home feed partial failure |
-| ViewModels | Search debounce, error and retry (Turbine); Home offline-first; Player like toggle, Free notice, position interpolation |
-| Compose UI | Player (mini, full, controls, restrictions, lyrics tap-to-seek) and Search (typing, chips, results, empty state) run on Robolectric, so CI doesn't need an emulator |
+Unit tests cover the network layer, repositories, the LRC parser, song ranking and radio mixing, the in-app updater's version logic, and the view models. Compose UI tests run on Robolectric, so CI needs no emulator.
 
 ```bash
 ./gradlew testDebugUnitTest
 ```
 
-## CI / Releases
+`.github/workflows/ci.yml` builds the debug APK and runs all tests on every push and pull request.
 
-- **`.github/workflows/ci.yml`** builds the debug APK and runs all unit tests on every push and pull request.
-- **`.github/workflows/release.yml`** runs on `v*` tags. It builds a signed, minified release APK and attaches it to a GitHub Release.
+## Credits and license
 
-Repository secrets used by the release workflow:
+Spotineil is free software under the [GNU General Public License v3.0](LICENSE). Copyright (c) 2026 The Spotineil contributors. You may use, study, share and change it; anyone you give a copy to must also be able to get its source code under the same license.
 
-| Secret | Purpose |
-|---|---|
-| `SPOTIFY_CLIENT_ID` | Spotify app Client ID (also optional for CI) |
-| `SPOTINEIL_KEYSTORE_BASE64` | `base64` of your release `.jks` |
-| `SPOTINEIL_KEYSTORE_PASSWORD` | Keystore password |
-| `SPOTINEIL_KEY_ALIAS` | Key alias |
-| `SPOTINEIL_KEY_PASSWORD` | Key password |
-
-> On Windows, mark the wrapper as executable before pushing: `git update-index --chmod=+x gradlew`. The workflows also `chmod` it.
-
-Remember to register the **release** key's SHA-1 for `com.spotineil.app` in the Spotify dashboard.
-
-## License
-
-[MIT](LICENSE). The Manrope font is under the SIL Open Font License 1.1. The Spotify Android SDK is downloaded at build time under its own license and the Spotify Developer Terms.
+It is built on [InnerTube X](https://github.com/MetrolistGroup/innertubex) (GPL-3.0), which is why the whole app is GPL-3.0, and on many open-source libraries and free services. The full list, with licenses, is in the app under **Settings → Open-source licenses**. The Manrope font is under the SIL Open Font License 1.1.

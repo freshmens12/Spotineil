@@ -104,9 +104,19 @@ class DefaultInnerTubeCatalogRepository @Inject constructor(
         cache.get(key, VIDEO_LIST, 6 * 60 * 60 * 1000L)?.let { return@runCatching it }
         try {
             val songs = retry(times = 2) {
-                withTimeout(15_000) {
-                    val response = innerTube.browse(YouTubeClient.WEB_REMIX, browseId = "FEmusic_charts")
-                    mapSearch(parseJson(response.bodyAsText())).tracks.map { it.toVideo() }
+                withTimeout(25_000) {
+                    val root = parseJson(innerTube.browse(YouTubeClient.WEB_REMIX, browseId = "FEmusic_charts").bodyAsText())
+                    // The charts page used to list the top songs itself. Today it lists chart playlists
+                    // ("Trending 20", "Top 100 Music Videos"): open the best one and read its songs.
+                    mapSearch(root).tracks.map { it.toVideo() }.ifEmpty {
+                        val playlist = chartPlaylists(root).let { all ->
+                            all.firstOrNull { it.first.startsWith("Trending", ignoreCase = true) }
+                                ?: all.firstOrNull { it.first.contains("Top", ignoreCase = true) }
+                                ?: all.firstOrNull()
+                        } ?: return@withTimeout emptyList()
+                        val page = innerTube.browse(YouTubeClient.WEB_REMIX, browseId = playlist.second).bodyAsText()
+                        mapSearch(parseJson(page)).tracks.map { it.toVideo() }
+                    }
                 }
             }.ifEmpty { throw IllegalStateException("Empty chart") }
             cache.put(key, VIDEO_LIST, songs)
@@ -115,6 +125,25 @@ class DefaultInnerTubeCatalogRepository @Inject constructor(
             if (e is CancellationException) throw e
             cache.get(key, VIDEO_LIST) ?: throw e
         }
+    }
+
+    /** The chart playlists on the charts page as (title, browseId), e.g. "Trending 20" to "VLOLAK5uy_…". */
+    private fun chartPlaylists(node: JsonElement, out: MutableList<Pair<String, String>> = mutableListOf()): List<Pair<String, String>> {
+        when (node) {
+            is JsonObject -> {
+                (node["musicTwoRowItemRenderer"] as? JsonObject)?.let { item ->
+                    val title = (((item["title"] as? JsonObject)?.get("runs") as? JsonArray)?.firstOrNull() as? JsonObject)
+                        ?.get("text")?.let { it as? JsonPrimitive }?.content
+                    val id = ((item["navigationEndpoint"] as? JsonObject)?.get("browseEndpoint") as? JsonObject)
+                        ?.get("browseId")?.let { it as? JsonPrimitive }?.content
+                    if (title != null && id != null && id.startsWith("VL")) out += title to id
+                }
+                node.values.forEach { chartPlaylists(it, out) }
+            }
+            is JsonArray -> node.forEach { chartPlaylists(it, out) }
+            else -> Unit
+        }
+        return out
     }
 
     private fun parseJson(text: String): JsonObject =

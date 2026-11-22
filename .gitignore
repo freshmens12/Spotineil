@@ -17,3 +17,11 @@ bin/
 .vscode/
 hs_err_pid*.log
 replay_pid*.log
+
+# Built apps (they embed the maintainer's keys): publish them as GitHub Releases, never commit them
+*.apk
+*.aab
+/apk/
+.env
+*.pem
+keystore.properties

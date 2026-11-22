@@ -394,7 +394,7 @@ fun YouTubePlayerScreen(nav: FreeNavigation, viewModel: YouTubePlayerViewModel =
                         if (playing) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                         stringResource(if (playing) R.string.yt_pause else R.string.free_play),
                         Modifier.size(36.dp),
-                        tint = background,
+                        tint = MaterialTheme.colorScheme.inverseOnSurface,
                     )
                 }
                 IconButton(onClick = viewModel::next, enabled = state.hasNext, modifier = Modifier.size(56.dp)) {

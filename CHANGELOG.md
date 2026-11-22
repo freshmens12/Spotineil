@@ -4,7 +4,49 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [1.7.0] - 2026-11-22
+
+### Added
+- **Soft glass** theme (Settings → Theme): a soft coloured backdrop with translucent panels.
+- **Trending music in Spotineil** on Home is now filled from YouTube Music's trending chart for your country. YouTube Music removed the "Top songs" list from its charts page, so the app reads the chart playlist instead.
+- **Support the developer** button in Settings, and a full credits screen (every library and service, with licenses).
+- Releases and updates now come from this repository's GitHub Releases (the separate downloads repository is retired).
+
+### Changed
+- The project license is now **GPL-3.0** (it uses the GPL-3.0 InnerTube X library).
+- Removed the Audius "Trending" shelf from Home so the trending shelf is YouTube Music only.
+- Removed the widget list from Settings; widgets are added from the Home screen.
+
+### Fixed
+- Switching theme no longer jumps back to Home.
+- No built APKs or keys are kept in the repository any more.
+
+## [1.6.0] - 2026-11-22
+### Added
+- Open-source licenses screen lists every library and service. Support button in Settings.
+
+## [1.5.0] - 2026-11-21
+### Added
+- Five home-screen widgets: Player (2×2), Now playing (4×1), Mini player (2×1), Quick actions (4×1) and Recently played (4×2). Widgets redraw together when the song or play/pause changes, and Play on a widget continues your last session.
+
+## [1.4.0] - 2026-11-21
+### Added
+- "Connect to a device" now works without Spotify: it lists the phone's outputs (speaker, Bluetooth, wired, USB, HDMI) and opens Android's output picker, Bluetooth pairing and cast.
+- Search now finds songs as you type; coming back from a song keeps the results without searching again.
+### Fixed
+- Lyrics no longer hidden behind the album art; "Session expired" message while playing.
+
+## [1.3.0] - 2026-11-20
+### Added
+- History of every song you played; search results stay when you come back from a song; the Home "Continue listening" card hides while a song is playing.
+
+## [1.2.0] - 2026-11-20
+### Added
+- **In-app updates:** the app checks for a newer release when it opens and, with your permission, downloads and installs it.
+- Audio-only playback from YouTube Music through InnerTube X (no video player); full songs for search, charts, radio and autoplay.
+
+## Earlier development
+
 
 ### Changed — first launch
 - New **Welcome** screen on first launch: the app's three main features and one **Get started** button. It shows once; after that the app opens straight into Home.

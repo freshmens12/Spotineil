@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Publishes an APK as a GitHub release in the public downloads repo. The app checks that repo
-# for updates when it opens, so a release with a higher version number shows up as an update.
+# Publishes an APK as a GitHub release of this repository. The app checks the latest release
+# when it opens, so a release with a higher version number shows up as an update.
 #
 # Usage: scripts/publish-release.sh <version> <path-to-apk> ["release notes"]
 #   e.g. scripts/publish-release.sh 1.3.0 app/build/outputs/apk/debug/app-debug.apk "New: History"
@@ -8,7 +8,7 @@
 # Uses the GitHub sign-in that git already has stored (no extra token needed).
 set -euo pipefail
 
-REPO="freshmens12/Spotineil-releases"
+REPO="${REPO:-freshmens12/Spotineil}"
 VERSION="${1:?version, e.g. 1.3.0}"
 APK="${2:?path to the APK}"
 NOTES="${3:-Spotineil $VERSION}"

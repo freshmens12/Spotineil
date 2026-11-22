@@ -77,7 +77,6 @@ import kotlinx.coroutines.launch
 data class HomeRemote(
     /** Main catalog: YouTube's most popular music videos in this country. */
     val youTube: List<YouTubeVideo>? = null,
-    val trending: List<StreamTrack>? = null,
     val rising: List<StreamTrack>? = null,
     val jamendo: List<StreamTrack>? = null,
     val ccMixter: List<StreamTrack>? = null,
@@ -88,7 +87,7 @@ data class HomeRemote(
     /** Set when every source failed (likely offline). */
     val error: Throwable? = null,
 ) {
-    val isLoading: Boolean get() = youTube == null && trending == null && concerts == null && stationsNear == null && podcasts == null
+    val isLoading: Boolean get() = youTube == null && concerts == null && stationsNear == null && podcasts == null
 }
 
 data class FreeHomeUiState(
@@ -178,7 +177,6 @@ class FreeHomeViewModel @Inject constructor(
         }
         val jobs = listOf(
             launch { shelf({ youTube.trending() }) { copy(youTube = it) } },
-            launch { shelf({ music.trending() }) { copy(trending = it) } },
             launch { shelf({ music.underground() }) { copy(rising = it) } },
             launch { shelf({ music.jamendoPopular() }) { copy(jamendo = it) } },
             launch { shelf({ ccMixter.featured() }) { copy(ccMixter = it) } },
@@ -322,9 +320,6 @@ fun FreeHomeRoute(nav: FreeNavigation, viewModel: FreeHomeViewModel = hiltViewMo
                         )
                     }
                 }
-            }
-            if (music) {
-                item(key = "trending") { trackShelf(R.string.free_trending, r.trending) }
             }
             if (radioOn) {
                 item(key = "yourStations") { stationShelf(stringResource(R.string.free_your_stations), state.favoriteStations) }

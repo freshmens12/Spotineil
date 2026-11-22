@@ -1,6 +1,6 @@
 package com.spotineil.core.model
 
-enum class ThemeMode { System, Light, Dark, Amoled }
+enum class ThemeMode { System, Light, Dark, Amoled, Glass }
 
 /** Preset accent colors (ARGB). The first one is the default Spotineil green. */
 enum class AccentColor(val argb: Long) {

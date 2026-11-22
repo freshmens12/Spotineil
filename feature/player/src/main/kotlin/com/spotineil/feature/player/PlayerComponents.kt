@@ -1,5 +1,7 @@
 package com.spotineil.feature.player
 
+import com.spotineil.core.designsystem.theme.LocalGlass
+import com.spotineil.core.designsystem.theme.glassPanel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -103,14 +105,15 @@ fun MiniPlayer(
     val dominant by rememberDominantColor(track.imageUrl, surface)
     // A deep, artwork-tinted bar (like the screenshot): dark enough for white text on any cover.
     val tint = lerp(dominant.copy(alpha = 1f), Color.Black, 0.45f)
-    val shape = RoundedCornerShape(8.dp)
+    val glass = LocalGlass.current
+    val shape = RoundedCornerShape(if (glass) 20.dp else 8.dp)
     Box(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
             .height(60.dp)
-            .clip(shape)
-            .background(tint)
+            // Soft glass: a frosted panel; otherwise the artwork-tinted bar.
+            .then(if (glass) Modifier.glassPanel(shape, fill = 0.14f, scrim = 0.94f) else Modifier.clip(shape).background(tint))
             .clickable(onClick = actions.onExpand)
             .pointerInput(Unit) {
                 detectVerticalDragGestures { _, dragAmount -> if (dragAmount < -12) actions.onExpand() }

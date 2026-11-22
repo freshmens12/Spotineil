@@ -1,5 +1,6 @@
 package com.spotineil.feature.settings
 
+import com.spotineil.core.designsystem.theme.dialogContainer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -223,7 +224,7 @@ fun SettingsRoute(
             onSelect = { viewModel.setLanguage(it); dialog = null },
             onDismiss = { dialog = null },
         )
-        "logout" -> AlertDialog(
+        "logout" -> AlertDialog(containerColor = dialogContainer(), 
             onDismissRequest = { dialog = null },
             title = { Text(stringResource(R.string.settings_logout)) },
             text = { Text(stringResource(R.string.settings_logout_confirm)) },
@@ -238,6 +239,7 @@ private fun ThemeMode.label() = when (this) {
     ThemeMode.Light -> R.string.settings_theme_light
     ThemeMode.Dark -> R.string.settings_theme_dark
     ThemeMode.Amoled -> R.string.settings_theme_amoled
+    ThemeMode.Glass -> R.string.settings_theme_glass
 }
 
 private fun AppLanguage.label() = when (this) {
@@ -265,7 +267,7 @@ private fun <T> ChoiceDialog(
     onSelect: (T) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    AlertDialog(
+    AlertDialog(containerColor = dialogContainer(), 
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = {
@@ -289,6 +291,7 @@ private fun <T> ChoiceDialog(
 private class Credit(val name: String, val usedFor: String, val license: String)
 
 private val libraryCredits = listOf(
+    Credit("Spotineil", "This app: free software, you can share and change it", "GNU GPL v3.0 · the full text is in the LICENSE file of the source code"),
     Credit("InnerTube X (MetrolistGroup)", "Search, charts and streams of the music catalog", "GNU GPL v3.0 · github.com/MetrolistGroup/innertubex"),
     Credit("Jetpack Compose, Material 3, Navigation", "The app's screens and navigation", "Apache License 2.0"),
     Credit("AndroidX Core, AppCompat, Activity, Lifecycle, Splash Screen", "App foundations", "Apache License 2.0"),

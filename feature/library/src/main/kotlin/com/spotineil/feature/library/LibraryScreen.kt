@@ -1,5 +1,7 @@
 package com.spotineil.feature.library
 
+import com.spotineil.core.designsystem.theme.menuContainer
+import com.spotineil.core.designsystem.theme.dialogContainer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -159,7 +161,7 @@ private fun SortBar(sort: LibrarySort, grid: Boolean, onSort: (LibrarySort) -> U
                 Spacer(Modifier.width(6.dp))
                 Text(stringResource(sort.label()))
             }
-            DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+            DropdownMenu(containerColor = menuContainer(), expanded = menu, onDismissRequest = { menu = false }) {
                 LibrarySort.entries.forEach { s ->
                     DropdownMenuItem(text = { Text(stringResource(s.label())) }, onClick = { onSort(s); menu = false })
                 }
@@ -283,7 +285,7 @@ fun CreatePlaylistDialog(onDismiss: () -> Unit, onCreate: (String, String?, Bool
     var description by rememberSaveable { mutableStateOf("") }
     var public by rememberSaveable { mutableStateOf(false) }
     var collaborative by rememberSaveable { mutableStateOf(false) }
-    AlertDialog(
+    AlertDialog(containerColor = dialogContainer(), 
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.library_create_playlist)) },
         text = {

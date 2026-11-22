@@ -311,7 +311,7 @@ private fun EpisodeRow(episode: PodcastEpisode, isCurrent: Boolean, onClick: () 
             Icon(
                 if (isCurrent) Icons.Rounded.GraphicEq else Icons.Rounded.PlayArrow,
                 stringResource(R.string.free_play),
-                tint = MaterialTheme.colorScheme.background,
+                tint = MaterialTheme.colorScheme.inverseOnSurface,
             )
         }
     }

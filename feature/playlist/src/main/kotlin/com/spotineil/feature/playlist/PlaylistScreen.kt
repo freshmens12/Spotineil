@@ -1,5 +1,6 @@
 package com.spotineil.feature.playlist
 
+import com.spotineil.core.designsystem.theme.dialogContainer
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -293,7 +294,7 @@ private fun EditDetailsDialog(
     var description by rememberSaveable { mutableStateOf(initialDescription) }
     var public by rememberSaveable { mutableStateOf(initialPublic) }
     var collaborative by rememberSaveable { mutableStateOf(initialCollaborative) }
-    AlertDialog(
+    AlertDialog(containerColor = dialogContainer(), 
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.playlist_edit_details)) },
         text = {

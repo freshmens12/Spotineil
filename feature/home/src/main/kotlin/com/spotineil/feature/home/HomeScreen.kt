@@ -251,7 +251,7 @@ private fun FilterChips(selected: HomeFilter, onSelect: (HomeFilter) -> Unit) {
             Text(
                 stringResource(f.label),
                 style = MaterialTheme.typography.titleSmall,
-                color = if (isSelected) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onSurface,
+                color = if (isSelected) MaterialTheme.colorScheme.inverseOnSurface else MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .clip(CircleShape)
                     .background(if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.surfaceContainerHigh)

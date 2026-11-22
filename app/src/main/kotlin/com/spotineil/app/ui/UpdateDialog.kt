@@ -1,5 +1,6 @@
 package com.spotineil.app.ui
 
+import com.spotineil.core.designsystem.theme.dialogContainer
 import android.content.ActivityNotFoundException
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -47,7 +48,7 @@ fun UpdateDialog(viewModel: UpdateViewModel = hiltViewModel()) {
 
     when (val s = state) {
         UpdateUi.Hidden -> Unit
-        is UpdateUi.Available -> AlertDialog(
+        is UpdateUi.Available -> AlertDialog(containerColor = dialogContainer(), 
             onDismissRequest = viewModel::dismiss,
             title = { Text(stringResource(R.string.update_title)) },
             text = {
@@ -61,14 +62,14 @@ fun UpdateDialog(viewModel: UpdateViewModel = hiltViewModel()) {
             confirmButton = { TextButton(onClick = viewModel::accept) { Text(stringResource(R.string.update_now)) } },
             dismissButton = { TextButton(onClick = viewModel::dismiss) { Text(stringResource(R.string.update_later)) } },
         )
-        is UpdateUi.NeedsPermission -> AlertDialog(
+        is UpdateUi.NeedsPermission -> AlertDialog(containerColor = dialogContainer(), 
             onDismissRequest = viewModel::dismiss,
             title = { Text(stringResource(R.string.update_permission_title)) },
             text = { Text(stringResource(R.string.update_permission_message)) },
             confirmButton = { TextButton(onClick = viewModel::openInstallSettings) { Text(stringResource(R.string.update_open_settings)) } },
             dismissButton = { TextButton(onClick = viewModel::dismiss) { Text(stringResource(R.string.update_later)) } },
         )
-        is UpdateUi.Downloading -> AlertDialog(
+        is UpdateUi.Downloading -> AlertDialog(containerColor = dialogContainer(), 
             onDismissRequest = {},
             title = { Text(stringResource(R.string.update_downloading)) },
             text = {
@@ -84,7 +85,7 @@ fun UpdateDialog(viewModel: UpdateViewModel = hiltViewModel()) {
             confirmButton = {},
             dismissButton = { TextButton(onClick = viewModel::dismiss) { Text(stringResource(R.string.update_cancel)) } },
         )
-        is UpdateUi.Failed -> AlertDialog(
+        is UpdateUi.Failed -> AlertDialog(containerColor = dialogContainer(), 
             onDismissRequest = viewModel::dismiss,
             title = { Text(stringResource(R.string.update_failed_title)) },
             text = { Text(stringResource(R.string.update_failed_message)) },

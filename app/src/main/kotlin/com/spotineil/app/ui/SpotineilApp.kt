@@ -70,6 +70,9 @@ import com.spotineil.app.R
 import com.spotineil.app.widget.WidgetLink
 import com.spotineil.app.auth.openSpotifyInPlayStore
 import com.spotineil.core.designsystem.theme.LocalBottomContentPadding
+import com.spotineil.core.designsystem.theme.LocalGlass
+import com.spotineil.core.designsystem.theme.glassPanel
+import androidx.compose.foundation.shape.RoundedCornerShape
 import com.spotineil.core.designsystem.theme.LocalPipState
 import com.spotineil.core.player.PlayerEvent
 import com.spotineil.feature.album.albumScreen
@@ -246,13 +249,25 @@ private fun BottomBar(navController: NavHostController, tabs: List<TopLevel>, mo
     val backStack by navController.currentBackStackEntryAsState()
     val destination = backStack?.destination
     val background = MaterialTheme.colorScheme.background
+    val glass = LocalGlass.current
     Row(
-        modifier
-            .fillMaxWidth()
-            .background(Brush.verticalGradient(listOf(background.copy(alpha = 0f), background.copy(alpha = 0.92f), background)))
-            .navigationBarsPadding()
-            .height(NavBarHeight)
-            .selectableGroup(),
+        if (glass) {
+            // A floating frosted bar instead of the fade-out gradient.
+            modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .height(NavBarHeight)
+                .padding(horizontal = 12.dp, vertical = 4.dp)
+                .glassPanel(RoundedCornerShape(28.dp), fill = 0.10f, scrim = 0.94f)
+                .selectableGroup()
+        } else {
+            modifier
+                .fillMaxWidth()
+                .background(Brush.verticalGradient(listOf(background.copy(alpha = 0f), background.copy(alpha = 0.92f), background)))
+                .navigationBarsPadding()
+                .height(NavBarHeight)
+                .selectableGroup()
+        },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         tabs.forEach { item ->

@@ -1,5 +1,6 @@
 package com.spotineil.feature.player
 
+import com.spotineil.core.designsystem.theme.sheetContainer
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -68,7 +69,7 @@ fun QueueSheet(viewModel: PlayerViewModel, onDismiss: () -> Unit) {
     val error by viewModel.queueError.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) { viewModel.loadQueue() }
 
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(containerColor = sheetContainer(), onDismissRequest = onDismiss) {
         Column(Modifier.navigationBarsPadding().heightIn(min = 240.dp)) {
             Text(stringResource(R.string.player_queue), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(horizontal = 16.dp))
             val q = queue
@@ -131,7 +132,7 @@ private fun QueueRow(item: QueueItem, dragHandle: (@Composable () -> Unit)?) {
 fun DevicesSheet(onDismiss: () -> Unit) {
     val context = LocalContext.current
     val outputs = rememberAudioOutputs()
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(containerColor = sheetContainer(), onDismissRequest = onDismiss) {
         Column(Modifier.navigationBarsPadding().padding(bottom = 16.dp)) {
             Text(stringResource(R.string.player_connect_device), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(horizontal = 16.dp))
             Text(
@@ -230,7 +231,7 @@ private fun tryStart(context: Context, intent: Intent): Boolean = try {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SleepTimerSheet(current: SleepTimerState, onSelect: (SleepTimerOption?) -> Unit, onDismiss: () -> Unit) {
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(containerColor = sheetContainer(), onDismissRequest = onDismiss) {
         Column(Modifier.navigationBarsPadding().padding(bottom = 16.dp)) {
             Text(stringResource(R.string.player_sleep_timer), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(horizontal = 16.dp))
             current.endsAtMs?.let {
