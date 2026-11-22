@@ -14,6 +14,16 @@ A free Android music app, written in Kotlin with Jetpack Compose (Material 3). I
 
 **Updates:** every time the app opens it checks this repository's latest release. If there is a newer version it asks you, and only downloads and installs it when you tap **Update**. Updates install over the app only if they are signed with the same key as the version you have, so always take updates from this page.
 
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/home.jpg" width="250" alt="Home"><br><sub>Home</sub></td>
+    <td align="center"><img src="docs/screenshots/player.jpg" width="250" alt="Player"><br><sub>Player</sub></td>
+    <td align="center"><img src="docs/screenshots/lyrics.jpg" width="250" alt="Synced lyrics"><br><sub>Synced lyrics</sub></td>
+  </tr>
+</table>
+
 ## What you get
 
 | | |
