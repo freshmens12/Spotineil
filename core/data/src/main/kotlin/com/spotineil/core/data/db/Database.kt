@@ -210,6 +210,86 @@ interface FollowedPodcastDao {
     suspend fun delete(feedUrl: String)
 }
 
+
+/** A playlist made by the person (or saved from Spotify, then [source] is "spotify:<id>"). */
+@Entity(tableName = "user_playlists")
+data class UserPlaylistEntity(
+    @PrimaryKey val id: String,
+    val name: String,
+    val createdAt: Long,
+    val updatedAt: Long,
+    val source: String? = null,
+)
+
+/** One song of a playlist; [json] is a serialized PlayableMedia. */
+@Entity(tableName = "user_playlist_items", primaryKeys = ["playlistId", "mediaId"])
+data class UserPlaylistItemEntity(
+    val playlistId: String,
+    val mediaId: String,
+    val position: Int,
+    val json: String,
+    val addedAt: Long,
+)
+
+data class UserPlaylistSummaryRow(
+    val id: String,
+    val name: String,
+    val source: String?,
+    val updatedAt: Long,
+    val count: Int,
+    val firstJson: String?,
+)
+
+@Dao
+interface UserPlaylistDao {
+    @Query(
+        """SELECT p.id, p.name, p.source, p.updatedAt,
+           (SELECT COUNT(*) FROM user_playlist_items i WHERE i.playlistId = p.id) AS count,
+           (SELECT i.json FROM user_playlist_items i WHERE i.playlistId = p.id ORDER BY i.position LIMIT 1) AS firstJson
+           FROM user_playlists p ORDER BY p.updatedAt DESC""",
+    )
+    fun observeSummaries(): Flow<List<UserPlaylistSummaryRow>>
+
+    @Query("SELECT * FROM user_playlists WHERE id = :id")
+    fun observePlaylist(id: String): Flow<UserPlaylistEntity?>
+
+    @Query("SELECT * FROM user_playlists")
+    suspend fun allPlaylists(): List<UserPlaylistEntity>
+
+    @Query("SELECT * FROM user_playlists WHERE source = :source LIMIT 1")
+    suspend fun bySource(source: String): UserPlaylistEntity?
+
+    @Query("SELECT * FROM user_playlist_items WHERE playlistId = :id ORDER BY position")
+    fun observeItems(id: String): Flow<List<UserPlaylistItemEntity>>
+
+    @Query("SELECT * FROM user_playlist_items WHERE playlistId = :id ORDER BY position")
+    suspend fun items(id: String): List<UserPlaylistItemEntity>
+
+    @Query("SELECT * FROM user_playlist_items")
+    suspend fun allItems(): List<UserPlaylistItemEntity>
+
+    @Query("SELECT COALESCE(MAX(position), -1) FROM user_playlist_items WHERE playlistId = :id")
+    suspend fun lastPosition(id: String): Int
+
+    @Upsert suspend fun upsertPlaylist(entity: UserPlaylistEntity)
+    @Upsert suspend fun upsertItems(items: List<UserPlaylistItemEntity>)
+
+    @Query("UPDATE user_playlists SET name = :name, updatedAt = :now WHERE id = :id")
+    suspend fun rename(id: String, name: String, now: Long)
+
+    @Query("UPDATE user_playlists SET updatedAt = :now WHERE id = :id")
+    suspend fun touch(id: String, now: Long)
+
+    @Query("DELETE FROM user_playlists WHERE id = :id")
+    suspend fun deletePlaylist(id: String)
+
+    @Query("DELETE FROM user_playlist_items WHERE playlistId = :id")
+    suspend fun clearItems(id: String)
+
+    @Query("DELETE FROM user_playlist_items WHERE playlistId = :id AND mediaId = :mediaId")
+    suspend fun removeItem(id: String, mediaId: String)
+}
+
 @Database(
     entities = [
         RecentSearchEntity::class,
@@ -221,10 +301,12 @@ interface FollowedPodcastDao {
         LikedMediaEntity::class,
         RecentItemEntity::class,
         FollowedPodcastEntity::class,
+        UserPlaylistEntity::class,
+        UserPlaylistItemEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
-    autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(from = 2, to = 3)],
+    autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(from = 2, to = 3), AutoMigration(from = 3, to = 4)],
 )
 abstract class SpotineilDatabase : RoomDatabase() {
     abstract fun recentSearchDao(): RecentSearchDao
@@ -236,4 +318,5 @@ abstract class SpotineilDatabase : RoomDatabase() {
     abstract fun likedMediaDao(): LikedMediaDao
     abstract fun recentItemDao(): RecentItemDao
     abstract fun followedPodcastDao(): FollowedPodcastDao
+    abstract fun userPlaylistDao(): UserPlaylistDao
 }

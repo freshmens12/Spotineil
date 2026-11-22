@@ -8,9 +8,11 @@ import kotlinx.serialization.Serializable
 @Serializable data object LibraryRoute
 @Serializable data object LikedSongsRoute
 @Serializable data object LocalFilesRoute
+@Serializable data object DownloadsRoute
 
 fun NavController.navigateToLikedSongs() = navigate(LikedSongsRoute)
 fun NavController.navigateToLocalFiles() = navigate(LocalFilesRoute)
+fun NavController.navigateToDownloads() = navigate(DownloadsRoute)
 
 fun NavGraphBuilder.libraryScreens(
     callbacks: LibraryCallbacks,
@@ -21,6 +23,7 @@ fun NavGraphBuilder.libraryScreens(
         LikedSongsRoute(onBack, callbacks.onArtistClick, callbacks.onAlbumClick, callbacks.onMessage)
     }
     composable<LocalFilesRoute> { LocalFilesRoute(onBack) }
+    composable<DownloadsRoute> { LocalFilesRoute(onBack, downloadsOnly = true) }
 }
 
 /** Guest mode: local music as a top-level tab (no back button). */

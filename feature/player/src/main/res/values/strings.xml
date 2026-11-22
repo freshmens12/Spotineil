@@ -34,4 +34,8 @@
     <string name="player_lyrics_unavailable">Lyrics not available</string>
     <string name="player_lyrics_instrumental">Instrumental — enjoy the music</string>
     <string name="player_lyrics_source">Lyrics</string>
+    <string name="player_save_queue">Save as playlist</string>
+    <string name="player_queue_saved">Queue saved to Your playlists</string>
+    <string name="player_remove_from_queue">Remove from queue</string>
+    <string name="player_add_to_playlist">Add to playlist</string>
 </resources>

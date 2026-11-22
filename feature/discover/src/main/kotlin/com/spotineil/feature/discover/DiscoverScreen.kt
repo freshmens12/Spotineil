@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+
 package com.spotineil.feature.discover
 
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -168,9 +171,10 @@ private fun LazyListScope.trackSection(
 }
 
 @Composable
-fun StreamTrackRow(track: StreamTrack, isCurrent: Boolean, onClick: () -> Unit, onDownload: (() -> Unit)?) {
+fun StreamTrackRow(track: StreamTrack, isCurrent: Boolean, onClick: () -> Unit, onDownload: (() -> Unit)?, onLongClick: (() -> Unit)? = null) {
+    val longClick = onLongClick ?: com.spotineil.core.ui.LocalSongMenu.current?.let { open -> { open(track.toPlayable()) } }
     Row(
-        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = 6.dp)
+        Modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = longClick).padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = 6.dp)
             .testTag("stream_${track.source.name}_${track.id}"),
         verticalAlignment = Alignment.CenterVertically,
     ) {

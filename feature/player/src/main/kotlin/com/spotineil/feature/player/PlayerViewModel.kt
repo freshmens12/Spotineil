@@ -69,6 +69,7 @@ class PlayerViewModel @Inject constructor(
     private val library: LibraryRepository,
     private val likedMedia: LikedMediaRepository,
     users: UserRepository,
+    private val userPlaylists: javax.inject.Provider<com.spotineil.core.data.repository.UserPlaylistRepository>,
 ) : ViewModel() {
 
     private val liked = MutableStateFlow<Boolean?>(null)
@@ -150,6 +151,21 @@ class PlayerViewModel @Inject constructor(
         list.add(to, list.removeAt(from))
         _queue.value = q.copy(upcoming = list)
         player.moveQueueItem(from, to)
+    }
+
+    fun removeQueueItem(index: Int) {
+        val q = _queue.value ?: return
+        if (!q.isReorderable || index !in q.upcoming.indices) return
+        _queue.value = q.copy(upcoming = q.upcoming.toMutableList().apply { removeAt(index) })
+        player.removeQueueItem(index)
+    }
+
+    /** Saves the current song and everything after it as a new playlist. */
+    fun saveQueueAsPlaylist(name: String, done: () -> Unit) {
+        val q = _queue.value ?: return
+        val songs = (listOfNotNull(q.current) + q.upcoming).mapNotNull { it.media }.filterNot { it.isLive }
+        if (songs.isEmpty()) return
+        viewModelScope.launch { userPlaylists.get().create(name, songs); done() }
     }
 }
 

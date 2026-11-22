@@ -102,6 +102,7 @@ class LocalEngine @Inject constructor(
                 name = item.mediaMetadata.title?.toString().orEmpty(),
                 artists = item.mediaMetadata.artist?.toString().orEmpty(),
                 imageUrl = item.mediaMetadata.artworkUri?.toString(),
+                media = item.toPlayableMedia(),
             )
         }
         PlaybackQueue(
@@ -128,6 +129,22 @@ class LocalEngine @Inject constructor(
             artist = "YouTube Music",
         ).toMediaItem()
         c.addMediaItem(item)
+    }
+
+    suspend fun insertNext(items: List<PlayableMedia>) = withContext(Dispatchers.Main) {
+        val c = controller()
+        c.addMediaItems((c.currentMediaItemIndex + 1).coerceAtMost(c.mediaItemCount), items.map { it.toMediaItem() })
+    }
+
+    suspend fun append(items: List<PlayableMedia>) = withContext(Dispatchers.Main) {
+        controller().addMediaItems(items.map { it.toMediaItem() })
+    }
+
+    /** [index] is within the upcoming list. */
+    suspend fun removeUpcoming(index: Int) = withContext(Dispatchers.Main) {
+        val c = controller()
+        val at = c.currentMediaItemIndex + 1 + index
+        if (at in 0 until c.mediaItemCount) c.removeMediaItem(at)
     }
 
     suspend fun setUpNext(items: List<PlayableMedia>) = withContext(Dispatchers.Main) {
@@ -195,4 +212,22 @@ class LocalEngine @Inject constructor(
             deviceName = null,
         )
     }
+}
+
+/** The [PlayableMedia] a queued item was made from (as far as the controller can see it). */
+private fun androidx.media3.common.MediaItem.toPlayableMedia(): PlayableMedia {
+    val md = mediaMetadata
+    val extras = md.extras
+    return PlayableMedia(
+        mediaId = mediaId,
+        uri = (localConfiguration?.uri ?: requestMetadata.mediaUri)?.toString().orEmpty(),
+        title = md.title?.toString().orEmpty(),
+        artist = md.artist?.toString().orEmpty(),
+        album = md.albumTitle?.toString(),
+        artworkUrl = md.artworkUri?.toString(),
+        isLive = extras?.getBoolean(EXTRA_IS_LIVE) == true,
+        durationMs = extras?.getLong(EXTRA_DURATION_MS) ?: 0L,
+        isPreview = extras?.getBoolean(EXTRA_IS_PREVIEW) == true,
+        isEpisode = extras?.getBoolean(EXTRA_IS_EPISODE) == true,
+    )
 }

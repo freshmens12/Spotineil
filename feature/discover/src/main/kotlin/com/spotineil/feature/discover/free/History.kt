@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+
 package com.spotineil.feature.discover.free
 
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -115,9 +118,10 @@ fun HistoryScreen(nav: FreeNavigation, viewModel: HistoryViewModel = hiltViewMod
 }
 
 @Composable
-private fun HistoryRow(media: PlayableMedia, isCurrent: Boolean, onClick: () -> Unit) {
+private fun HistoryRow(media: PlayableMedia, isCurrent: Boolean, onLongClick: (() -> Unit)? = null, onClick: () -> Unit) {
+    val longClick = onLongClick ?: com.spotineil.core.ui.LocalSongMenu.current?.let { open -> { open(media) } }
     Row(
-        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 6.dp),
+        Modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = longClick).padding(horizontal = 16.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         CoverImage(media.artworkUrl, null, Modifier.size(48.dp))

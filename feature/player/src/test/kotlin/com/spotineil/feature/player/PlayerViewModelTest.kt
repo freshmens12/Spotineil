@@ -70,7 +70,7 @@ class PlayerViewModelTest {
     @Test
     fun `like state is loaded for the current track and can be toggled`() = runTest {
         val library = FakeLibrary()
-        val vm = PlayerViewModel(player, library, FakeLikedMedia(), FakeUsers(Product.Premium))
+        val vm = PlayerViewModel(player, library, FakeLikedMedia(), FakeUsers(Product.Premium), { error("not used") })
         vm.uiState.test {
             var state = awaitItem()
             while (state.isLiked == null) state = awaitItem()
@@ -94,7 +94,7 @@ class PlayerViewModelTest {
             )
         }
         val liked = FakeLikedMedia()
-        val vm = PlayerViewModel(local, FakeLibrary(), liked, FakeUsers(Product.Free))
+        val vm = PlayerViewModel(local, FakeLibrary(), liked, FakeUsers(Product.Free), { error("not used") })
         vm.uiState.test {
             var state = awaitItem()
             while (state.isLiked == null) state = awaitItem()
@@ -110,7 +110,7 @@ class PlayerViewModelTest {
     @Test
     fun `free accounts see the friendly notice`() = runTest {
         player.canPlayOnDemand.value = null
-        val vm = PlayerViewModel(player, FakeLibrary(), FakeLikedMedia(), FakeUsers(Product.Free))
+        val vm = PlayerViewModel(player, FakeLibrary(), FakeLikedMedia(), FakeUsers(Product.Free), { error("not used") })
         vm.uiState.test {
             var state = awaitItem()
             while (!state.showFreeNotice) state = awaitItem()
@@ -121,7 +121,7 @@ class PlayerViewModelTest {
 
     @Test
     fun `controls are forwarded to the playback controller`() {
-        val vm = PlayerViewModel(player, FakeLibrary(), FakeLikedMedia(), FakeUsers(Product.Premium))
+        val vm = PlayerViewModel(player, FakeLibrary(), FakeLikedMedia(), FakeUsers(Product.Premium), { error("not used") })
         vm.togglePlayPause(); vm.next(); vm.previous(); vm.seekTo(1234); vm.toggleShuffle(); vm.cycleRepeat()
         assertEquals(listOf("toggle", "next", "previous", "seek:1234", "shuffle", "repeat"), player.commands)
     }

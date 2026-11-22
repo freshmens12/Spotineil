@@ -122,7 +122,7 @@ class DefaultFreeMusicRepository @Inject constructor(
             artworkUrl = artwork?.medium ?: artwork?.small,
             durationMs = duration * 1000L,
             streamUrl = "https://api.audius.co/v1/tracks/$id/stream?app_name=$app",
-            downloadUrl = if (isDownloadable) "https://api.audius.co/v1/tracks/$id/download?app_name=$app" else null,
+            downloadUrl = if (isDownloadable && (downloadConditions == null || downloadConditions is kotlinx.serialization.json.JsonNull)) "https://api.audius.co/v1/tracks/$id/download?app_name=$app" else null,
             downloadFileName = safeFileName("${user.name} - $title.$ext"),
         )
     }

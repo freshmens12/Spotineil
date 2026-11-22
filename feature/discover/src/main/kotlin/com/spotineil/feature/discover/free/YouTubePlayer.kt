@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+
 package com.spotineil.feature.discover.free
 
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +38,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.GraphicEq
@@ -334,6 +338,10 @@ fun YouTubePlayerScreen(nav: FreeNavigation, viewModel: YouTubePlayerViewModel =
     val background = MaterialTheme.colorScheme.background
     val dominant by rememberDominantColor(video?.thumbnailUrl, MaterialTheme.colorScheme.surfaceContainerHigh)
     var showAllLyrics by remember { mutableStateOf(false) }
+    var addToPlaylist by remember { mutableStateOf(false) }
+    if (addToPlaylist && video != null) {
+        com.spotineil.core.ui.AddToPlaylistSheet(listOf(video.toPlayable()), onDismiss = { addToPlaylist = false }, onMessage = nav.onMessage)
+    }
 
     Column(
         Modifier
@@ -365,6 +373,9 @@ fun YouTubePlayerScreen(nav: FreeNavigation, viewModel: YouTubePlayerViewModel =
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(video?.artist.orEmpty(), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
+                }
+                IconButton(onClick = { addToPlaylist = true }, enabled = video != null) {
+                    Icon(Icons.AutoMirrored.Rounded.PlaylistAdd, stringResource(R.string.yt_add_to_playlist))
                 }
                 IconButton(onClick = viewModel::toggleLike, modifier = Modifier.testTag("yt_like")) {
                     Icon(
@@ -537,9 +548,10 @@ private fun YouTubeLyricsCard(lyrics: Lyrics, positionMs: Long, expanded: Boolea
 
 /** A YouTube song in a list: thumbnail, title, "artist • YouTube • 3:45". */
 @Composable
-internal fun YouTubeRow(video: YouTubeVideo, isCurrent: Boolean, onClick: () -> Unit) {
+internal fun YouTubeRow(video: YouTubeVideo, isCurrent: Boolean, onLongClick: (() -> Unit)? = null, onClick: () -> Unit) {
+    val longClick = onLongClick ?: com.spotineil.core.ui.LocalSongMenu.current?.let { open -> { open(video.toPlayable()) } }
     Row(
-        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 6.dp).testTag("yt_${video.id}"),
+        Modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = longClick).padding(horizontal = 16.dp, vertical = 6.dp).testTag("yt_${video.id}"),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(contentAlignment = Alignment.Center) {

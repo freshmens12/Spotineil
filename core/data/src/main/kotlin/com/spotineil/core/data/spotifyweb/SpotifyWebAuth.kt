@@ -83,6 +83,25 @@ class SpotifyWebAuth @Inject constructor(
     /** The newest token the web player showed, if it is still fresh (used while signing in). */
     fun latestToken(): String? = fresh()
 
+    /**
+     * Uses the person's own `sp_dc` cookie (copied from Spotify in a desktop browser): it is put in
+     * the app's web storage, then the hidden web player gets a token with it. Returns that token,
+     * or null if the web player didn't produce one. The caller checks it belongs to an account.
+     */
+    suspend fun tokenFromCookie(spDc: String): String? {
+        val value = spDc.trim().removePrefix("sp_dc=").substringBefore(';').trim()
+        if (value.isEmpty()) return null
+        withContext(Dispatchers.Main) {
+            val cookies = CookieManager.getInstance()
+            cookies.setAcceptCookie(true)
+            cookies.setCookie("https://open.spotify.com", "sp_dc=$value; Domain=.spotify.com; Path=/; Secure; HttpOnly")
+            cookies.flush()
+        }
+        token = null
+        tokenAt = 0L
+        return anyToken(forceRefresh = true)
+    }
+
     /** Remembers that the sign-in worked and whose account it is. */
     fun markConnected(accountName: String?) {
         prefs.edit().putBoolean(CONNECTED, true).putString(ACCOUNT, accountName).apply()
@@ -117,8 +136,11 @@ class SpotifyWebAuth @Inject constructor(
         webView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
-            // The desktop site: on a phone's own user agent Spotify only offers "open the app".
-            userAgentString = DESKTOP_USER_AGENT
+            // The phone's own Chrome identity, minus the "embedded WebView" marks. A desktop identity
+            // contradicts what the browser reports about itself, and Spotify's sign-in then refuses.
+            userAgentString = android.webkit.WebSettings.getDefaultUserAgent(viewContext)
+                .replace("; wv)", ")")
+                .replace(Regex("Version/[0-9.]+ "), "")
             useWideViewPort = true
             loadWithOverviewMode = true
             setSupportZoom(true)
@@ -161,7 +183,5 @@ class SpotifyWebAuth @Inject constructor(
         // Web-player tokens last an hour; renew a little early.
         private const val TOKEN_LIFETIME_MS = 50 * 60_000L
         private const val HIDDEN_TIMEOUT_MS = 30_000L
-        private const val DESKTOP_USER_AGENT =
-            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
     }
 }

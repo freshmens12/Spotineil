@@ -64,6 +64,8 @@ data class QueueItem(
     val name: String,
     val artists: String,
     val imageUrl: String?,
+    /** The playable item behind this entry (on-device queue only), e.g. to save the queue as a playlist. */
+    val media: PlayableMedia? = null,
 )
 
 data class PlaybackQueue(

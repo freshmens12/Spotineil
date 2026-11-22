@@ -56,4 +56,13 @@
     <string name="settings_spotify_connected">Conectado como %1$s</string>
     <string name="settings_spotify_open">Abrir biblioteca</string>
     <string name="settings_spotify_disconnect">Desconectar</string>
+    <string name="settings_backup_header">Copia de seguridad</string>
+    <string name="settings_backup">Hacer copia</string>
+    <string name="settings_backup_desc">Guarda en un archivo tus canciones favoritas, playlists, historial, emisoras, podcasts y ajustes</string>
+    <string name="settings_restore">Restaurar</string>
+    <string name="settings_restore_desc">Recupéralos desde una copia (se añaden a lo que ya hay)</string>
+    <string name="settings_backup_done">Copia guardada</string>
+    <string name="settings_backup_failed">No se pudo guardar la copia</string>
+    <string name="settings_restore_done">Restauradas %1$d canciones favoritas y %2$d playlists</string>
+    <string name="settings_restore_failed">Ese archivo no es una copia de Spotineil</string>
 </resources>

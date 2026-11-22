@@ -62,6 +62,7 @@ fun PlayerHost(
         onShowDevices = { sheet = "devices" },
         onShowSleepTimer = { sheet = "sleep" },
         onToggleLyrics = { showLyrics = !showLyrics },
+        onAddToPlaylist = state.track?.media?.takeIf { !it.isLive }?.let { { sheet = "playlist" } },
         onArtistClick = {
             state.track?.artistUri?.substringAfterLast(':')?.let { onExpandedChange(false); onArtistClick(it) }
         },
@@ -108,6 +109,14 @@ fun PlayerHost(
     when (sheet) {
         "queue" -> QueueSheet(viewModel) { sheet = null }
         "devices" -> DevicesSheet { sheet = null }
+        "playlist" -> state.track?.media?.let { media ->
+            val context = androidx.compose.ui.platform.LocalContext.current
+            com.spotineil.core.ui.AddToPlaylistSheet(
+                listOf(media),
+                onDismiss = { sheet = null },
+                onMessage = { android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_SHORT).show() },
+            )
+        }
         "sleep" -> SleepTimerSheet(state.sleepTimer, viewModel::setSleepTimer) { sheet = null }
     }
 }

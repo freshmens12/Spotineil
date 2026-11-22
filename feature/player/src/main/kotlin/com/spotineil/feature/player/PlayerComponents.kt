@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
+import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
 import androidx.compose.material.icons.rounded.AddCircleOutline
 import androidx.compose.material.icons.rounded.Bedtime
 import androidx.compose.material.icons.rounded.CheckCircle
@@ -88,6 +89,7 @@ data class PlayerActions(
     val onShowDevices: () -> Unit = {},
     val onShowSleepTimer: () -> Unit = {},
     val onToggleLyrics: () -> Unit = {},
+    val onAddToPlaylist: (() -> Unit)? = null,
     val onArtistClick: () -> Unit = {},
     val onAlbumClick: () -> Unit = {},
 )
@@ -291,6 +293,9 @@ fun FullPlayer(
                         stringResource(R.string.player_lyrics),
                         tint = if (showLyrics) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                     )
+                }
+                actions.onAddToPlaylist?.let { add ->
+                    IconButton(onClick = add) { Icon(Icons.AutoMirrored.Rounded.PlaylistAdd, stringResource(R.string.player_add_to_playlist)) }
                 }
                 IconButton(onClick = actions.onShowQueue) { Icon(Icons.AutoMirrored.Rounded.QueueMusic, stringResource(R.string.player_queue)) }
             }

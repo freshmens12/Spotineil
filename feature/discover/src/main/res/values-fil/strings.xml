@@ -122,4 +122,29 @@
     <string name="spotify_played_from_youtube">Hinahanap at pinapatugtog ang mga kanta mula sa YouTube Music.</string>
     <string name="spotify_not_found">Hindi mahanap ang mga kantang ito sa YouTube Music.</string>
     <string name="spotify_connected_message">Nakakonekta na ang Spotify</string>
+    <string name="free_your_playlists">Mga playlist mo</string>
+    <string name="free_create_playlist">Gumawa ng playlist</string>
+    <string name="free_create_playlist_desc">Pagsamahin ang mga paborito mong kanta</string>
+    <string name="free_downloads">Mga download</string>
+    <string name="free_downloads_desc">Mga kantang naka-save sa teleponong ito</string>
+    <plurals name="playlist_song_count"><item quantity="one">Playlist • %1$d kanta</item><item quantity="other">Playlist • %1$d kanta</item></plurals>
+    <string name="playlist_options">Mga opsyon ng playlist</string>
+    <string name="playlist_rename">Palitan ang pangalan</string>
+    <string name="playlist_delete">Burahin ang playlist</string>
+    <string name="playlist_delete_title">Burahin ang playlist na ito?</string>
+    <string name="playlist_delete_body">Aalisin ang \"%1$s\". Hindi buburahin ang mga kanta mismo.</string>
+    <string name="playlist_cancel">Kanselahin</string>
+    <string name="playlist_empty_title">Walang laman ang playlist na ito</string>
+    <string name="playlist_empty_body">Pindutin nang matagal ang kahit anong kanta at piliin ang Idagdag sa playlist.</string>
+    <string name="playlist_drag">I-drag para ayusin</string>
+    <string name="spotify_save">I-save sa Iyong Library</string>
+    <string name="spotify_saving">Sine-save… %1$d sa %2$d</string>
+    <plurals name="spotify_saved"><item quantity="one">Na-save ang %1$d kanta sa Mga playlist mo</item><item quantity="other">Na-save ang %1$d kanta sa Mga playlist mo</item></plurals>
+    <string name="yt_add_to_playlist">Idagdag sa playlist</string>
+    <string name="spotify_cookie_title">Kumonekta gamit ang iyong sp_dc cookie</string>
+    <string name="spotify_cookie_steps">Hinaharangan ng Spotify ang pag-sign in mula sa loob ng mga app, kaya kumonekta gamit ang sarili mong session cookie:\n\n1. Sa computer, buksan ang open.spotify.com sa Chrome o Edge at mag-log in.\n2. Pindutin ang F12, buksan ang Application (Storage sa Firefox) → Cookies → https://open.spotify.com.\n3. Kopyahin ang value ng cookie na sp_dc.\n4. Ipadala ito sa telepono mo (halimbawa sa sarili mo sa pribadong chat) at i-paste sa ibaba.</string>
+    <string name="spotify_cookie_checking">Sinusuri…</string>
+    <string name="spotify_cookie_failed">Hindi gumana ang cookie na iyon. Kopyahin muli ang buong sp_dc value habang naka-log in sa open.spotify.com.</string>
+    <string name="spotify_cookie_privacy">Parang password ng Spotify account mo ang cookie: nananatili ito sa teleponong ito at sa Spotify lang ipinapadala. I-disconnect sa Settings → Account para alisin ito. Natatapos din ito kapag nag-log out ka sa open.spotify.com.</string>
+    <string name="spotify_try_sign_in">O subukan ang sign-in page ng Spotify</string>
 </resources>

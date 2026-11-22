@@ -34,4 +34,8 @@
     <string name="player_lyrics_unavailable">Letra no disponible</string>
     <string name="player_lyrics_instrumental">Instrumental — disfruta la música</string>
     <string name="player_lyrics_source">Letra</string>
+    <string name="player_save_queue">Guardar como playlist</string>
+    <string name="player_queue_saved">Cola guardada en Tus playlists</string>
+    <string name="player_remove_from_queue">Quitar de la cola</string>
+    <string name="player_add_to_playlist">Añadir a playlist</string>
 </resources>

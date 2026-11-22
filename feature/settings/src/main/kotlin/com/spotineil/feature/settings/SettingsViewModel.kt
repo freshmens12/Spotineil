@@ -32,6 +32,7 @@ class SettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val settings: SettingsRepository,
     private val spotifyWeb: SpotifyWebAuth,
+    private val backup: com.spotineil.core.data.repository.BackupRepository,
     private val auth: AuthRepository,
     private val cacheManager: CacheManager,
     private val player: PlaybackController,
@@ -43,6 +44,24 @@ class SettingsViewModel @Inject constructor(
     val spotifyConnected: StateFlow<Boolean> = spotifyWeb.connected
     val spotifyName: StateFlow<String?> = spotifyWeb.accountName
     fun disconnectSpotify() = spotifyWeb.disconnect()
+
+    private val _backupMessage = MutableSharedFlow<String>(extraBufferCapacity = 2)
+    /** Result of a backup or restore, shown as a message. */
+    val backupMessage: SharedFlow<String> = _backupMessage.asSharedFlow()
+
+    fun exportBackup(target: android.net.Uri) = viewModelScope.launch {
+        _backupMessage.tryEmit(
+            runCatching { backup.export(target, appVersion) }
+                .fold({ context.getString(R.string.settings_backup_done) }, { context.getString(R.string.settings_backup_failed) }),
+        )
+    }
+
+    fun restoreBackup(source: android.net.Uri) = viewModelScope.launch {
+        _backupMessage.tryEmit(
+            runCatching { backup.restore(source) }
+                .fold({ context.getString(R.string.settings_restore_done, it.liked, it.playlists) }, { context.getString(R.string.settings_restore_failed) }),
+        )
+    }
 
     val state: StateFlow<UserSettings> = settings.settings
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UserSettings())

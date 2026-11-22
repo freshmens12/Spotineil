@@ -1,5 +1,9 @@
 package com.spotineil.feature.player
 
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextButton
+import androidx.compose.foundation.lazy.itemsIndexed
 import com.spotineil.core.designsystem.theme.sheetContainer
 import android.app.Activity
 import android.content.ActivityNotFoundException
@@ -71,7 +75,27 @@ fun QueueSheet(viewModel: PlayerViewModel, onDismiss: () -> Unit) {
 
     ModalBottomSheet(containerColor = sheetContainer(), onDismissRequest = onDismiss) {
         Column(Modifier.navigationBarsPadding().heightIn(min = 240.dp)) {
-            Text(stringResource(R.string.player_queue), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(horizontal = 16.dp))
+            var naming by remember { mutableStateOf(false) }
+            val context = LocalContext.current
+            Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.player_queue), style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+                if (queue?.isReorderable == true) {
+                    TextButton(onClick = { naming = true }) { Text(stringResource(R.string.player_save_queue)) }
+                }
+            }
+            if (naming) {
+                com.spotineil.core.ui.PlaylistNameDialog(
+                    title = stringResource(R.string.player_save_queue),
+                    initial = "",
+                    onDismiss = { naming = false },
+                    onConfirm = { name ->
+                        naming = false
+                        viewModel.saveQueueAsPlaylist(name) {
+                            android.widget.Toast.makeText(context, context.getString(R.string.player_queue_saved), android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                )
+            }
             val q = queue
             when {
                 error != null -> ErrorState(error!!, onRetry = { viewModel.loadQueue() })
@@ -94,11 +118,11 @@ fun QueueSheet(viewModel: PlayerViewModel, onDismiss: () -> Unit) {
                         viewModel.moveQueueItem(from.index, to.index)
                     }
                     LazyColumn(state = listState) {
-                        items(q.upcoming, key = { it.key }) { item ->
+                        itemsIndexed(q.upcoming, key = { _, it -> it.key }) { index, item ->
                             if (q.isReorderable) {
                                 ReorderableItem(reorderState, key = item.key) { dragging ->
                                     Surface(tonalElevation = if (dragging) 8.dp else 0.dp) {
-                                        QueueRow(item, dragHandle = {
+                                        QueueRow(item, onRemove = { viewModel.removeQueueItem(index) }, dragHandle = {
                                             Icon(Icons.Rounded.DragHandle, stringResource(R.string.player_drag), Modifier.draggableHandle().padding(12.dp))
                                         })
                                     }
@@ -115,13 +139,16 @@ fun QueueSheet(viewModel: PlayerViewModel, onDismiss: () -> Unit) {
 }
 
 @Composable
-private fun QueueRow(item: QueueItem, dragHandle: (@Composable () -> Unit)?) {
+private fun QueueRow(item: QueueItem, dragHandle: (@Composable () -> Unit)?, onRemove: (() -> Unit)? = null) {
     Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
         CoverImage(item.imageUrl, null, Modifier.size(44.dp))
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
             Text(item.name, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(item.artists, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
+        }
+        if (onRemove != null) {
+            IconButton(onClick = onRemove) { Icon(Icons.Rounded.Close, stringResource(R.string.player_remove_from_queue)) }
         }
         dragHandle?.invoke()
     }

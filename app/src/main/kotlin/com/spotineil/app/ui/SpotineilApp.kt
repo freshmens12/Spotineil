@@ -106,6 +106,7 @@ import androidx.compose.material.icons.rounded.Explore
 import com.spotineil.feature.library.libraryScreens
 import com.spotineil.feature.library.navigateToLikedSongs
 import com.spotineil.feature.library.navigateToLocalFiles
+import com.spotineil.feature.library.navigateToDownloads
 import com.spotineil.feature.player.PlayerHost
 import com.spotineil.feature.playlist.navigateToPlaylist
 import com.spotineil.feature.playlist.playlistScreen
@@ -231,13 +232,19 @@ private fun MainShell(mainViewModel: MainViewModel, free: Boolean) {
     val onFullPlayer = currentEntry?.destination?.hasRoute(YouTubePlayerRoute::class) == true
     val showMini = hasTrack && !onFullPlayer
     val bottomPadding = NavBarHeight + navInsets + if (showMini) MiniPlayerHeight else 0.dp
+    // One song menu for every list (long press on a song).
+    var songMenu by remember { mutableStateOf<com.spotineil.core.model.PlayableMedia?>(null) }
+    songMenu?.let { m -> com.spotineil.core.ui.SongActionsSheet(m, onDismiss = { songMenu = null }, onMessage = showMessage) }
 
     Box(Modifier.fillMaxSize()) {
         Scaffold(
             snackbarHost = { SnackbarHost(snackbar, Modifier.padding(bottom = bottomPadding)) },
             contentWindowInsets = WindowInsets(0),
         ) { _ ->
-            CompositionLocalProvider(LocalBottomContentPadding provides bottomPadding) {
+            CompositionLocalProvider(
+                LocalBottomContentPadding provides bottomPadding,
+                com.spotineil.core.ui.LocalSongMenu provides { songMenu = it },
+            ) {
                 AppNavHost(navController, showMessage, startDestination = tabs.first().route)
             }
         }
@@ -335,6 +342,8 @@ private fun AppNavHost(navController: NavHostController, onMessage: (String) -> 
             onHistory = { navController.navigate(HistoryRoute) },
             onYouTubePlayer = { navController.navigate(YouTubePlayerRoute) { launchSingleTop = true } },
             onLocalMusic = { navController.navigateToLocalFiles() },
+            onDownloads = { navController.navigateToDownloads() },
+            onUserPlaylist = { navController.navigate(com.spotineil.feature.discover.free.UserPlaylistRoute(it)) },
             onSpotify = { navController.navigate(SpotifyLibraryRoute) },
             onSpotifyConnect = { navController.navigate(SpotifyConnectRoute) },
             onSpotifyPlaylist = { id, name -> navController.navigate(SpotifyPlaylistRoute(id, name)) },

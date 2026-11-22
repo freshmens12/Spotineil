@@ -1,5 +1,8 @@
+@file:OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+
 package com.spotineil.feature.discover.free
 
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -595,9 +598,10 @@ fun LikedMediaScreen(nav: FreeNavigation, viewModel: LikedMediaViewModel = hiltV
 }
 
 @Composable
-private fun LikedRow(media: PlayableMedia, isCurrent: Boolean, onClick: () -> Unit, onUnlike: () -> Unit) {
+private fun LikedRow(media: PlayableMedia, isCurrent: Boolean, onClick: () -> Unit, onUnlike: () -> Unit, onLongClick: (() -> Unit)? = null) {
+    val longClick = onLongClick ?: com.spotineil.core.ui.LocalSongMenu.current?.let { open -> { open(media) } }
     Row(
-        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
+        Modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = longClick).padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         CoverImage(media.artworkUrl, null, Modifier.size(48.dp))

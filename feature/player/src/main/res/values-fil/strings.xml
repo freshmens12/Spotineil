@@ -34,4 +34,8 @@
     <string name="player_lyrics_unavailable">Walang available na lyrics</string>
     <string name="player_lyrics_instrumental">Instrumental — i-enjoy ang musika</string>
     <string name="player_lyrics_source">Lyrics</string>
+    <string name="player_save_queue">I-save bilang playlist</string>
+    <string name="player_queue_saved">Na-save ang pila sa Mga playlist mo</string>
+    <string name="player_remove_from_queue">Alisin sa pila</string>
+    <string name="player_add_to_playlist">Idagdag sa playlist</string>
 </resources>

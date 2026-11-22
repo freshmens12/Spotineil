@@ -47,4 +47,5 @@ fun NavGraphBuilder.freeScreens(nav: FreeNavigation) {
     composable<BrowseRoute> { BrowseScreen(nav) }
     composable<YouTubePlayerRoute> { YouTubePlayerScreen(nav) }
     spotifyScreens(nav)
+    composable<UserPlaylistRoute> { UserPlaylistScreen(nav) }
 }

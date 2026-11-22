@@ -28,7 +28,7 @@ To show and play music, the app sends requests (such as your search words and yo
 Spotineil does not access your Google or YouTube accounts. Signing in is never required.
 
 ## Connecting Spotify (optional)
-If you tap **Connect Spotify**, you sign in on Spotify's own web page inside the app. Your password goes only to Spotify. Spotify's session cookie (`sp_dc`) and the short-lived access token stay on your phone (the cookie in the app's web storage) and are sent only to Spotify, to read your playlists and Liked Songs. Nothing is sent to the developer. **Settings → Account → Spotify → Disconnect** deletes the cookies and the token. This uses Spotify's unofficial web-player route, which Spotify's terms do not allow for apps, so use it at your own risk.
+If you tap **Connect Spotify**, you either paste your own `sp_dc` cookie (copied from open.spotify.com on a computer) or sign in on Spotify's own web page inside the app. Your password and cookie go only to Spotify. Spotify's session cookie (`sp_dc`) and the short-lived access token stay on your phone (the cookie in the app's web storage) and are sent only to Spotify, to read your playlists and Liked Songs. Nothing is sent to the developer. **Settings → Account → Spotify → Disconnect** deletes the cookies and the token. This uses Spotify's unofficial web-player route, which Spotify's terms do not allow for apps, so use it at your own risk.
 
 ## Contact
 Questions: open an issue on the project's GitHub page, <https://github.com/freshmens12/Spotineil/issues>.

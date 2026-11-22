@@ -34,4 +34,7 @@
     <string name="library_delete">Eliminar del dispositivo</string>
     <string name="library_delete_title">¿Eliminar esta canción?</string>
     <string name="library_delete_body">\"%1$s\" se eliminará de forma permanente de tu teléfono. Android te pedirá confirmar.</string>
+    <string name="library_downloads">Descargas</string>
+    <string name="library_no_downloads">Aún no hay descargas. Las canciones de artistas libres que lo permiten tienen un botón de descarga.</string>
+    <plurals name="library_downloads_size"><item quantity="one">%1$d canción • %2$s en este teléfono</item><item quantity="many">%1$d canciones • %2$s en este teléfono</item><item quantity="other">%1$d canciones • %2$s en este teléfono</item></plurals>
 </resources>

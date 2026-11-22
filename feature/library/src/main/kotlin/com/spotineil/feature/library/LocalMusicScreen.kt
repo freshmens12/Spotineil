@@ -85,7 +85,8 @@ internal fun List<LocalTrack>.artists(): List<LocalGroup> =
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LocalFilesRoute(onBack: (() -> Unit)?, viewModel: LocalFilesViewModel = hiltViewModel()) {
+fun LocalFilesRoute(onBack: (() -> Unit)?, downloadsOnly: Boolean = false, viewModel: LocalFilesViewModel = hiltViewModel()) {
+    viewModel.downloadsOnly = downloadsOnly
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -156,7 +157,7 @@ fun LocalFilesRoute(onBack: (() -> Unit)?, viewModel: LocalFilesViewModel = hilt
         containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
-                title = { Text(openGroup?.title ?: stringResource(R.string.library_local_files)) },
+                title = { Text(openGroup?.title ?: stringResource(if (downloadsOnly) R.string.library_downloads else R.string.library_local_files)) },
                 navigationIcon = {
                     val back = if (openGroup != null) ({ openGroup = null }) else onBack
                     if (back != null) IconButton(onClick = back) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, null) }
@@ -183,7 +184,16 @@ fun LocalFilesRoute(onBack: (() -> Unit)?, viewModel: LocalFilesViewModel = hilt
                 )
                 LocalFilesUiState.Loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
                 is LocalFilesUiState.Loaded -> when {
-                    s.tracks.isEmpty() -> MessageState(Icons.Rounded.FolderOff, stringResource(R.string.library_no_local), null)
+                    s.tracks.isEmpty() -> MessageState(Icons.Rounded.FolderOff, stringResource(if (downloadsOnly) R.string.library_no_downloads else R.string.library_no_local), null)
+                    downloadsOnly && openGroup == null -> Column {
+                        Text(
+                            androidx.compose.ui.res.pluralStringResource(R.plurals.library_downloads_size, s.tracks.size, s.tracks.size, android.text.format.Formatter.formatShortFileSize(context, s.tracks.sumOf { it.sizeBytes })),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        )
+                        SongList(s.tracks, ::askDelete) { i -> viewModel.play(s.tracks, i) }
+                    }
                     openGroup != null -> SongList(openGroup!!.tracks, ::askDelete) { i -> viewModel.play(openGroup!!.tracks, i) }
                     else -> Column {
                         PrimaryTabRow(selectedTabIndex = tab, containerColor = Color.Transparent) {

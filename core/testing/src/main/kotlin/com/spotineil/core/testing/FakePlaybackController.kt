@@ -36,6 +36,10 @@ class FakePlaybackController : PlaybackController {
         mediaRequests += items
         commands += "playMedia:$startIndex"
     }
+    override fun playNext(items: List<com.spotineil.core.model.PlayableMedia>) { commands += "playNext:${items.size}" }
+    override fun addToQueueEnd(items: List<com.spotineil.core.model.PlayableMedia>) { commands += "addToQueueEnd:${items.size}" }
+    override fun removeQueueItem(index: Int) { commands += "removeQueueItem:$index" }
+    override val queueEdits = kotlinx.coroutines.flow.MutableSharedFlow<Unit>()
     override fun togglePlayPause() { commands += "toggle" }
     override fun next() { commands += "next" }
     override fun previous() { commands += "previous" }

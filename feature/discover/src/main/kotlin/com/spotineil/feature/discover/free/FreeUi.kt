@@ -234,7 +234,29 @@ class FreePlayer @Inject constructor(
     fun download(track: StreamTrack): Boolean = downloads.download(track)
 
     // Last in the class, so every field above is initialised before it runs.
+    /**
+     * The queue was edited by hand (play next, add, remove, reorder): rebuild the YouTube list from
+     * the audio player, so the player screen's "Up next" matches what will really play.
+     */
+    private suspend fun resyncYouTubeQueue() {
+        val list = _youTubeQueue.value
+        if (list.isEmpty()) return
+        val q = runCatching { player.queue() }.getOrNull() ?: return
+        val current = q.current ?: return
+        if (!current.uri.startsWith(YOUTUBE_MEDIA_PREFIX)) return
+        val known = list.associateBy { YOUTUBE_MEDIA_PREFIX + it.id }
+        val before = list.take(_youTubeIndex.value.coerceIn(0, list.size))
+        val after = (listOf(current) + q.upcoming).mapNotNull { item ->
+            known[item.uri] ?: item.uri.takeIf { it.startsWith(YOUTUBE_MEDIA_PREFIX) }?.let {
+                YouTubeVideo(it.removePrefix(YOUTUBE_MEDIA_PREFIX), item.name, item.artists, item.imageUrl, 0L)
+            }
+        }
+        _youTubeQueue.value = before + after
+        _youTubeIndex.value = before.size
+    }
+
     init {
+        scope.launch { player.queueEdits.collect { resyncYouTubeQueue() } }
         // Remember where each song is, so playing it again continues from there.
         scope.launch {
             while (true) {

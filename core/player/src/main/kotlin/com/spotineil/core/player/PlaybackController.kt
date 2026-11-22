@@ -84,6 +84,18 @@ interface PlaybackController {
     /** Only effective for reorderable (local) queues; indices are within `upcoming`. */
     fun moveQueueItem(from: Int, to: Int)
 
+    /** Plays [items] right after the current song (starts them if nothing is playing). */
+    fun playNext(items: List<com.spotineil.core.model.PlayableMedia>)
+
+    /** Adds [items] at the end of the queue (starts them if nothing is playing). */
+    fun addToQueueEnd(items: List<com.spotineil.core.model.PlayableMedia>)
+
+    /** Removes an upcoming song; [index] is within `upcoming`. */
+    fun removeQueueItem(index: Int)
+
+    /** Fires after the queue was changed by hand (reorder, remove, play next, add). */
+    val queueEdits: SharedFlow<Unit>
+
     suspend fun devices(): List<Device>
     fun transferTo(device: Device)
 

@@ -30,6 +30,8 @@ data class AudiusTrackDto(
     val genre: String? = null,
     @SerialName("is_streamable") val isStreamable: Boolean = true,
     @SerialName("is_downloadable") val isDownloadable: Boolean = false,
+    /** Set when downloading needs something first (e.g. following the artist): we then can't download it. */
+    @SerialName("download_conditions") val downloadConditions: kotlinx.serialization.json.JsonElement? = null,
     @SerialName("orig_filename") val origFilename: String? = null,
     val artwork: AudiusArtworkDto? = null,
     val user: AudiusUserDto = AudiusUserDto(),

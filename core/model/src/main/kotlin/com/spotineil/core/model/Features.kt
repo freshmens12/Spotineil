@@ -135,4 +135,6 @@ data class LocalTrack(
     val album: String,
     val durationMs: Long,
     val albumArtUri: String?,
+    /** File size in bytes (0 when unknown). */
+    val sizeBytes: Long = 0,
 )

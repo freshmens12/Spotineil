@@ -256,7 +256,26 @@ class DefaultPlaybackController @Inject constructor(
         if (route() == Route.Local) local.queue() else connectRepository.queue()
 
     override fun moveQueueItem(from: Int, to: Int) {
-        if (route() == Route.Local) command { local.moveUpcoming(from, to) }
+        if (route() == Route.Local) command { local.moveUpcoming(from, to); _queueEdits.tryEmit(Unit) }
+    }
+
+    private val _queueEdits = MutableSharedFlow<Unit>(extraBufferCapacity = 4)
+    override val queueEdits: SharedFlow<Unit> = _queueEdits.asSharedFlow()
+
+    override fun playNext(items: List<PlayableMedia>) {
+        if (items.isEmpty()) return
+        if (!localActive.value || !local.hasMedia) return playMedia(items, 0)
+        command { local.insertNext(items); _queueEdits.tryEmit(Unit) }
+    }
+
+    override fun addToQueueEnd(items: List<PlayableMedia>) {
+        if (items.isEmpty()) return
+        if (!localActive.value || !local.hasMedia) return playMedia(items, 0)
+        command { local.append(items); _queueEdits.tryEmit(Unit) }
+    }
+
+    override fun removeQueueItem(index: Int) {
+        if (route() == Route.Local) command { local.removeUpcoming(index); _queueEdits.tryEmit(Unit) }
     }
 
     override suspend fun devices(): List<Device> = connectRepository.devices()

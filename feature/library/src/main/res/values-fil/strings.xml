@@ -34,4 +34,7 @@
     <string name="library_delete">Burahin sa device</string>
     <string name="library_delete_title">Burahin ang kantang ito?</string>
     <string name="library_delete_body">Permanenteng buburahin ang \"%1$s\" sa iyong telepono. Hihingi ng kumpirmasyon ang Android.</string>
+    <string name="library_downloads">Mga download</string>
+    <string name="library_no_downloads">Wala pang download. May download button ang mga kanta ng libreng artist na pumapayag dito.</string>
+    <plurals name="library_downloads_size"><item quantity="one">%1$d kanta • %2$s sa teleponong ito</item><item quantity="other">%1$d kanta • %2$s sa teleponong ito</item></plurals>
 </resources>

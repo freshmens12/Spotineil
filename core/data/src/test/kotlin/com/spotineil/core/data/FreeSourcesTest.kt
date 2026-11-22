@@ -60,7 +60,8 @@ class FreeSourcesTest {
         {"id":"abc","title":"Night Drive","duration":185,"is_streamable":true,"is_downloadable":true,
          "orig_filename":"night drive.wav","artwork":{"480x480":"https://img/480.jpg"},"user":{"name":"Indie Artist","handle":"indie"}},
         {"id":"locked","title":"Gated","duration":100,"is_streamable":false,"user":{"name":"X"}},
-        {"id":"nodl","title":"Stream Only","duration":90,"is_streamable":true,"is_downloadable":false,"user":{"name":"","handle":"handle_only"}}
+        {"id":"nodl","title":"Stream Only","duration":90,"is_streamable":true,"is_downloadable":false,"user":{"name":"","handle":"handle_only"}},
+        {"id":"follow","title":"Follow To Download","duration":90,"is_streamable":true,"is_downloadable":true,"download_conditions":{"follow_user_id":7},"user":{"name":"Z"}}
     ]}"""
 
     @Test
@@ -70,7 +71,8 @@ class FreeSourcesTest {
 
         val sections = repo.featured()
 
-        assertEquals(listOf("Night Drive", "Stream Only"), sections.audius.map { it.title }) // non-streamable skipped
+        assertEquals(listOf("Night Drive", "Stream Only", "Follow To Download"), sections.audius.map { it.title }) // non-streamable skipped
+        assertFalse("downloads that need a follow on Audius are not offered", sections.audius[2].canDownload)
         val first = sections.audius.first()
         assertEquals(StreamSource.Audius, first.source)
         assertEquals(185_000L, first.durationMs)

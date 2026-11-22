@@ -122,15 +122,20 @@ class LocalFilesViewModel @Inject constructor(
     private val _state = MutableStateFlow<LocalFilesUiState>(LocalFilesUiState.NeedsPermission)
     val state: StateFlow<LocalFilesUiState> = _state.asStateFlow()
 
+    /** True on the Downloads page: only songs Spotineil saved. */
+    var downloadsOnly = false
+
+    private suspend fun load() = if (downloadsOnly) localMedia.downloads() else localMedia.tracks()
+
     fun onPermissionResult(granted: Boolean) {
         if (!granted) { _state.value = LocalFilesUiState.NeedsPermission; return }
         _state.value = LocalFilesUiState.Loading
-        viewModelScope.launch { _state.value = LocalFilesUiState.Loaded(localMedia.tracks()) }
+        viewModelScope.launch { _state.value = LocalFilesUiState.Loaded(load()) }
     }
 
     /** Reads the files again (after one was deleted). */
     fun reload() {
-        viewModelScope.launch { _state.value = LocalFilesUiState.Loaded(localMedia.tracks()) }
+        viewModelScope.launch { _state.value = LocalFilesUiState.Loaded(load()) }
     }
 
     fun play(tracks: List<LocalTrack>, index: Int) {

@@ -11,4 +11,14 @@
     <string name="ui_choose_playlist">Pumili ng playlist</string>
     <string name="ui_share">I-share</string>
     <string name="ui_action_failed">Hindi ito natapos. Subukan muli.</string>
+    <string name="ui_remove_playlist">Alisin sa playlist na ito</string>
+    <string name="ui_play_next">Susunod na patugtugin</string>
+    <string name="ui_will_play_next">Susunod na tutugtog</string>
+    <string name="ui_new_playlist">Bagong playlist</string>
+    <string name="ui_added_to_named">Naidagdag sa %1$s</string>
+    <string name="ui_already_in_playlist">Nasa %1$s na</string>
+    <string name="ui_playlist_name_hint">Pangalan ng playlist</string>
+    <string name="ui_save">I-save</string>
+    <string name="ui_cancel">Kanselahin</string>
+    <plurals name="ui_song_count"><item quantity="one">%1$d kanta</item><item quantity="other">%1$d kanta</item></plurals>
 </resources>

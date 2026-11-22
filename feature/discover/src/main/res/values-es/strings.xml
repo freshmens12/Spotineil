@@ -125,4 +125,29 @@
     <string name="spotify_played_from_youtube">Las canciones se buscan y se reproducen desde YouTube Music.</string>
     <string name="spotify_not_found">No se encontraron estas canciones en YouTube Music.</string>
     <string name="spotify_connected_message">Spotify conectado</string>
+    <string name="free_your_playlists">Tus playlists</string>
+    <string name="free_create_playlist">Crear playlist</string>
+    <string name="free_create_playlist_desc">Agrupa tus canciones favoritas</string>
+    <string name="free_downloads">Descargas</string>
+    <string name="free_downloads_desc">Canciones guardadas en este teléfono</string>
+    <plurals name="playlist_song_count"><item quantity="one">Playlist • %1$d canción</item><item quantity="many">Playlist • %1$d canciones</item><item quantity="other">Playlist • %1$d canciones</item></plurals>
+    <string name="playlist_options">Opciones de la playlist</string>
+    <string name="playlist_rename">Cambiar nombre</string>
+    <string name="playlist_delete">Eliminar playlist</string>
+    <string name="playlist_delete_title">¿Eliminar esta playlist?</string>
+    <string name="playlist_delete_body">Se quitará \"%1$s\". Las canciones no se eliminan.</string>
+    <string name="playlist_cancel">Cancelar</string>
+    <string name="playlist_empty_title">Esta playlist está vacía</string>
+    <string name="playlist_empty_body">Mantén pulsada cualquier canción y elige Añadir a playlist.</string>
+    <string name="playlist_drag">Arrastra para reordenar</string>
+    <string name="spotify_save">Guardar en tu biblioteca</string>
+    <string name="spotify_saving">Guardando… %1$d de %2$d</string>
+    <plurals name="spotify_saved"><item quantity="one">%1$d canción guardada en Tus playlists</item><item quantity="many">%1$d canciones guardadas en Tus playlists</item><item quantity="other">%1$d canciones guardadas en Tus playlists</item></plurals>
+    <string name="yt_add_to_playlist">Añadir a playlist</string>
+    <string name="spotify_cookie_title">Conecta con tu cookie sp_dc</string>
+    <string name="spotify_cookie_steps">Spotify bloquea el inicio de sesión dentro de apps, así que conecta con tu propia cookie de sesión:\n\n1. En un ordenador, abre open.spotify.com en Chrome o Edge e inicia sesión.\n2. Pulsa F12, abre Aplicación (Almacenamiento en Firefox) → Cookies → https://open.spotify.com.\n3. Copia el valor de la cookie llamada sp_dc.\n4. Envíala a tu teléfono (por ejemplo, a ti mismo en un chat privado) y pégala abajo.</string>
+    <string name="spotify_cookie_checking">Comprobando…</string>
+    <string name="spotify_cookie_failed">Esa cookie no funcionó. Copia de nuevo el valor completo de sp_dc con la sesión iniciada en open.spotify.com.</string>
+    <string name="spotify_cookie_privacy">La cookie es como una contraseña de tu cuenta de Spotify: se queda en este teléfono y solo se envía a Spotify. Desconéctala en Ajustes → Cuenta. Cerrar sesión en open.spotify.com también la invalida.</string>
+    <string name="spotify_try_sign_in">O prueba la página de inicio de sesión de Spotify</string>
 </resources>

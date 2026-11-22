@@ -56,4 +56,13 @@
     <string name="settings_spotify_connected">Nakakonekta bilang %1$s</string>
     <string name="settings_spotify_open">Buksan ang library</string>
     <string name="settings_spotify_disconnect">Idiskonekta</string>
+    <string name="settings_backup_header">Backup at restore</string>
+    <string name="settings_backup">Mag-back up</string>
+    <string name="settings_backup_desc">I-save sa isang file ang Mga Paboritong Kanta, playlist, kasaysayan, istasyon, podcast at setting mo</string>
+    <string name="settings_restore">I-restore</string>
+    <string name="settings_restore_desc">Ibalik ang mga ito mula sa backup file (idinadagdag sa nandito na)</string>
+    <string name="settings_backup_done">Na-save ang backup</string>
+    <string name="settings_backup_failed">Hindi ma-save ang backup</string>
+    <string name="settings_restore_done">Naibalik ang %1$d paboritong kanta at %2$d playlist</string>
+    <string name="settings_restore_failed">Hindi Spotineil backup ang file na iyon</string>
 </resources>

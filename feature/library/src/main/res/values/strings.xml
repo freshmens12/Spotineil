@@ -34,4 +34,7 @@
     <string name="library_delete">Delete from device</string>
     <string name="library_delete_title">Delete this song?</string>
     <string name="library_delete_body">\"%1$s\" will be permanently deleted from your phone. Android will ask you to confirm.</string>
+    <string name="library_downloads">Downloads</string>
+    <string name="library_no_downloads">No downloads yet. Songs from free artists that allow it have a download button.</string>
+    <plurals name="library_downloads_size"><item quantity="one">%1$d song • %2$s on this phone</item><item quantity="other">%1$d songs • %2$s on this phone</item></plurals>
 </resources>

@@ -1,5 +1,8 @@
 package com.spotineil.feature.discover.free
 
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.OutlinedTextField
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -59,6 +62,7 @@ import com.spotineil.core.designsystem.component.TrackRow
 import com.spotineil.core.designsystem.component.formatDuration
 import com.spotineil.core.designsystem.theme.LocalBottomContentPadding
 import com.spotineil.core.model.YouTubeVideo
+import com.spotineil.core.model.toPlayable
 import com.spotineil.feature.discover.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -99,6 +103,9 @@ class SpotifyConnectViewModel @Inject constructor(
 ) : ViewModel() {
     private var checkedToken: String? = null
 
+    private val _cookieState = MutableStateFlow<CookieConnect>(CookieConnect.Idle)
+    val cookieState: StateFlow<CookieConnect> = _cookieState.asStateFlow()
+
     /** Checks the token the web player showed; true once it belongs to a real account. */
     suspend fun checkSignedIn(): Boolean {
         val token = auth.latestToken() ?: return false
@@ -108,31 +115,109 @@ class SpotifyConnectViewModel @Inject constructor(
         auth.markConnected(name)
         return true
     }
-}
 
-/** Spotify's own sign-in page. [onDone] runs once the account is connected. */
-@Composable
-fun SpotifyConnectScreen(onDone: () -> Unit, onBack: () -> Unit, viewModel: SpotifyConnectViewModel = hiltViewModel()) {
-    val context = LocalContext.current
-    val webView = remember { viewModel.auth.newWebView(context) }
-    DisposableEffect(webView) { onDispose { webView.stopLoading(); webView.destroy() } }
-    var signedIn by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        while (!signedIn) {
-            if (viewModel.checkSignedIn()) {
-                signedIn = true
-                onDone()
+    /** Connects with a pasted `sp_dc` cookie. */
+    fun connectWithCookie(cookie: String) {
+        if (_cookieState.value == CookieConnect.Working) return
+        viewModelScope.launch {
+            _cookieState.value = CookieConnect.Working
+            val token = runCatching { auth.tokenFromCookie(cookie) }.getOrNull()
+            val name = token?.let { runCatching { repository.displayName(it) }.getOrNull() }
+            _cookieState.value = if (name != null) {
+                auth.markConnected(name)
+                CookieConnect.Done
+            } else {
+                CookieConnect.Failed
             }
-            delay(1_500)
         }
     }
+}
+
+enum class CookieConnect { Idle, Working, Done, Failed }
+
+/**
+ * Connect to Spotify. First choice: paste your own `sp_dc` cookie (Spotify refuses sign-ins from
+ * inside apps with its robot check). Second choice: Spotify's sign-in page, which may work on
+ * some phones. [onDone] runs once the account is connected.
+ */
+@Composable
+fun SpotifyConnectScreen(onDone: () -> Unit, onBack: () -> Unit, viewModel: SpotifyConnectViewModel = hiltViewModel()) {
+    val cookieState by viewModel.cookieState.collectAsStateWithLifecycle()
+    var showSignIn by remember { mutableStateOf(false) }
+    var cookie by remember { mutableStateOf("") }
+    LaunchedEffect(cookieState) { if (cookieState == CookieConnect.Done) onDone() }
 
     Column(Modifier.fillMaxSize().statusBarsPadding()) {
         Row(Modifier.padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.free_back)) }
+            IconButton(onClick = { if (showSignIn) showSignIn = false else onBack() }) {
+                Icon(Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.free_back))
+            }
             Text(stringResource(R.string.spotify_connect_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         }
+        if (showSignIn) {
+            SpotifySignInPage(viewModel, onDone)
+            return@Column
+        }
+        Column(
+            Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp).padding(bottom = LocalBottomContentPadding.current + 16.dp),
+        ) {
+            Text(stringResource(R.string.spotify_cookie_title), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 8.dp))
+            Text(
+                stringResource(R.string.spotify_cookie_steps),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(vertical = 8.dp),
+            )
+            OutlinedTextField(
+                value = cookie,
+                onValueChange = { cookie = it },
+                label = { Text("sp_dc") },
+                singleLine = true,
+                visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth(),
+            )
+            if (cookieState == CookieConnect.Failed) {
+                Text(stringResource(R.string.spotify_cookie_failed), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
+            }
+            Button(
+                onClick = { viewModel.connectWithCookie(cookie) },
+                enabled = cookie.isNotBlank() && cookieState != CookieConnect.Working,
+                modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+            ) {
+                if (cookieState == CookieConnect.Working) {
+                    CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+                    Text(stringResource(R.string.spotify_cookie_checking), Modifier.padding(start = 8.dp))
+                } else {
+                    Text(stringResource(R.string.spotify_connect_button))
+                }
+            }
+            Text(
+                stringResource(R.string.spotify_cookie_privacy),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(vertical = 12.dp),
+            )
+            OutlinedButton(onClick = { showSignIn = true }, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.spotify_try_sign_in))
+            }
+        }
+    }
+}
+
+/** Spotify's own sign-in page (Spotify's robot check often refuses it inside apps). */
+@Composable
+private fun SpotifySignInPage(viewModel: SpotifyConnectViewModel, onDone: () -> Unit) {
+    val context = LocalContext.current
+    val webView = remember { viewModel.auth.newWebView(context) }
+    DisposableEffect(webView) { onDispose { webView.stopLoading(); webView.destroy() } }
+    LaunchedEffect(Unit) {
+        while (true) {
+            if (viewModel.checkSignedIn()) { onDone(); break }
+            delay(1_500)
+        }
+    }
+    Column {
         Text(
             stringResource(R.string.spotify_connect_help),
             style = MaterialTheme.typography.bodySmall,
@@ -146,11 +231,10 @@ fun SpotifyConnectScreen(onDone: () -> Unit, onBack: () -> Unit, viewModel: Spot
                     loadUrl(SpotifyWebAuth.LOGIN_URL)
                 }
             },
-            modifier = Modifier.weight(1f).fillMaxWidth().padding(bottom = LocalBottomContentPadding.current),
+            modifier = Modifier.fillMaxSize().padding(bottom = LocalBottomContentPadding.current),
         )
     }
 }
-
 // ---------------------------------------------------------------------------------------------
 // Library: Liked Songs + playlists
 // ---------------------------------------------------------------------------------------------
@@ -259,6 +343,7 @@ sealed interface SpotifyTracksState {
 sealed interface SpotifyPlayEvent {
     data object OpenPlayer : SpotifyPlayEvent
     data class Message(val resId: Int) : SpotifyPlayEvent
+    data class Saved(val count: Int) : SpotifyPlayEvent
 }
 
 @HiltViewModel
@@ -267,6 +352,7 @@ class SpotifyPlaylistViewModel @Inject constructor(
     private val repository: SpotifyWebRepository,
     private val youTube: YouTubeRepository,
     private val freePlayer: FreePlayer,
+    private val userPlaylists: com.spotineil.core.data.repository.UserPlaylistRepository,
 ) : ViewModel() {
     private val route = savedState.toRoute<SpotifyPlaylistRoute>()
     val title = route.name
@@ -279,6 +365,36 @@ class SpotifyPlaylistViewModel @Inject constructor(
     val events = _events.receiveAsFlow()
 
     private var playJob: Job? = null
+
+    private val _saving = MutableStateFlow<Pair<Int, Int>?>(null)
+    /** (songs looked up so far, total) while saving to Your Library; null when not saving. */
+    val saving: StateFlow<Pair<Int, Int>?> = _saving.asStateFlow()
+
+    /**
+     * Saves the playlist into "Your playlists": every song is matched on YouTube Music once, so it
+     * opens instantly later and keeps working without Spotify. Saving again updates the copy.
+     */
+    fun saveToLibrary(tracks: List<SpotifyTrack>) {
+        if (_saving.value != null) return
+        viewModelScope.launch {
+            val list = tracks.take(SAVE_LIMIT)
+            _saving.value = 0 to list.size
+            try {
+                val found = mutableListOf<YouTubeVideo>()
+                for (batch in list.chunked(PARALLEL)) {
+                    found += batch.resolve()
+                    _saving.value = (_saving.value?.first ?: 0) + batch.size to list.size
+                }
+                val songs = found.distinctBy { it.id }.map { it.toPlayable() }
+                val source = "spotify:${route.id}"
+                val existing = userPlaylists.findBySource(source)
+                if (existing != null) userPlaylists.replaceSongs(existing, songs) else userPlaylists.create(title, songs, source)
+                _events.send(SpotifyPlayEvent.Saved(songs.size))
+            } finally {
+                _saving.value = null
+            }
+        }
+    }
 
     init { load() }
 
@@ -354,6 +470,7 @@ class SpotifyPlaylistViewModel @Inject constructor(
         const val PLAY_WINDOW = 60
         const val FIRST_BATCH = 3
         const val PARALLEL = 4
+        const val SAVE_LIMIT = 500
     }
 }
 
@@ -361,12 +478,14 @@ class SpotifyPlaylistViewModel @Inject constructor(
 fun SpotifyPlaylistScreen(nav: FreeNavigation, viewModel: SpotifyPlaylistViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val busy by viewModel.busy.collectAsStateWithLifecycle()
+    val saving by viewModel.saving.collectAsStateWithLifecycle()
     val context = LocalContext.current
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             when (event) {
                 SpotifyPlayEvent.OpenPlayer -> nav.onYouTubePlayer()
                 is SpotifyPlayEvent.Message -> nav.onMessage(context.getString(event.resId))
+                is SpotifyPlayEvent.Saved -> nav.onMessage(context.resources.getQuantityString(R.plurals.spotify_saved, event.count, event.count))
             }
         }
     }
@@ -398,6 +517,19 @@ fun SpotifyPlaylistScreen(nav: FreeNavigation, viewModel: SpotifyPlaylistViewMod
                                 OutlinedButton(onClick = { viewModel.play(s.tracks.shuffled(), 0) }, enabled = !busy, modifier = Modifier.weight(1f)) {
                                     Icon(Icons.Rounded.Shuffle, null, Modifier.size(18.dp))
                                     Text(stringResource(R.string.free_shuffle), Modifier.padding(start = 6.dp))
+                                }
+                            }
+                            val progress = saving
+                            OutlinedButton(
+                                onClick = { viewModel.saveToLibrary(s.tracks) },
+                                enabled = progress == null,
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            ) {
+                                if (progress != null) {
+                                    CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
+                                    Text(stringResource(R.string.spotify_saving, progress.first, progress.second), Modifier.padding(start = 8.dp))
+                                } else {
+                                    Text(stringResource(R.string.spotify_save))
                                 }
                             }
                             Text(

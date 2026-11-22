@@ -16,4 +16,13 @@
     <string name="ui_share">Compartir</string>
     <string name="ui_action_failed">No se pudo completar. Inténtalo de nuevo.</string>
     <string name="ui_free_notice">Usas Spotify Free. Spotify limita algunos controles a demanda (como elegir una canción concreta o saltar libremente). Mejora a Premium en la app de Spotify para tener control total.</string>
+    <string name="ui_play_next">Reproducir a continuación</string>
+    <string name="ui_will_play_next">Sonará a continuación</string>
+    <string name="ui_new_playlist">Nueva playlist</string>
+    <string name="ui_added_to_named">Añadida a %1$s</string>
+    <string name="ui_already_in_playlist">Ya está en %1$s</string>
+    <string name="ui_playlist_name_hint">Nombre de la playlist</string>
+    <string name="ui_save">Guardar</string>
+    <string name="ui_cancel">Cancelar</string>
+    <plurals name="ui_song_count"><item quantity="one">%1$d canción</item><item quantity="many">%1$d canciones</item><item quantity="other">%1$d canciones</item></plurals>
 </resources>

@@ -1,5 +1,11 @@
 package com.spotineil.feature.discover.free
 
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.material3.Text
+import androidx.compose.material.icons.automirrored.rounded.QueueMusic
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.DownloadDone
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -70,17 +76,33 @@ class FreeLibraryViewModel @Inject constructor(
     radio: RadioRepository,
     recents: RecentsRepository,
     private val freePlayer: FreePlayer,
+    private val userPlaylists: com.spotineil.core.data.repository.UserPlaylistRepository,
 ) : ViewModel() {
     val state: StateFlow<FreeLibraryUiState> = combine(liked.liked, podcasts.followed, radio.favorites, recents.recent(50)) { l, p, s, r ->
         FreeLibraryUiState(l.size, p, s, r.filterIsInstance<RecentItem.Collection>().map { it.collection })
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), FreeLibraryUiState())
 
     fun playStation(station: RadioStation) = freePlayer.playStation(station)
+
+    val playlists = userPlaylists.playlists.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    /** Makes an empty playlist and hands its id to [opened]. */
+    fun createPlaylist(name: String, opened: (String) -> Unit) = viewModelScope.launch { opened(userPlaylists.create(name)) }
 }
 
 @Composable
 fun FreeLibraryRoute(nav: FreeNavigation, viewModel: FreeLibraryViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val playlists by viewModel.playlists.collectAsStateWithLifecycle()
+    var naming by rememberSaveable { mutableStateOf(false) }
+    if (naming) {
+        com.spotineil.core.ui.PlaylistNameDialog(
+            title = stringResource(R.string.free_create_playlist),
+            initial = "",
+            onDismiss = { naming = false },
+            onConfirm = { name -> naming = false; viewModel.createPlaylist(name) { nav.onUserPlaylist(it) } },
+        )
+    }
     var filter by rememberSaveable { mutableStateOf(LibraryFilter.All) }
     val show = { f: LibraryFilter -> filter == LibraryFilter.All || filter == f }
 
@@ -98,6 +120,13 @@ fun FreeLibraryRoute(nav: FreeNavigation, viewModel: FreeLibraryViewModel = hilt
             item(key = "history") {
                 LibraryRow(stringResource(R.string.free_history), stringResource(R.string.free_history_desc), nav.onHistory) { m -> HistoryArt(m) }
             }
+            item(key = "downloads") {
+                LibraryRow(stringResource(R.string.free_downloads), stringResource(R.string.free_downloads_desc), nav.onDownloads) { m ->
+                    Box(m.background(MaterialTheme.colorScheme.surfaceContainerHighest), contentAlignment = Alignment.Center) {
+                        Icon(Icons.Rounded.DownloadDone, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
+                    }
+                }
+            }
             item(key = "spotify") {
                 LibraryRow(stringResource(R.string.spotify_title), stringResource(R.string.spotify_row_desc), nav.onSpotify) { m ->
                     Box(m.background(MaterialTheme.colorScheme.surfaceContainerHighest), contentAlignment = Alignment.Center) {
@@ -110,6 +139,26 @@ fun FreeLibraryRoute(nav: FreeNavigation, viewModel: FreeLibraryViewModel = hilt
                     Box(m.background(MaterialTheme.colorScheme.surfaceContainerHighest), contentAlignment = Alignment.Center) {
                         Icon(Icons.Rounded.PhoneAndroid, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
                     }
+                }
+            }
+            item(key = "playlistsH") {
+                Text(
+                    stringResource(R.string.free_your_playlists),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 4.dp),
+                )
+            }
+            item(key = "createPlaylist") {
+                LibraryRow(stringResource(R.string.free_create_playlist), stringResource(R.string.free_create_playlist_desc), { naming = true }) { m ->
+                    Box(m.background(MaterialTheme.colorScheme.surfaceContainerHighest), contentAlignment = Alignment.Center) {
+                        Icon(Icons.Rounded.Add, null, tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(28.dp))
+                    }
+                }
+            }
+            items(playlists, key = { "up:" + it.id }) { p ->
+                LibraryRow(p.name, androidx.compose.ui.res.pluralStringResource(R.plurals.playlist_song_count, p.songCount, p.songCount), { nav.onUserPlaylist(p.id) }) { m ->
+                    CoverImage(p.coverUrl, null, m, placeholderIcon = Icons.AutoMirrored.Rounded.QueueMusic)
                 }
             }
         }

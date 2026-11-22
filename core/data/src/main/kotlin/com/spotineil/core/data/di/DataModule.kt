@@ -63,6 +63,7 @@ object DatabaseModule {
     @Provides fun likedMediaDao(db: SpotineilDatabase): com.spotineil.core.data.db.LikedMediaDao = db.likedMediaDao()
     @Provides fun recentItemDao(db: SpotineilDatabase): com.spotineil.core.data.db.RecentItemDao = db.recentItemDao()
     @Provides fun followedPodcastDao(db: SpotineilDatabase): com.spotineil.core.data.db.FollowedPodcastDao = db.followedPodcastDao()
+    @Provides fun userPlaylistDao(db: SpotineilDatabase): com.spotineil.core.data.db.UserPlaylistDao = db.userPlaylistDao()
 }
 
 @Module

@@ -56,4 +56,13 @@
     <string name="settings_spotify_connected">Connected as %1$s</string>
     <string name="settings_spotify_open">Open library</string>
     <string name="settings_spotify_disconnect">Disconnect</string>
+    <string name="settings_backup_header">Backup &amp; restore</string>
+    <string name="settings_backup">Back up</string>
+    <string name="settings_backup_desc">Save your Liked Songs, playlists, history, stations, podcasts and settings to a file</string>
+    <string name="settings_restore">Restore</string>
+    <string name="settings_restore_desc">Bring them back from a backup file (adds to what is here)</string>
+    <string name="settings_backup_done">Backup saved</string>
+    <string name="settings_backup_failed">Could not save the backup</string>
+    <string name="settings_restore_done">Restored %1$d liked songs and %2$d playlists</string>
+    <string name="settings_restore_failed">That file is not a Spotineil backup</string>
 </resources>

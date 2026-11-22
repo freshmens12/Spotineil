@@ -109,6 +109,13 @@ fun SettingsRoute(
     val clearedMsg = stringResource(R.string.settings_cache_cleared)
     val context = LocalContext.current
     LaunchedEffect(Unit) { viewModel.cacheCleared.collect { onMessage(clearedMsg) } }
+    LaunchedEffect(Unit) { viewModel.backupMessage.collect { onMessage(it) } }
+    val exportLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/json"),
+    ) { uri -> uri?.let(viewModel::exportBackup) }
+    val restoreLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenDocument(),
+    ) { uri -> uri?.let(viewModel::restoreBackup) }
 
     Scaffold(
         topBar = {
@@ -190,6 +197,22 @@ fun SettingsRoute(
                     headlineContent = { Text(stringResource(R.string.settings_clear_cache)) },
                     supportingContent = { Text(stringResource(R.string.settings_clear_cache_desc)) },
                     modifier = Modifier.clickable { viewModel.clearCache() },
+                )
+            }
+
+            item { Header(stringResource(R.string.settings_backup_header)) }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_backup)) },
+                    supportingContent = { Text(stringResource(R.string.settings_backup_desc)) },
+                    modifier = Modifier.clickable { exportLauncher.launch("Spotineil-backup-${java.time.LocalDate.now()}.json") },
+                )
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_restore)) },
+                    supportingContent = { Text(stringResource(R.string.settings_restore_desc)) },
+                    modifier = Modifier.clickable { restoreLauncher.launch(arrayOf("application/json", "application/octet-stream", "text/plain")) },
                 )
             }
 

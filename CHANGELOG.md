@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.10.0] - 2026-11-23
+
+### Added
+- **Your playlists:** create, rename, delete and reorder (drag) your own playlists in Your Library.
+- **Song menu:** long-press any song for Play next, Add to queue, Add to playlist and Like. "Add to playlist" is also on both player screens.
+- **Save Spotify playlists:** "Save to Your Library" on a Spotify playlist matches every song once and keeps a copy in Your playlists that opens instantly and works without Spotify.
+- **Backup & restore** (Settings): save Liked Songs, playlists, history, stations, podcasts, recent searches and settings to a file, and bring them back on any phone.
+- **Downloads** in Your Library: the songs you downloaded, with how much space they use; delete them from there.
+- **Queue:** remove songs with ✕ and "Save as playlist".
+
+### Fixed
+- Audius songs that can only be downloaded by following the artist no longer show a download button that fails.
+- **Connect Spotify:** Spotify's robot check refuses its sign-in page inside apps ("Oops! Something went wrong"). You can now connect by pasting your own `sp_dc` cookie from open.spotify.com on a computer (steps are shown in the app); the sign-in page stays as a second option.
+
 ## [1.9.0] - 2026-11-22
 
 ### Added
