@@ -20,8 +20,8 @@ android {
     defaultConfig {
         applicationId = "com.spotineil.app"
         // Releases bump these; -PappVersionName / -PappVersionCode override them (used to test updates).
-        versionCode = (findProperty("appVersionCode") as String?)?.toInt() ?: 6
-        versionName = (findProperty("appVersionName") as String?) ?: "1.5.0"
+        versionCode = (findProperty("appVersionCode") as String?)?.toInt() ?: 7
+        versionName = (findProperty("appVersionName") as String?) ?: "1.6.0"
 
         buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${secret("SPOTIFY_CLIENT_ID") ?: ""}\"")
         buildConfigField("String", "SPOTIFY_REDIRECT_URI", "\"spotineil://callback\"")

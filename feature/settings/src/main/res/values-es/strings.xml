@@ -14,19 +14,6 @@
     <string name="settings_clear_cache">Borrar caché</string>
     <string name="settings_clear_cache_desc">Elimina imágenes, páginas y letras en caché. Se conservan las búsquedas recientes.</string>
     <string name="settings_cache_cleared">Caché borrada</string>
-    <string name="settings_widgets">Widgets de la pantalla de inicio</string>
-    <string name="settings_widgets_desc">Toca un widget para añadirlo a tu pantalla de inicio.</string>
-    <string name="settings_widgets_fallback">Mantén pulsada la pantalla de inicio, toca Widgets y elige Spotineil.</string>
-    <string name="settings_widget_player">Reproductor</string>
-    <string name="settings_widget_player_desc">Portada grande con controles (2×2)</string>
-    <string name="settings_widget_now_playing">Reproduciendo</string>
-    <string name="settings_widget_now_playing_desc">Barra ancha con controles (4×1)</string>
-    <string name="settings_widget_mini">Mini reproductor</string>
-    <string name="settings_widget_mini_desc">Botón pequeño de reproducir y pausa (2×1)</string>
-    <string name="settings_widget_shortcuts">Accesos rápidos</string>
-    <string name="settings_widget_shortcuts_desc">Buscar, Me gusta, Historial y Biblioteca (4×1)</string>
-    <string name="settings_widget_recent">Reproducido recientemente</string>
-    <string name="settings_widget_recent_desc">Tus últimas canciones, toca para reproducir (4×2)</string>
     <string name="settings_general">General</string>
     <string name="settings_language">Idioma</string>
     <string name="settings_language_system">Predeterminado del sistema</string>
@@ -39,5 +26,10 @@
     <string name="settings_about">Acerca de</string>
     <string name="settings_version">Versión</string>
     <string name="settings_licenses">Licencias de código abierto</string>
+    <string name="settings_licenses_libraries">Software de código abierto</string>
+    <string name="settings_licenses_services">Servicios y contenido</string>
+    <string name="settings_licenses_note">Gracias a cada proyecto y comunidad de esta lista. La música, las portadas y las letras pertenecen a sus artistas y titulares de derechos.</string>
+    <string name="settings_support">Apoya al desarrollador</string>
+    <string name="settings_support_desc">Spotineil es gratis. Si te gusta, puedes invitar un café al desarrollador.</string>
     <string name="settings_attribution">Spotineil es un reproductor de música. Toda la música, las portadas y las letras pertenecen a sus respectivos artistas y titulares de derechos.</string>
 </resources>

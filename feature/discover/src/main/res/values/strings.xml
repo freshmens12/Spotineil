@@ -46,7 +46,7 @@
     <string name="free_history_clear">Clear history</string>
     <string name="free_on_device">On this device</string>
     <string name="free_on_device_desc">Music files on your phone</string>
-    <string name="free_trending">Trending now</string>
+    <string name="free_trending">Trending music in Spotineil</string>
     <string name="free_rising">Rising artists</string>
     <string name="free_jamendo">Popular right now</string>
     <string name="free_concerts">Live concerts</string>
@@ -92,7 +92,7 @@
     <string name="yt_pause">Pause</string>
     <string name="yt_lyrics">Lyrics</string>
     <string name="yt_up_next">Up next</string>
-    <string name="yt_trending">Trending now</string>
+    <string name="yt_trending">Trending music in Spotineil</string>
     <string name="yt_songs">Songs</string>
     <string name="yt_genre">%1$s</string>
     <string name="yt_error_embed">This song cannot be played right now. Skipping.</string>

@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,9 +26,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.ui.platform.LocalContext
-import android.appwidget.AppWidgetManager
-import android.content.ComponentName
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -85,7 +89,6 @@ fun SettingsRoute(
     var dialog by rememberSaveable { mutableStateOf<String?>(null) }
     val clearedMsg = stringResource(R.string.settings_cache_cleared)
     val context = LocalContext.current
-    val widgetFallbackMsg = stringResource(R.string.settings_widgets_fallback)
     LaunchedEffect(Unit) { viewModel.cacheCleared.collect { onMessage(clearedMsg) } }
 
     Scaffold(
@@ -164,24 +167,6 @@ fun SettingsRoute(
                 }
             }
 
-            item { Header(stringResource(R.string.settings_widgets)) }
-            item {
-                Text(
-                    stringResource(R.string.settings_widgets_desc),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                )
-            }
-            items(HomeWidgets, key = { it.receiver }) { widget ->
-                ListItem(
-                    headlineContent = { Text(stringResource(widget.label)) },
-                    supportingContent = { Text(stringResource(widget.description)) },
-                    trailingContent = { Icon(Icons.Rounded.Add, null) },
-                    modifier = Modifier.clickable { if (!pinWidget(context, widget.receiver)) onMessage(widgetFallbackMsg) },
-                )
-            }
-
             item { Header(stringResource(R.string.settings_about)) }
             item {
                 ListItem(
@@ -202,6 +187,21 @@ fun SettingsRoute(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(16.dp),
                 )
+            }
+            item {
+                Column(Modifier.padding(horizontal = 16.dp)) {
+                    Button(onClick = { openSupportPage(context) }, modifier = Modifier.fillMaxWidth()) {
+                        Icon(Icons.Rounded.Favorite, null, Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(stringResource(R.string.settings_support))
+                    }
+                    Text(
+                        stringResource(R.string.settings_support_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(vertical = 8.dp),
+                    )
+                }
             }
         }
     }
@@ -285,18 +285,40 @@ private fun <T> ChoiceDialog(
     )
 }
 
-private val licenses = listOf(
-    "AndroidX, Jetpack Compose, Media3, Room, Paging, DataStore, Glance" to "Apache License 2.0",
-    "Kotlin, kotlinx.coroutines, kotlinx.serialization" to "Apache License 2.0",
-    "Dagger / Hilt" to "Apache License 2.0",
-    "Retrofit, OkHttp" to "Apache License 2.0",
-    "Coil" to "Apache License 2.0",
-    "Tink" to "Apache License 2.0",
-    "AppAuth for Android" to "Apache License 2.0",
-    "Spotify Android SDK (App Remote)" to "Apache License 2.0 (see Spotify Developer Terms)",
-    "Reorderable (sh.calvin.reorderable)" to "Apache License 2.0",
-    "Manrope typeface" to "SIL Open Font License 1.1",
-    "Audius API, Jamendo API, Radio Browser, Deezer API, iTunes Search API" to "Used under each service's public API terms",
+/** One credit: what it is, what Spotineil uses it for, and under which license / terms. */
+private class Credit(val name: String, val usedFor: String, val license: String)
+
+private val libraryCredits = listOf(
+    Credit("InnerTube X (MetrolistGroup)", "Search, charts and streams of the music catalog", "GNU GPL v3.0 · github.com/MetrolistGroup/innertubex"),
+    Credit("Jetpack Compose, Material 3, Navigation", "The app's screens and navigation", "Apache License 2.0"),
+    Credit("AndroidX Core, AppCompat, Activity, Lifecycle, Splash Screen", "App foundations", "Apache License 2.0"),
+    Credit("Media3 (ExoPlayer, MediaSession)", "Audio playback, notification and lock-screen controls", "Apache License 2.0"),
+    Credit("Jetpack Glance", "Home screen widgets", "Apache License 2.0"),
+    Credit("Room, Paging, DataStore", "On-device storage: history, likes and settings", "Apache License 2.0"),
+    Credit("Palette", "Colors taken from the cover art", "Apache License 2.0"),
+    Credit("Kotlin, kotlinx.coroutines, kotlinx.serialization", "Language and background work", "Apache License 2.0"),
+    Credit("Dagger / Hilt", "Dependency injection", "Apache License 2.0"),
+    Credit("Ktor Client", "Network requests of the music catalog", "Apache License 2.0"),
+    Credit("OkHttp, Retrofit", "Network requests", "Apache License 2.0"),
+    Credit("Coil", "Loading images", "Apache License 2.0"),
+    Credit("Gson", "Reading data", "Apache License 2.0"),
+    Credit("Tink", "Encrypting data stored on the device", "Apache License 2.0"),
+    Credit("AppAuth for Android", "Sign-in with Spotify (optional)", "Apache License 2.0"),
+    Credit("Spotify Android SDK (App Remote)", "Controlling the Spotify app (optional)", "Spotify Developer Terms"),
+    Credit("Reorderable (sh.calvin.reorderable)", "Drag to reorder the queue", "Apache License 2.0"),
+    Credit("Manrope typeface", "The app's font", "SIL Open Font License 1.1"),
+)
+
+private val serviceCredits = listOf(
+    Credit("YouTube Music", "Songs, artwork and charts", "Content belongs to its artists, labels and rights holders"),
+    Credit("LRCLIB", "Song lyrics", "lrclib.net · community lyrics database"),
+    Credit("Last.fm", "Similar artists for radio and Play similar", "Last.fm API Terms of Use"),
+    Credit("Audius", "Independent artists' music", "Audius API terms"),
+    Credit("Jamendo", "Free music by independent artists", "Creative Commons licenses chosen by each artist"),
+    Credit("ccMixter", "Remixes and samples", "Creative Commons licenses chosen by each artist"),
+    Credit("Internet Archive", "Live concerts and free albums", "Each item's own license, see archive.org"),
+    Credit("Radio Browser", "Live radio stations", "radio-browser.info · community database"),
+    Credit("Apple Podcasts directory (iTunes Search)", "Finding podcasts and their charts", "Apple Terms of Use. Episodes come from each show's own feed"),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -314,28 +336,45 @@ fun LicensesScreen(onBack: () -> Unit) {
             Modifier.fillMaxSize().padding(top = padding.calculateTopPadding()),
             contentPadding = PaddingValues(bottom = LocalBottomContentPadding.current + 24.dp),
         ) {
-            items(licenses, key = { it.first }) { (name, license) ->
-                ListItem(headlineContent = { Text(name) }, supportingContent = { Text(license) })
-                HorizontalDivider()
+            item { Header(stringResource(R.string.settings_licenses_libraries)) }
+            items(libraryCredits, key = { it.name }) { CreditRow(it) }
+            item { Header(stringResource(R.string.settings_licenses_services)) }
+            items(serviceCredits, key = { it.name }) { CreditRow(it) }
+            item {
+                Text(
+                    stringResource(R.string.settings_licenses_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(16.dp),
+                )
             }
         }
     }
 }
 
-/** The widgets of the app; [receiver] is the class name in the app module (no code dependency needed). */
-private class HomeWidget(val receiver: String, val label: Int, val description: Int)
+@Composable
+private fun CreditRow(credit: Credit) {
+    Column {
+        ListItem(
+            headlineContent = { Text(credit.name) },
+            supportingContent = {
+                Column {
+                    Text(credit.usedFor)
+                    Text(credit.license, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            },
+        )
+        HorizontalDivider()
+    }
+}
 
-private val HomeWidgets = listOf(
-    HomeWidget("PlayerWidgetReceiver", R.string.settings_widget_player, R.string.settings_widget_player_desc),
-    HomeWidget("NowPlayingWidgetReceiver", R.string.settings_widget_now_playing, R.string.settings_widget_now_playing_desc),
-    HomeWidget("MiniWidgetReceiver", R.string.settings_widget_mini, R.string.settings_widget_mini_desc),
-    HomeWidget("ShortcutsWidgetReceiver", R.string.settings_widget_shortcuts, R.string.settings_widget_shortcuts_desc),
-    HomeWidget("RecentWidgetReceiver", R.string.settings_widget_recent, R.string.settings_widget_recent_desc),
-)
+private const val SUPPORT_URL = "https://vincentos.vercel.app/#/wallet"
 
-/** Asks the launcher to place the widget on the Home screen (the user confirms). False if the launcher can't. */
-private fun pinWidget(context: Context, receiver: String): Boolean {
-    val manager = AppWidgetManager.getInstance(context)
-    if (!manager.isRequestPinAppWidgetSupported) return false
-    return manager.requestPinAppWidget(ComponentName(context.packageName, "com.spotineil.app.widget.$receiver"), null, null)
+/** Opens the developer's support page in the browser. */
+private fun openSupportPage(context: Context) {
+    try {
+        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(SUPPORT_URL)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    } catch (_: ActivityNotFoundException) {
+        // No browser installed: nothing more to do.
+    }
 }
