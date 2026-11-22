@@ -9,6 +9,7 @@ import com.spotineil.core.common.SpotifyAppConfig
 import com.spotineil.core.data.maintenance.CacheManager
 import com.spotineil.core.data.repository.AuthRepository
 import com.spotineil.core.data.repository.SettingsRepository
+import com.spotineil.core.data.spotifyweb.SpotifyWebAuth
 import com.spotineil.core.model.AccentColor
 import com.spotineil.core.model.AppLanguage
 import com.spotineil.core.model.ThemeMode
@@ -30,6 +31,7 @@ import kotlinx.coroutines.launch
 class SettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val settings: SettingsRepository,
+    private val spotifyWeb: SpotifyWebAuth,
     private val auth: AuthRepository,
     private val cacheManager: CacheManager,
     private val player: PlaybackController,
@@ -37,6 +39,10 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     val appVersion: String = config.appVersion
+
+    val spotifyConnected: StateFlow<Boolean> = spotifyWeb.connected
+    val spotifyName: StateFlow<String?> = spotifyWeb.accountName
+    fun disconnectSpotify() = spotifyWeb.disconnect()
 
     val state: StateFlow<UserSettings> = settings.settings
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UserSettings())

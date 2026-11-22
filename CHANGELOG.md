@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.9.0] - 2026-11-22
+
+### Added
+- **Connect Spotify** (Settings → Account, the Welcome screen, or Your Library → Spotify): sign in to Spotify's web player inside the app to see your private playlists and Liked Songs. Songs are matched and played from YouTube Music, so Spotify Premium is not needed. This uses Spotify's unofficial web-player route; see the privacy page.
+
+### Fixed
+- **Crossfade / AutoMix** no longer pause for a moment near the end of a song: the old song is now handed to a second player first, then the next one fades in.
+
 ## [1.8.0] - 2026-11-22
 
 ### Added

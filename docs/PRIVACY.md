@@ -10,7 +10,7 @@ Spotineil is a free, open-source Android music app. This page explains what it d
 ## What stays on your phone
 These are stored only on your device. They are deleted when you uninstall the app or clear its data:
 - your Liked Songs, followed podcasts, favourite radio stations and play history;
-- where you stopped in a song ("Continue listening");
+- where you stopped in each song, and your recent searches;
 - temporary copies of song lists (cache) so the app loads faster and uses less data;
 - your settings (theme, accent colour, language).
 
@@ -22,9 +22,13 @@ To show and play music, the app sends requests (such as your search words and yo
 - **Audius, Jamendo, ccMixter, Internet Archive**: free and Creative Commons music.
 - **Radio Browser**: the radio station directory.
 - **Apple Podcasts directory** and each podcast's own RSS feed.
+- **Spotify (only if you choose to connect it)**: see below.
 - **GitHub**: when the app opens it asks GitHub whether a newer version exists, and downloads it only if you agree.
 
-Spotineil does not access your Google, YouTube or other accounts, and it never asks you to sign in.
+Spotineil does not access your Google or YouTube accounts. Signing in is never required.
+
+## Connecting Spotify (optional)
+If you tap **Connect Spotify**, you sign in on Spotify's own web page inside the app. Your password goes only to Spotify. Spotify's session cookie (`sp_dc`) and the short-lived access token stay on your phone (the cookie in the app's web storage) and are sent only to Spotify, to read your playlists and Liked Songs. Nothing is sent to the developer. **Settings → Account → Spotify → Disconnect** deletes the cookies and the token. This uses Spotify's unofficial web-player route, which Spotify's terms do not allow for apps, so use it at your own risk.
 
 ## Contact
 Questions: open an issue on the project's GitHub page, <https://github.com/freshmens12/Spotineil/issues>.

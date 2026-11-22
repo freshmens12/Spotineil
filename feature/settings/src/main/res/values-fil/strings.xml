@@ -50,4 +50,10 @@
     <string name="settings_support">Suportahan ang developer</string>
     <string name="settings_support_desc">Libre ang Spotineil. Kung nagustuhan mo ito, maaari mong ibili ng kape ang developer.</string>
     <string name="settings_attribution">Ang Spotineil ay isang music player. Ang lahat ng musika, artwork at lyrics ay pag-aari ng kani-kanilang artist at may-ari ng karapatan.</string>
+    <string name="settings_account">Account</string>
+    <string name="settings_spotify">Spotify</string>
+    <string name="settings_spotify_desc">Kumonekta para makita ang iyong mga pribadong playlist at Mga Paboritong Kanta</string>
+    <string name="settings_spotify_connected">Nakakonekta bilang %1$s</string>
+    <string name="settings_spotify_open">Buksan ang library</string>
+    <string name="settings_spotify_disconnect">Idiskonekta</string>
 </resources>

@@ -50,4 +50,10 @@
     <string name="settings_support">Support the developer</string>
     <string name="settings_support_desc">Spotineil is free. If you enjoy it, you can buy the developer a coffee.</string>
     <string name="settings_attribution">Spotineil is a music player. All music, artwork and lyrics belong to their respective artists and rights holders.</string>
+    <string name="settings_account">Account</string>
+    <string name="settings_spotify">Spotify</string>
+    <string name="settings_spotify_desc">Connect to see your private playlists and Liked Songs</string>
+    <string name="settings_spotify_connected">Connected as %1$s</string>
+    <string name="settings_spotify_open">Open library</string>
+    <string name="settings_spotify_disconnect">Disconnect</string>
 </resources>

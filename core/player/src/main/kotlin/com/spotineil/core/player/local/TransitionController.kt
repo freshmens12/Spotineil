@@ -50,6 +50,9 @@ internal class TransitionController(
 
     private var blending = false
     private var waitingForMain = false
+    private var handingOff = false
+    private var handoffBeganAt = 0L
+    private var handoffRampFrom = 0L
     private var blendElapsedMs = 0L
     private var lastBlendTickAt = 0L
     private var blendMs = 0L
@@ -58,7 +61,7 @@ internal class TransitionController(
     private val tick = object : Runnable {
         override fun run() {
             step()
-            handler.postDelayed(this, TICK_MS)
+            handler.postDelayed(this, if (blending) BLEND_TICK_MS else TICK_MS)
         }
     }
 
@@ -120,15 +123,37 @@ internal class TransitionController(
         armedKey = key
         if (tail == null || tailKey != key) prepareTail(key, player.currentPosition)
         val t = tail ?: return
-        t.seekTo(player.currentPosition)
-        t.volume = 1f
-        t.playWhenReady = player.playWhenReady
         t.addListener(tailListener)
+        // The tail starts first, silently and a touch ahead (it needs a moment to produce sound).
+        // Only once it is really playing do the two swap places, so there is no gap.
+        t.volume = 0f
+        t.seekTo(player.currentPosition + HANDOFF_LEAD_MS)
+        t.playWhenReady = player.playWhenReady
 
         blending = true
-        waitingForMain = true
+        handingOff = true
+        handoffBeganAt = SystemClock.uptimeMillis()
+        handoffRampFrom = 0L
+        waitingForMain = false
         blendMs = fadeMs
-        // Hop to the next song, silent until it is actually playing.
+    }
+
+    /** Hands the old song from the main player to the tail player over a few hundred ms, then moves main on. */
+    private fun advanceHandoff(t: ExoPlayer) {
+        val now = SystemClock.uptimeMillis()
+        if (!t.isPlaying) {
+            // Never got going (or the phone is paused): give up and let the song end normally.
+            if (player.playWhenReady && now - handoffBeganAt > HANDOFF_TIMEOUT_MS) endBlend()
+            return
+        }
+        if (handoffRampFrom == 0L) handoffRampFrom = now
+        val p = ((now - handoffRampFrom).toFloat() / HANDOFF_MS).coerceIn(0f, 1f)
+        player.volume = 1f - p
+        t.volume = p
+        if (p < 1f) return
+        handingOff = false
+        waitingForMain = true
+        // The old song now lives on the tail player: hop to the next song, silent until it plays.
         ignoreDiscontinuityUntil = SystemClock.uptimeMillis() + IGNORE_MS
         player.volume = 0f
         player.seekToNextMediaItem()
@@ -137,6 +162,7 @@ internal class TransitionController(
     private fun advanceBlend() {
         val t = tail
         if (t == null) { endBlend(); return }
+        if (handingOff) { advanceHandoff(t); return }
         if (waitingForMain) {
             // The next song is still loading: the old one keeps playing at full volume meanwhile.
             if (t.playbackState == Player.STATE_ENDED) { endBlend(); return }
@@ -174,6 +200,7 @@ internal class TransitionController(
         val wasBlending = blending
         blending = false
         waitingForMain = false
+        handingOff = false
         if (wasBlending || player.volume != 1f) player.volume = 1f
         discardTail()
     }
@@ -210,10 +237,14 @@ internal class TransitionController(
 
     private companion object {
         const val TICK_MS = 150L
+        const val BLEND_TICK_MS = 50L
         const val CROSSFADE_MS = 6_000L
         const val AUTOMIX_MS = 10_000L
         const val MIN_BLEND_MS = 1_500L
-        const val PREPARE_AHEAD_MS = 3_000L
+        const val PREPARE_AHEAD_MS = 12_000L
+        const val HANDOFF_MS = 300L
+        const val HANDOFF_LEAD_MS = 120L
+        const val HANDOFF_TIMEOUT_MS = 4_000L
         const val IGNORE_MS = 1_000L
     }
 }

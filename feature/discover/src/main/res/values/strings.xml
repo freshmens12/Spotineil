@@ -110,4 +110,18 @@
     <string name="yt_kind_video">Song</string>
     <string name="free_continue_listening">Continue listening</string>
     <string name="free_continue_at">%1$s • from %2$s</string>
+    <string name="spotify_title">Spotify</string>
+    <string name="spotify_row_desc">Your private playlists and Liked Songs</string>
+    <string name="spotify_connect_title">Connect to Spotify</string>
+    <string name="spotify_connect_body">Sign in to see your private playlists and Liked Songs here. Songs are played from YouTube Music, so nothing needs Spotify Premium.</string>
+    <string name="spotify_connect_help">Sign in to Spotify below. Your password goes only to Spotify. If Google or Facebook sign-in is refused here, use your email and password or a one-time code.</string>
+    <string name="spotify_connect_button">Connect Spotify</string>
+    <string name="spotify_reconnect_hint">Sign in to Spotify again to keep using your library.</string>
+    <string name="spotify_retry">Try again</string>
+    <string name="spotify_signed_in_as">Signed in as %1$s</string>
+    <string name="spotify_liked_subtitle">Playlist • your Spotify likes</string>
+    <string name="spotify_playlist_songs">%1$d songs</string>
+    <string name="spotify_played_from_youtube">Songs are matched and played from YouTube Music.</string>
+    <string name="spotify_not_found">Couldn\'t find these songs on YouTube Music.</string>
+    <string name="spotify_connected_message">Spotify connected</string>
 </resources>

@@ -36,6 +36,7 @@ A free Android music app, written in Kotlin with Jetpack Compose (Material 3). I
 | **Player** | Full player screen, mini player, queue, sleep timer, output-device picker (Bluetooth, wired, cast), notification, lock-screen and Bluetooth controls, Android Auto browsing. |
 | **Widgets** | Five home-screen widgets: **Player** (2×2), **Now playing** (4×1), **Mini player** (2×1), **Quick actions** (4×1) and **Recently played** (4×2). Long-press your Home screen, tap Widgets and pick Spotineil. |
 | **Themes and language** | System, Light, Dark, AMOLED black and **Soft glass**; 8 accent colours; English, Spanish and Tagalog (or Automatic). |
+| **Spotify (optional)** | Connect your Spotify account to see private playlists and Liked Songs; songs are played from YouTube Music. |
 | **Transitions** | Off, **Crossfade** or **AutoMix** between songs (Settings → Playback). |
 | **Downloads** | A download button appears only on songs whose artist or licence allows it. |
 

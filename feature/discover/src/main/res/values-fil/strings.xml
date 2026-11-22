@@ -108,4 +108,18 @@
     <string name="yt_kind_video">Kanta</string>
     <string name="free_continue_listening">Ituloy ang pakikinig</string>
     <string name="free_continue_at">%1$s • mula %2$s</string>
+    <string name="spotify_title">Spotify</string>
+    <string name="spotify_row_desc">Ang iyong mga pribadong playlist at Mga Paboritong Kanta</string>
+    <string name="spotify_connect_title">Kumonekta sa Spotify</string>
+    <string name="spotify_connect_body">Mag-sign in para makita rito ang iyong mga pribadong playlist at Mga Paboritong Kanta. Pinapatugtog ang mga kanta mula sa YouTube Music, kaya hindi kailangan ng Spotify Premium.</string>
+    <string name="spotify_connect_help">Mag-sign in sa Spotify sa ibaba. Sa Spotify lang napupunta ang password mo. Kung tinanggihan dito ang Google o Facebook sign-in, gamitin ang email at password o isang one-time code.</string>
+    <string name="spotify_connect_button">Ikonekta ang Spotify</string>
+    <string name="spotify_reconnect_hint">Mag-sign in muli sa Spotify para magamit pa rin ang iyong library.</string>
+    <string name="spotify_retry">Subukan muli</string>
+    <string name="spotify_signed_in_as">Naka-sign in bilang %1$s</string>
+    <string name="spotify_liked_subtitle">Playlist • ang mga like mo sa Spotify</string>
+    <string name="spotify_playlist_songs">%1$d kanta</string>
+    <string name="spotify_played_from_youtube">Hinahanap at pinapatugtog ang mga kanta mula sa YouTube Music.</string>
+    <string name="spotify_not_found">Hindi mahanap ang mga kantang ito sa YouTube Music.</string>
+    <string name="spotify_connected_message">Nakakonekta na ang Spotify</string>
 </resources>

@@ -45,7 +45,7 @@ import com.spotineil.app.R
  * No account or sign-in is involved.
  */
 @Composable
-fun WelcomeScreen(onGetStarted: () -> Unit) {
+fun WelcomeScreen(onGetStarted: () -> Unit, onConnectSpotify: () -> Unit) {
     Box(
         Modifier
             .fillMaxSize()
@@ -90,6 +90,12 @@ fun WelcomeScreen(onGetStarted: () -> Unit) {
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             ) {
                 Text(stringResource(R.string.welcome_get_started), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            }
+            androidx.compose.material3.OutlinedButton(
+                onClick = onConnectSpotify,
+                modifier = Modifier.fillMaxWidth().height(48.dp).padding(top = 8.dp).testTag("welcome_connect_spotify"),
+            ) {
+                Text(stringResource(R.string.welcome_connect_spotify), style = MaterialTheme.typography.titleSmall)
             }
             Text(
                 stringResource(R.string.welcome_note),

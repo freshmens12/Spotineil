@@ -68,6 +68,7 @@ import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.LibraryMusic
 import androidx.compose.material.icons.rounded.Share
 import kotlinx.serialization.Serializable
 
@@ -77,9 +78,14 @@ import kotlinx.serialization.Serializable
 
 fun NavController.navigateToSettings() = navigate(SettingsRoute)
 
-fun NavGraphBuilder.settingsScreens(navController: NavController, onMessage: (String) -> Unit) {
+fun NavGraphBuilder.settingsScreens(
+    navController: NavController,
+    onMessage: (String) -> Unit,
+    onSpotifyConnect: () -> Unit,
+    onSpotifyLibrary: () -> Unit,
+) {
     composable<SettingsRoute> {
-        SettingsRoute(onBack = { navController.popBackStack() }, onAbout = { navController.navigate(AboutRoute) }, onMessage = onMessage)
+        SettingsRoute(onBack = { navController.popBackStack() }, onAbout = { navController.navigate(AboutRoute) }, onSpotifyConnect = onSpotifyConnect, onSpotifyLibrary = onSpotifyLibrary, onMessage = onMessage)
     }
     composable<LicensesRoute> { LicensesScreen(onBack = { navController.popBackStack() }) }
     composable<AboutRoute> { AboutScreen(onBack = { navController.popBackStack() }, onLicenses = { navController.navigate(LicensesRoute) }) }
@@ -90,11 +96,15 @@ fun NavGraphBuilder.settingsScreens(navController: NavController, onMessage: (St
 fun SettingsRoute(
     onBack: () -> Unit,
     onAbout: () -> Unit,
+    onSpotifyConnect: () -> Unit,
+    onSpotifyLibrary: () -> Unit,
     onMessage: (String) -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val settings by viewModel.state.collectAsStateWithLifecycle()
     val loggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
+    val spotifyConnected by viewModel.spotifyConnected.collectAsStateWithLifecycle()
+    val spotifyName by viewModel.spotifyName.collectAsStateWithLifecycle()
     var dialog by rememberSaveable { mutableStateOf<String?>(null) }
     val clearedMsg = stringResource(R.string.settings_cache_cleared)
     val context = LocalContext.current
@@ -112,6 +122,20 @@ fun SettingsRoute(
             Modifier.fillMaxSize().padding(top = padding.calculateTopPadding()),
             contentPadding = PaddingValues(bottom = LocalBottomContentPadding.current + 24.dp),
         ) {
+            item { Header(stringResource(R.string.settings_account)) }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_spotify)) },
+                    supportingContent = {
+                        Text(
+                            if (spotifyConnected) stringResource(R.string.settings_spotify_connected, spotifyName.orEmpty())
+                            else stringResource(R.string.settings_spotify_desc),
+                        )
+                    },
+                    leadingContent = { Icon(Icons.Rounded.LibraryMusic, null) },
+                    modifier = Modifier.clickable { if (spotifyConnected) dialog = "spotify" else onSpotifyConnect() },
+                )
+            }
             item { Header(stringResource(R.string.settings_appearance)) }
             item {
                 ListItem(
@@ -246,6 +270,18 @@ fun SettingsRoute(
             onSelect = { viewModel.setLanguage(it); dialog = null },
             onDismiss = { dialog = null },
         )
+        "spotify" -> AlertDialog(
+            containerColor = dialogContainer(),
+            onDismissRequest = { dialog = null },
+            title = { Text(stringResource(R.string.settings_spotify)) },
+            text = { Text(stringResource(R.string.settings_spotify_connected, spotifyName.orEmpty())) },
+            confirmButton = { TextButton(onClick = { dialog = null; onSpotifyLibrary() }) { Text(stringResource(R.string.settings_spotify_open)) } },
+            dismissButton = {
+                TextButton(onClick = { dialog = null; viewModel.disconnectSpotify() }) {
+                    Text(stringResource(R.string.settings_spotify_disconnect), color = MaterialTheme.colorScheme.error)
+                }
+            },
+        )
         "transition" -> ChoiceDialog(
             title = stringResource(R.string.settings_transition),
             options = TransitionMode.entries.toList(),
@@ -365,6 +401,7 @@ private val libraryCredits = listOf(
 private val serviceCredits = listOf(
     Credit("YouTube Music", "Songs, artwork and charts", "Content belongs to its artists, labels and rights holders"),
     Credit("LRCLIB", "Song lyrics", "lrclib.net · community lyrics database"),
+    Credit("Spotify (optional)", "Your private playlists and Liked Songs, when you connect your account. Songs play from YouTube Music", "Spotify web player (unofficial) · Spotify terms"),
     Credit("Last.fm", "Similar artists for radio and Play similar", "Last.fm API Terms of Use"),
     Credit("Audius", "Independent artists' music", "Audius API terms"),
     Credit("Jamendo", "Free music by independent artists", "Creative Commons licenses chosen by each artist"),

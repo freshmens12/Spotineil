@@ -47,4 +47,5 @@
     <string name="update_failed_title">Hindi natuloy ang update</string>
     <string name="update_failed_message">Hindi ma-download ang update. Tingnan ang iyong koneksyon at subukan muli.</string>
     <string name="update_retry">Subukan muli</string>
+    <string name="welcome_connect_spotify">Ikonekta ang Spotify (opsyonal)</string>
 </resources>

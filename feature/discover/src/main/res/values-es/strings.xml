@@ -111,4 +111,18 @@
     <string name="yt_kind_video">Canción</string>
     <string name="free_continue_listening">Seguir escuchando</string>
     <string name="free_continue_at">%1$s • desde %2$s</string>
+    <string name="spotify_title">Spotify</string>
+    <string name="spotify_row_desc">Tus playlists privadas y Canciones que te gustan</string>
+    <string name="spotify_connect_title">Conectar con Spotify</string>
+    <string name="spotify_connect_body">Inicia sesión para ver aquí tus playlists privadas y las canciones que te gustan. Las canciones se reproducen desde YouTube Music, así que no hace falta Spotify Premium.</string>
+    <string name="spotify_connect_help">Inicia sesión en Spotify abajo. Tu contraseña va solo a Spotify. Si se rechaza el acceso con Google o Facebook, usa tu correo y contraseña o un código de un solo uso.</string>
+    <string name="spotify_connect_button">Conectar Spotify</string>
+    <string name="spotify_reconnect_hint">Vuelve a iniciar sesión en Spotify para seguir usando tu biblioteca.</string>
+    <string name="spotify_retry">Reintentar</string>
+    <string name="spotify_signed_in_as">Sesión iniciada como %1$s</string>
+    <string name="spotify_liked_subtitle">Playlist • tus me gusta de Spotify</string>
+    <string name="spotify_playlist_songs">%1$d canciones</string>
+    <string name="spotify_played_from_youtube">Las canciones se buscan y se reproducen desde YouTube Music.</string>
+    <string name="spotify_not_found">No se encontraron estas canciones en YouTube Music.</string>
+    <string name="spotify_connected_message">Spotify conectado</string>
 </resources>

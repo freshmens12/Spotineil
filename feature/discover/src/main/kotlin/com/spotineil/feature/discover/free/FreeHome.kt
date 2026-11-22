@@ -223,6 +223,9 @@ data class FreeNavigation(
     /** Opens YouTube's player (after [FreePlayer.playYouTube] set the queue). */
     val onYouTubePlayer: () -> Unit,
     val onLocalMusic: () -> Unit,
+    val onSpotify: () -> Unit,
+    val onSpotifyConnect: () -> Unit,
+    val onSpotifyPlaylist: (id: String, name: String) -> Unit,
     val onSettings: () -> Unit,
     val onBack: () -> Unit,
     val onMessage: (String) -> Unit,

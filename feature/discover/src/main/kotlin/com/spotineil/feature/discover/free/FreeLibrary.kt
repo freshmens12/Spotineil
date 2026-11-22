@@ -98,6 +98,13 @@ fun FreeLibraryRoute(nav: FreeNavigation, viewModel: FreeLibraryViewModel = hilt
             item(key = "history") {
                 LibraryRow(stringResource(R.string.free_history), stringResource(R.string.free_history_desc), nav.onHistory) { m -> HistoryArt(m) }
             }
+            item(key = "spotify") {
+                LibraryRow(stringResource(R.string.spotify_title), stringResource(R.string.spotify_row_desc), nav.onSpotify) { m ->
+                    Box(m.background(MaterialTheme.colorScheme.surfaceContainerHighest), contentAlignment = Alignment.Center) {
+                        Icon(Icons.Rounded.LibraryMusic, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
+                    }
+                }
+            }
             item(key = "device") {
                 LibraryRow(stringResource(R.string.free_on_device), stringResource(R.string.free_on_device_desc), nav.onLocalMusic) { m ->
                     Box(m.background(MaterialTheme.colorScheme.surfaceContainerHighest), contentAlignment = Alignment.Center) {

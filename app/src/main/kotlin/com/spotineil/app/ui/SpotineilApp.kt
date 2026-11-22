@@ -87,6 +87,10 @@ import com.spotineil.feature.discover.discoverScreen
 import com.spotineil.feature.discover.free.FreeHomeTab
 import com.spotineil.feature.discover.free.FreeLibraryTab
 import com.spotineil.feature.discover.free.FreeNavigation
+import com.spotineil.feature.discover.free.SpotifyConnectRoute
+import com.spotineil.feature.discover.free.SpotifyConnectScreen
+import com.spotineil.feature.discover.free.SpotifyLibraryRoute
+import com.spotineil.feature.discover.free.SpotifyPlaylistRoute
 import com.spotineil.feature.discover.free.FreeSearchTab
 import com.spotineil.feature.discover.free.LikedMediaRoute
 import com.spotineil.feature.discover.free.YouTubePlayerRoute
@@ -153,7 +157,15 @@ fun SpotineilApp(isLoggedIn: Boolean, guestMode: Boolean, mainViewModel: MainVie
         when (m) {
             AppMode.Spotify -> MainShell(mainViewModel, free = false)
             AppMode.Free -> MainShell(mainViewModel, free = true)
-            AppMode.Welcome -> WelcomeScreen(onGetStarted = { mainViewModel.finishWelcome() })
+            AppMode.Welcome -> {
+                var connecting by rememberSaveable { mutableStateOf(false) }
+                androidx.activity.compose.BackHandler(enabled = connecting) { connecting = false }
+                if (connecting) {
+                    SpotifyConnectScreen(onDone = { connecting = false; mainViewModel.finishWelcome() }, onBack = { connecting = false })
+                } else {
+                    WelcomeScreen(onGetStarted = { mainViewModel.finishWelcome() }, onConnectSpotify = { connecting = true })
+                }
+            }
         }
     }
     UpdateDialog()
@@ -323,6 +335,9 @@ private fun AppNavHost(navController: NavHostController, onMessage: (String) -> 
             onHistory = { navController.navigate(HistoryRoute) },
             onYouTubePlayer = { navController.navigate(YouTubePlayerRoute) { launchSingleTop = true } },
             onLocalMusic = { navController.navigateToLocalFiles() },
+            onSpotify = { navController.navigate(SpotifyLibraryRoute) },
+            onSpotifyConnect = { navController.navigate(SpotifyConnectRoute) },
+            onSpotifyPlaylist = { id, name -> navController.navigate(SpotifyPlaylistRoute(id, name)) },
             onSettings = { navController.navigateToSettings() },
             onBack = back,
             onMessage = onMessage,
@@ -357,7 +372,12 @@ private fun AppNavHost(navController: NavHostController, onMessage: (String) -> 
         artistScreen(back, toArtist, toAlbum, onMessage)
         playlistScreen(back, toArtist, toAlbum, onOwnerClick = { navController.navigateToProfile(it) }, onMessage)
         profileScreen(back, toArtist)
-        settingsScreens(navController, onMessage)
+        settingsScreens(
+            navController,
+            onMessage,
+            onSpotifyConnect = { navController.navigate(SpotifyConnectRoute) },
+            onSpotifyLibrary = { navController.navigate(SpotifyLibraryRoute) },
+        )
     }
 }
 

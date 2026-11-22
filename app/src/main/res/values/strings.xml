@@ -53,4 +53,5 @@
     <string name="update_failed_title">Update failed</string>
     <string name="update_failed_message">The update could not be downloaded. Check your connection and try again.</string>
     <string name="update_retry">Try again</string>
+    <string name="welcome_connect_spotify">Connect Spotify (optional)</string>
 </resources>

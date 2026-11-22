@@ -52,4 +52,5 @@
     <string name="update_failed_title">Error al actualizar</string>
     <string name="update_failed_message">No se pudo descargar la actualización. Revisa tu conexión e inténtalo de nuevo.</string>
     <string name="update_retry">Reintentar</string>
+    <string name="welcome_connect_spotify">Conectar Spotify (opcional)</string>
 </resources>
