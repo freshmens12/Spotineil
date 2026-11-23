@@ -1,5 +1,14 @@
 package com.spotineil.core.player.local
 
+import com.spotineil.core.player.R
+import com.spotineil.core.model.RecentItem
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.Job
+import androidx.media3.session.SessionError
+import androidx.media3.session.SessionResult
+import androidx.media3.session.SessionCommand
+import androidx.media3.session.CommandButton
+import android.os.Bundle
 import android.app.PendingIntent
 import android.content.Intent
 import androidx.media3.common.AudioAttributes
@@ -69,6 +78,9 @@ class LocalPlaybackService : MediaLibraryService() {
 
     @Inject lateinit var localMedia: LocalMediaRepository
     @Inject lateinit var settings: SettingsRepository
+    @Inject lateinit var liked: com.spotineil.core.data.repository.LikedMediaRepository
+    @Inject lateinit var userPlaylists: com.spotineil.core.data.repository.UserPlaylistRepository
+    @Inject lateinit var recents: com.spotineil.core.data.repository.RecentsRepository
     @Inject lateinit var youTubeStreamFactory: YouTubeStreamDataSourceFactory
 
     private var session: MediaLibrarySession? = null
@@ -124,6 +136,11 @@ class LocalPlaybackService : MediaLibraryService() {
             )
         }
         session = builder.build()
+        // The heart on the notification follows the song now playing.
+        player.addListener(object : Player.Listener {
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) = watchLike(mediaItem)
+        })
+        watchLike(player.currentMediaItem)
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? = session
@@ -147,7 +164,72 @@ class LocalPlaybackService : MediaLibraryService() {
         super.onDestroy()
     }
 
+    // ---------------- Like button on the notification / lock screen ----------------
+
+    private val likeCommand = SessionCommand(ACTION_LIKE, Bundle.EMPTY)
+    private var likeJob: Job? = null
+    private var currentLiked = false
+
+    private fun likeButton(liked: Boolean): CommandButton =
+        CommandButton.Builder(if (liked) CommandButton.ICON_HEART_FILLED else CommandButton.ICON_HEART_UNFILLED)
+            .setDisplayName(getString(if (liked) R.string.player_notification_unlike else R.string.player_notification_like))
+            .setSessionCommand(likeCommand)
+            .build()
+
+    /** Shows a filled or empty heart for the song now playing (none for live radio). */
+    private fun watchLike(item: MediaItem?) {
+        likeJob?.cancel()
+        val s = session ?: return
+        val live = item?.mediaMetadata?.extras?.getBoolean(EXTRA_IS_LIVE) == true
+        if (item == null || live || item.mediaId.isBlank()) {
+            s.setCustomLayout(ImmutableList.of())
+            return
+        }
+        likeJob = scope.launch {
+            liked.isLiked(item.mediaId).collect { value ->
+                currentLiked = value
+                s.setCustomLayout(ImmutableList.of(likeButton(value)))
+            }
+        }
+    }
+
+    // ---------------- Library tree (Android Auto) ----------------
+
+    /** The songs of the folders opened last, so tapping one song plays the whole folder. */
+    private val browsedFolders = LinkedHashMap<String, List<MediaItem>>()
+
+    private suspend fun folderSongs(parentId: String): List<MediaItem> = when {
+        parentId == LIKED_ID -> liked.liked.first().map { it.toMediaItem() }
+        parentId == RECENT_ID -> recents.recent(RECENT_LIMIT).first().filterIsInstance<RecentItem.Song>().map { it.media.toMediaItem() }
+        parentId == SONGS_ID -> localMedia.tracks().map(LocalTrack::toMediaItem)
+        parentId.startsWith(PLAYLIST_PREFIX) -> userPlaylists.songs(parentId.removePrefix(PLAYLIST_PREFIX)).first().map { it.toMediaItem() }
+        else -> emptyList()
+    }
+
     private inner class LibraryCallback : MediaLibrarySession.Callback {
+
+        override fun onConnect(session: MediaSession, controller: MediaSession.ControllerInfo): MediaSession.ConnectionResult =
+            MediaSession.ConnectionResult.AcceptedResultBuilder(session)
+                .setAvailableSessionCommands(
+                    MediaSession.ConnectionResult.DEFAULT_SESSION_AND_LIBRARY_COMMANDS.buildUpon().add(likeCommand).build(),
+                )
+                .build()
+
+        override fun onCustomCommand(
+            session: MediaSession,
+            controller: MediaSession.ControllerInfo,
+            customCommand: SessionCommand,
+            args: Bundle,
+        ): ListenableFuture<SessionResult> {
+            if (customCommand.customAction != ACTION_LIKE) {
+                return Futures.immediateFuture(SessionResult(SessionError.ERROR_NOT_SUPPORTED))
+            }
+            val item = session.player.currentMediaItem ?: return Futures.immediateFuture(SessionResult(SessionError.ERROR_BAD_VALUE))
+            val media = item.toPlayableMedia()
+            val value = !currentLiked
+            scope.launch { liked.setLiked(media, value) }
+            return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+        }
 
         override fun onGetLibraryRoot(
             session: MediaLibrarySession,
@@ -165,13 +247,21 @@ class LocalPlaybackService : MediaLibraryService() {
             params: LibraryParams?,
         ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> = async {
             val children = when (parentId) {
-                ROOT_ID -> listOf(folderItem(SONGS_ID, "Local files"))
-                SONGS_ID -> localMedia.tracks()
-                    .drop(page * pageSize).take(pageSize)
-                    .map(LocalTrack::toMediaItem)
-                else -> emptyList()
+                ROOT_ID -> listOf(
+                    folderItem(LIKED_ID, getString(R.string.player_auto_liked)),
+                    folderItem(PLAYLISTS_ID, getString(R.string.player_auto_playlists)),
+                    folderItem(RECENT_ID, getString(R.string.player_auto_recent)),
+                    folderItem(SONGS_ID, getString(R.string.player_auto_local)),
+                )
+                PLAYLISTS_ID -> userPlaylists.playlists.first().map { folderItem(PLAYLIST_PREFIX + it.id, it.name) }
+                else -> folderSongs(parentId).also { songs ->
+                    browsedFolders.remove(parentId)
+                    browsedFolders[parentId] = songs
+                    while (browsedFolders.size > 6) browsedFolders.remove(browsedFolders.keys.first())
+                }
             }
-            LibraryResult.ofItemList(ImmutableList.copyOf(children), params)
+            val pageItems = if (pageSize > 0) children.drop(page * pageSize).take(pageSize) else children
+            LibraryResult.ofItemList(ImmutableList.copyOf(pageItems), params)
         }
 
         override fun onGetItem(
@@ -188,16 +278,34 @@ class LocalPlaybackService : MediaLibraryService() {
             mediaSession: MediaSession,
             controller: MediaSession.ControllerInfo,
             mediaItems: MutableList<MediaItem>,
-        ): ListenableFuture<MutableList<MediaItem>> = async {
-            mediaItems.mapNotNull { item ->
-                when {
-                    item.localConfiguration != null -> item
-                    item.requestMetadata.mediaUri != null -> item.buildUpon().setUri(item.requestMetadata.mediaUri).build()
-                    else -> resolve(item.mediaId)
-                }
-            }.toMutableList()
+        ): ListenableFuture<MutableList<MediaItem>> = async { withUris(mediaItems) }
+
+        /** One song picked from a folder in the car: play the whole folder, starting at that song. */
+        override fun onSetMediaItems(
+            mediaSession: MediaSession,
+            controller: MediaSession.ControllerInfo,
+            mediaItems: MutableList<MediaItem>,
+            startIndex: Int,
+            startPositionMs: Long,
+        ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> = async {
+            val single = mediaItems.singleOrNull()
+            val folder = single?.let { pick -> browsedFolders.values.lastOrNull { list -> list.any { it.mediaId == pick.mediaId } } }
+            if (single != null && folder != null && folder.size > 1) {
+                MediaSession.MediaItemsWithStartPosition(folder, folder.indexOfFirst { it.mediaId == single.mediaId }, startPositionMs)
+            } else {
+                MediaSession.MediaItemsWithStartPosition(withUris(mediaItems), startIndex.coerceAtLeast(0), startPositionMs)
+            }
         }
     }
+
+    private suspend fun withUris(mediaItems: List<MediaItem>): MutableList<MediaItem> =
+        mediaItems.mapNotNull { item ->
+            when {
+                item.localConfiguration != null -> item
+                item.requestMetadata.mediaUri != null -> item.buildUpon().setUri(item.requestMetadata.mediaUri).build()
+                else -> resolve(item.mediaId)
+            }
+        }.toMutableList()
 
     private suspend fun resolve(mediaId: String): MediaItem? {
         val id = mediaId.removePrefix(LOCAL_ID_PREFIX).toLongOrNull() ?: return null
@@ -214,3 +322,10 @@ class LocalPlaybackService : MediaLibraryService() {
         return future
     }
 }
+
+private const val ACTION_LIKE = "spotineil.LIKE"
+private const val LIKED_ID = "liked"
+private const val PLAYLISTS_ID = "playlists"
+private const val RECENT_ID = "recent"
+private const val PLAYLIST_PREFIX = "playlist:"
+private const val RECENT_LIMIT = 50

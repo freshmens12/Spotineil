@@ -557,7 +557,9 @@ class LikedMediaViewModel @Inject constructor(
 fun LikedMediaScreen(nav: FreeNavigation, viewModel: LikedMediaViewModel = hiltViewModel()) {
     val liked by viewModel.liked.collectAsStateWithLifecycle()
     val nowPlaying by viewModel.nowPlayingId.collectAsStateWithLifecycle()
-    val list = liked.orEmpty()
+    val all = liked.orEmpty()
+    var filter by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf("") }
+    val list = all.matching(filter)
 
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = LocalBottomContentPadding.current + 16.dp)) {
         item(key = "header") {
@@ -590,7 +592,8 @@ fun LikedMediaScreen(nav: FreeNavigation, viewModel: LikedMediaViewModel = hiltV
                 }
             }
         }
-        if (liked != null && list.isEmpty()) {
+        if (all.size > 5) item(key = "filter") { ListFilterField(filter, { filter = it }, stringResource(R.string.free_find_in_list)) }
+        if (liked != null && all.isEmpty()) {
             item { Text(stringResource(R.string.free_liked_empty), Modifier.padding(24.dp), textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant) }
         }
         itemsIndexed(list, key = { _, m -> m.mediaId }) { i, m ->

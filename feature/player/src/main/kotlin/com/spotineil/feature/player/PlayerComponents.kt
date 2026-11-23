@@ -27,6 +27,7 @@ import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
 import androidx.compose.material.icons.rounded.AddCircleOutline
 import androidx.compose.material.icons.rounded.Bedtime
+import androidx.compose.material.icons.rounded.DirectionsCar
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Devices
 import androidx.compose.material.icons.rounded.Favorite
@@ -90,6 +91,7 @@ data class PlayerActions(
     val onShowSleepTimer: () -> Unit = {},
     val onToggleLyrics: () -> Unit = {},
     val onAddToPlaylist: (() -> Unit)? = null,
+    val onCarMode: (() -> Unit)? = null,
     val onArtistClick: () -> Unit = {},
     val onAlbumClick: () -> Unit = {},
 )
@@ -232,6 +234,9 @@ fun FullPlayer(
                     state.playback.deviceName?.let {
                         Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                     }
+                }
+                actions.onCarMode?.let { car ->
+                    IconButton(onClick = car) { Icon(Icons.Rounded.DirectionsCar, stringResource(R.string.player_car_mode)) }
                 }
                 IconButton(onClick = actions.onShowSleepTimer) {
                     Icon(

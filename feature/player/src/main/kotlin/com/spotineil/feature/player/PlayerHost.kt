@@ -44,6 +44,8 @@ fun PlayerHost(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var showLyrics by rememberSaveable { mutableStateOf(false) }
     var sheet by rememberSaveable { mutableStateOf<String?>(null) }
+    var karaoke by rememberSaveable { mutableStateOf(false) }
+    var carMode by rememberSaveable { mutableStateOf(false) }
 
     if (!state.hasTrack) return
     BackHandler(enabled = expanded) { onExpandedChange(false) }
@@ -63,6 +65,7 @@ fun PlayerHost(
         onShowSleepTimer = { sheet = "sleep" },
         onToggleLyrics = { showLyrics = !showLyrics },
         onAddToPlaylist = state.track?.media?.takeIf { !it.isLive }?.let { { sheet = "playlist" } },
+        onCarMode = { carMode = true },
         onArtistClick = {
             state.track?.artistUri?.substringAfterLast(':')?.let { onExpandedChange(false); onArtistClick(it) }
         },
@@ -93,7 +96,16 @@ fun PlayerHost(
                     showLyrics = showLyrics,
                     lyricsContent = {
                         val lyrics by lyricsViewModel.state.collectAsStateWithLifecycle()
-                        LyricsPanel(lyrics, state.positionMs, viewModel::seekTo)
+                        val context = androidx.compose.ui.platform.LocalContext.current
+                        LyricsPanel(
+                            lyrics,
+                            state.positionMs,
+                            viewModel::seekTo,
+                            onShareLine = { line -> shareLyricLine(context, line, state.track?.name.orEmpty(), state.track?.artists.orEmpty()) },
+                            onKaraoke = { karaoke = true },
+                            translation = lyricsViewModel.translation.collectAsStateWithLifecycle().value,
+                            onTranslate = lyricsViewModel::toggleTranslate,
+                        )
                     },
                     artworkModifier = artwork,
                     titleModifier = title,
@@ -106,6 +118,41 @@ fun PlayerHost(
         }
     }
 
+
+    if (karaoke && expanded) {
+        val lyrics by lyricsViewModel.state.collectAsStateWithLifecycle()
+        val loaded = (lyrics as? LyricsUiState.Loaded)?.lyrics
+        if (loaded == null || loaded.isInstrumental) {
+            karaoke = false
+        } else {
+            KaraokeScreen(
+                lyrics = loaded,
+                positionMs = state.positionMs,
+                durationMs = state.track?.durationMs ?: 0L,
+                title = state.track?.name.orEmpty(),
+                artist = state.track?.artists.orEmpty(),
+                imageUrl = state.track?.imageUrl,
+                isPlaying = state.playback.isPlaying,
+                onTogglePlay = viewModel::togglePlayPause,
+                onClose = { karaoke = false },
+            )
+        }
+    }
+
+    if (carMode && expanded) {
+        CarModeScreen(
+            title = state.track?.name.orEmpty(),
+            artist = state.track?.artists.orEmpty(),
+            imageUrl = state.track?.imageUrl,
+            isPlaying = state.playback.isPlaying,
+            isLiked = state.isLiked.takeIf { state.canLike },
+            onPrevious = viewModel::previous,
+            onTogglePlay = viewModel::togglePlayPause,
+            onNext = viewModel::next,
+            onLike = viewModel::toggleLike,
+            onClose = { carMode = false },
+        )
+    }
     when (sheet) {
         "queue" -> QueueSheet(viewModel) { sheet = null }
         "devices" -> DevicesSheet { sheet = null }

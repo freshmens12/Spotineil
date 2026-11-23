@@ -470,6 +470,7 @@ private val libraryCredits = listOf(
 
 private val serviceCredits = listOf(
     Credit("YouTube Music", "Songs, artwork and charts", "Content belongs to its artists, labels and rights holders"),
+    Credit("Google Translate", "Translated lyrics (only when you turn it on)", "Google Terms of Service"),
     Credit("LRCLIB", "Song lyrics", "lrclib.net · community lyrics database"),
     Credit("Spotify (optional)", "Your private playlists and Liked Songs, when you connect your account. Songs play from YouTube Music", "Spotify web player (unofficial) · Spotify terms"),
     Credit("Last.fm", "Similar artists for radio and Play similar", "Last.fm API Terms of Use"),

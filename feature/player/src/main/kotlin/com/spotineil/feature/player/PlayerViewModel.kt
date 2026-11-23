@@ -180,6 +180,7 @@ sealed interface LyricsUiState {
 class LyricsViewModel @Inject constructor(
     player: PlaybackController,
     private val repository: LyricsRepository,
+    private val translator: com.spotineil.core.data.repository.LyricsTranslator,
 ) : ViewModel() {
 
     val state: StateFlow<LyricsUiState> = player.state
@@ -207,4 +208,41 @@ class LyricsViewModel @Inject constructor(
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LyricsUiState.Idle)
+
+    private val translateOn = MutableStateFlow(false)
+    val isTranslating: StateFlow<Boolean> = translateOn.asStateFlow()
+
+    /** Translated lines (same count as the lyrics) while "Translate" is on; follows the song. */
+    val translation: StateFlow<TranslationState> = kotlinx.coroutines.flow.combine(state, translateOn) { s, on -> s to on }
+        .flatMapLatest { (s, on) ->
+            flow {
+                val lyrics = (s as? LyricsUiState.Loaded)?.lyrics
+                if (!on || lyrics == null || lyrics.isInstrumental) {
+                    emit(TranslationState.Off)
+                    return@flow
+                }
+                emit(TranslationState.Loading)
+                val target = translator.targetLanguage()
+                val result = runCatching { translator.translate(lyrics.lines.map { it.text }, target) }.getOrNull()
+                emit(
+                    when {
+                        result == null -> TranslationState.Failed
+                        result.sourceLanguage?.substringBefore('-') == target -> TranslationState.SameLanguage
+                        else -> TranslationState.Shown(result.lines)
+                    },
+                )
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TranslationState.Off)
+
+    fun toggleTranslate() { translateOn.value = !translateOn.value }
+}
+
+sealed interface TranslationState {
+    data object Off : TranslationState
+    data object Loading : TranslationState
+    data object Failed : TranslationState
+    /** The song is already in your language. */
+    data object SameLanguage : TranslationState
+    data class Shown(val lines: List<String>) : TranslationState
 }

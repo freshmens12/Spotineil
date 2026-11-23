@@ -178,4 +178,8 @@
     <plurals name="wrapped_plays"><item quantity="one">%1$d reproducción</item><item quantity="many">%1$d reproducciones</item><item quantity="other">%1$d reproducciones</item></plurals>
     <string name="wrapped_share">Compartir</string>
     <string name="wrapped_share_text">Mi Spotineil Wrapped: %1$d minutos de música, artista favorito %2$s.</string>
+    <string name="free_voice_search">Buscar por voz</string>
+    <string name="free_voice_unavailable">La búsqueda por voz no está disponible en este teléfono</string>
+    <string name="free_find_in_list">Buscar en esta lista</string>
+    <string name="discovery_playlist">Playlist</string>
 </resources>

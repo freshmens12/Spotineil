@@ -48,4 +48,10 @@
     <string name="update_failed_message">Hindi ma-download ang update. Tingnan ang iyong koneksyon at subukan muli.</string>
     <string name="update_retry">Subukan muli</string>
     <string name="welcome_connect_spotify">Ikonekta ang Spotify (opsyonal)</string>
+    <string name="widget_playlists_name">Spotineil — Mga playlist mo</string>
+    <string name="widget_playlists_description">Mga Paboritong Kanta at mga playlist mo: isang tap para i-shuffle.</string>
+    <string name="widget_playlists_title">Mga playlist mo</string>
+    <string name="widget_liked_songs">Mga Paboritong Kanta</string>
+    <string name="widget_shuffle">Shuffle</string>
+    <plurals name="widget_song_count"><item quantity="one">%1$d kanta</item><item quantity="other">%1$d kanta</item></plurals>
 </resources>

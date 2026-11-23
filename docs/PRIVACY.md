@@ -18,6 +18,7 @@ These are stored only on your device. They are deleted when you uninstall the ap
 To show and play music, the app sends requests (such as your search words and your approximate country) directly from your phone to the services below. Each one handles those requests under its own privacy policy. The developer does not see them.
 - **YouTube Music**: the music catalog, search, charts and audio streams.
 - **LRCLIB**: song lyrics.
+- **Google Translate** (only when you turn on "Translate lyrics"): the lyric lines of the song, to translate them into your language.
 - **Last.fm**: similar artists, used for radio and "Play similar".
 - **Audius, Jamendo, ccMixter, Internet Archive**: free and Creative Commons music.
 - **Radio Browser**: the radio station directory.

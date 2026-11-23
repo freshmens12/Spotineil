@@ -38,4 +38,10 @@
     <string name="player_queue_saved">Queue saved to Your playlists</string>
     <string name="player_remove_from_queue">Remove from queue</string>
     <string name="player_add_to_playlist">Add to playlist</string>
+    <string name="player_karaoke">Karaoke mode</string>
+    <string name="player_share_lyric">Share lyric</string>
+    <string name="player_car_mode">Car mode</string>
+    <string name="player_translate">Translate lyrics</string>
+    <string name="player_translate_same">Already in your language</string>
+    <string name="player_translate_failed">Couldn\'t translate</string>
 </resources>

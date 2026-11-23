@@ -77,6 +77,8 @@ interface WidgetEntryPoint {
     fun playbackController(): PlaybackController
     fun freePlayer(): FreePlayer
     fun recents(): RecentsRepository
+    fun liked(): com.spotineil.core.data.repository.LikedMediaRepository
+    fun userPlaylists(): com.spotineil.core.data.repository.UserPlaylistRepository
 }
 
 internal fun Context.entryPoint(): WidgetEntryPoint =

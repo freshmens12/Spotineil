@@ -1,5 +1,6 @@
 package com.spotineil.feature.discover.free
 
+import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -304,7 +305,16 @@ fun FreeSearchRoute(nav: FreeNavigation, viewModel: FreeSearchViewModel = hiltVi
     Column(Modifier.fillMaxSize()) {
     // Title and search box stay put; only the results scroll under them.
     ScreenTitle(stringResource(R.string.free_search_title), nav.onSettings, Modifier.statusBarsPadding())
-    SearchField(query, viewModel::onQueryChange, onSearch = viewModel::submit)
+    // Voice search: Android's speech recogniser fills in the box and searches.
+    val voice = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()) { result ->
+        result.data?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()?.takeIf { it.isNotBlank() }?.let(viewModel::searchRecent)
+    }
+    SearchField(query, viewModel::onQueryChange, onSearch = viewModel::submit, onVoice = {
+        val intent = android.content.Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+            .putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL, android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            .putExtra(android.speech.RecognizerIntent.EXTRA_PROMPT, context.getString(R.string.free_search_hint))
+        try { voice.launch(intent) } catch (_: android.content.ActivityNotFoundException) { nav.onMessage(context.getString(R.string.free_voice_unavailable)) }
+    })
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier.fillMaxWidth().weight(1f),
@@ -460,7 +470,7 @@ fun FreeSearchRoute(nav: FreeNavigation, viewModel: FreeSearchViewModel = hiltVi
 }
 
 @Composable
-private fun SearchField(value: String, onChange: (String) -> Unit, onSearch: () -> Unit) {
+private fun SearchField(value: String, onChange: (String) -> Unit, onSearch: () -> Unit, onVoice: (() -> Unit)? = null) {
     val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
     TextField(
         value = value,
@@ -474,7 +484,11 @@ private fun SearchField(value: String, onChange: (String) -> Unit, onSearch: () 
         placeholder = { Text(stringResource(R.string.free_search_hint), color = Color(0xFF535353)) },
         leadingIcon = { Icon(Icons.Rounded.Search, null, tint = Color.Black) },
         trailingIcon = {
-            if (value.isNotEmpty()) IconButton(onClick = { onChange("") }) { Icon(Icons.Rounded.Close, null, tint = Color.Black) }
+            if (value.isNotEmpty()) {
+                IconButton(onClick = { onChange("") }) { Icon(Icons.Rounded.Close, null, tint = Color.Black) }
+            } else if (onVoice != null) {
+                IconButton(onClick = onVoice) { Icon(Icons.Rounded.Mic, stringResource(R.string.free_voice_search), tint = Color.Black) }
+            }
         },
         shape = RoundedCornerShape(6.dp),
         colors = TextFieldDefaults.colors(

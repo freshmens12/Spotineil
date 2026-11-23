@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_notification_like">Add to Liked Songs</string>
+    <string name="player_notification_unlike">Remove from Liked Songs</string>
+    <string name="player_auto_liked">Liked Songs</string>
+    <string name="player_auto_playlists">Your playlists</string>
+    <string name="player_auto_recent">Recently played</string>
+    <string name="player_auto_local">On this device</string>
+</resources>

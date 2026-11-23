@@ -38,4 +38,10 @@
     <string name="player_queue_saved">Na-save ang pila sa Mga playlist mo</string>
     <string name="player_remove_from_queue">Alisin sa pila</string>
     <string name="player_add_to_playlist">Idagdag sa playlist</string>
+    <string name="player_karaoke">Karaoke mode</string>
+    <string name="player_share_lyric">I-share ang lyric</string>
+    <string name="player_car_mode">Car mode</string>
+    <string name="player_translate">Isalin ang lyrics</string>
+    <string name="player_translate_same">Nasa wika mo na</string>
+    <string name="player_translate_failed">Hindi maisalin</string>
 </resources>

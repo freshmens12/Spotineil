@@ -1,5 +1,7 @@
 package com.spotineil.feature.discover.free
 
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.rounded.Radio
 import androidx.compose.runtime.setValue
@@ -575,4 +577,26 @@ internal fun PlaylistRadioButton(nav: FreeNavigation, start: suspend () -> Boole
         if (busy) androidx.compose.material3.CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp)
         else Icon(Icons.Rounded.Radio, stringResource(R.string.playlist_radio))
     }
+}
+
+/** Songs whose title, artist or album contain [query] (all of them when it is blank). */
+internal fun List<PlayableMedia>.matching(query: String): List<PlayableMedia> {
+    val q = query.trim()
+    if (q.isEmpty()) return this
+    return filter { it.title.contains(q, true) || it.artist.contains(q, true) || it.album.orEmpty().contains(q, true) }
+}
+
+/** Small "find in this list" box. */
+@Composable
+internal fun ListFilterField(value: String, onChange: (String) -> Unit, hint: String, modifier: Modifier = Modifier) {
+    androidx.compose.material3.OutlinedTextField(
+        value = value,
+        onValueChange = onChange,
+        singleLine = true,
+        placeholder = { Text(hint) },
+        leadingIcon = { Icon(Icons.Rounded.Search, null) },
+        trailingIcon = { if (value.isNotEmpty()) IconButton(onClick = { onChange("") }) { Icon(Icons.Rounded.Close, null) } },
+        shape = RoundedCornerShape(24.dp),
+        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+    )
 }

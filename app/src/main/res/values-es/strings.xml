@@ -53,4 +53,10 @@
     <string name="update_failed_message">No se pudo descargar la actualización. Revisa tu conexión e inténtalo de nuevo.</string>
     <string name="update_retry">Reintentar</string>
     <string name="welcome_connect_spotify">Conectar Spotify (opcional)</string>
+    <string name="widget_playlists_name">Spotineil — Tus playlists</string>
+    <string name="widget_playlists_description">Canciones que te gustan y tus playlists: un toque para reproducir en aleatorio.</string>
+    <string name="widget_playlists_title">Tus playlists</string>
+    <string name="widget_liked_songs">Canciones que te gustan</string>
+    <string name="widget_shuffle">Aleatorio</string>
+    <plurals name="widget_song_count"><item quantity="one">%1$d canción</item><item quantity="many">%1$d canciones</item><item quantity="other">%1$d canciones</item></plurals>
 </resources>

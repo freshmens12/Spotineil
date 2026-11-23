@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_notification_like">Idagdag sa Mga Paboritong Kanta</string>
+    <string name="player_notification_unlike">Alisin sa Mga Paboritong Kanta</string>
+    <string name="player_auto_liked">Mga Paboritong Kanta</string>
+    <string name="player_auto_playlists">Mga playlist mo</string>
+    <string name="player_auto_recent">Kamakailang pinatugtog</string>
+    <string name="player_auto_local">Sa device na ito</string>
+</resources>

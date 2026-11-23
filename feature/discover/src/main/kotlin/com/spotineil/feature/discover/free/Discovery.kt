@@ -217,7 +217,8 @@ fun ArtistScreen(nav: FreeNavigation, viewModel: ArtistViewModel = hiltViewModel
                 }
                 if (s.data.playlists.isNotEmpty()) item(key = "playlists") {
                     Shelf(stringResource(R.string.discovery_featured_on), s.data.playlists, key = { it.id }) { p ->
-                        BigCard(p.name, p.owner.displayName, p.images.firstOrNull()?.url, { nav.onYtCollection(p.id, p.name, p.owner.displayName.orEmpty(), p.images.firstOrNull()?.url) })
+                        val subtitle = playlistSubtitle(p.owner.displayName)
+                        BigCard(p.name, subtitle, p.images.firstOrNull()?.url, { nav.onYtCollection(p.id, p.name, subtitle, p.images.firstOrNull()?.url) })
                     }
                 }
             }
@@ -331,7 +332,7 @@ fun MoodScreen(nav: FreeNavigation, viewModel: MoodViewModel = hiltViewModel()) 
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 items(s.data, key = { it.id }) { p ->
-                    BigCard(p.name, p.owner.displayName, p.images.firstOrNull()?.url, {
+                    BigCard(p.name, playlistSubtitle(p.owner.displayName), p.images.firstOrNull()?.url, {
                         nav.onYtCollection(p.id, p.name, viewModel.route.title, p.images.firstOrNull()?.url)
                     })
                 }
@@ -551,4 +552,11 @@ private fun shareWrapped(context: Context, s: ListeningSummary, periodLabel: Str
     runCatching {
         context.startActivity(Intent.createChooser(send, context.getString(R.string.wrapped_share)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
+}
+
+/** Under a playlist: its owner, or just "Playlist" when it is the catalog's own. */
+@Composable
+private fun playlistSubtitle(owner: String?): String {
+    val o = owner?.trim().orEmpty()
+    return if (o.isEmpty() || o.contains("YouTube", ignoreCase = true)) stringResource(R.string.discovery_playlist) else o
 }

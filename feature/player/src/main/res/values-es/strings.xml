@@ -38,4 +38,10 @@
     <string name="player_queue_saved">Cola guardada en Tus playlists</string>
     <string name="player_remove_from_queue">Quitar de la cola</string>
     <string name="player_add_to_playlist">Añadir a playlist</string>
+    <string name="player_karaoke">Modo karaoke</string>
+    <string name="player_share_lyric">Compartir letra</string>
+    <string name="player_car_mode">Modo coche</string>
+    <string name="player_translate">Traducir letra</string>
+    <string name="player_translate_same">Ya está en tu idioma</string>
+    <string name="player_translate_failed">No se pudo traducir</string>
 </resources>

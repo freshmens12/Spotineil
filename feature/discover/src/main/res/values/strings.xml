@@ -177,4 +177,8 @@
     <plurals name="wrapped_plays"><item quantity="one">%1$d play</item><item quantity="other">%1$d plays</item></plurals>
     <string name="wrapped_share">Share</string>
     <string name="wrapped_share_text">My Spotineil Wrapped: %1$d minutes of music, top artist %2$s.</string>
+    <string name="free_voice_search">Search by voice</string>
+    <string name="free_voice_unavailable">Voice search isn\'t available on this phone</string>
+    <string name="free_find_in_list">Find in this list</string>
+    <string name="discovery_playlist">Playlist</string>
 </resources>

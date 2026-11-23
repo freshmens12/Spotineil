@@ -32,9 +32,9 @@ A free Android music app, written in Kotlin with Jetpack Compose (Material 3). I
 | **More free music** | Independent artists on Audius and Jamendo, Creative Commons remixes on ccMixter, and live concerts and free albums from the Internet Archive. |
 | **Radio and podcasts** | Thousands of live radio stations (Radio Browser) and the Apple Podcasts directory, with episodes from each show's own RSS feed. |
 | **Your library** | Your own playlists (create, reorder, rename), Downloads, Backup & restore, Liked Songs, History of every song you played, recent searches, songs that continue where you left them, followed podcasts, saved stations, and the music files on your phone, which you can also delete from inside the app. All stored on the phone. |
-| **Lyrics** | Synced, line-by-line lyrics from LRCLIB, with a live lyrics card under the player. |
+| **Lyrics** | Synced, line-by-line lyrics from LRCLIB, translated lyrics, karaoke mode, and lyric lines shared as pictures. |
 | **Player** | Full player screen, mini player, queue, sleep timer, output-device picker (Bluetooth, wired, cast), notification, lock-screen and Bluetooth controls, Android Auto browsing. |
-| **Widgets** | Five home-screen widgets: **Player** (2×2), **Now playing** (4×1), **Mini player** (2×1), **Quick actions** (4×1) and **Recently played** (4×2). Long-press your Home screen, tap Widgets and pick Spotineil. |
+| **Widgets** | Six home-screen widgets: **Your playlists** (tap to shuffle), **Player** (2×2), **Now playing** (4×1), **Mini player** (2×1), **Quick actions** (4×1) and **Recently played** (4×2). Long-press your Home screen, tap Widgets and pick Spotineil. |
 | **Themes and language** | System, Light, Dark, AMOLED black and **Soft glass**; 8 accent colours; English, Spanish and Tagalog (or Automatic). |
 | **Spotify (optional)** | Connect your Spotify account to see private playlists and Liked Songs; songs are played from YouTube Music. |
 | **Sound** | Crossfade or AutoMix between songs (gapless within an album), equalizer with presets, volume leveling, skip silence, podcast speed, sleep timer that fades out. |

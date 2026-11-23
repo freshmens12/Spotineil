@@ -2,6 +2,7 @@
 
 package com.spotineil.feature.discover.free
 
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -84,7 +85,9 @@ class HistoryViewModel @Inject constructor(
 fun HistoryScreen(nav: FreeNavigation, viewModel: HistoryViewModel = hiltViewModel()) {
     val songs by viewModel.songs.collectAsStateWithLifecycle()
     val nowPlaying by viewModel.nowPlayingId.collectAsStateWithLifecycle()
-    val list = songs.orEmpty()
+    val all = songs.orEmpty()
+    var filter by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf("") }
+    val list = all.matching(filter)
 
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = LocalBottomContentPadding.current + 16.dp)) {
         item(key = "header") {
@@ -101,7 +104,8 @@ fun HistoryScreen(nav: FreeNavigation, viewModel: HistoryViewModel = hiltViewMod
                 }
             }
         }
-        if (songs != null && list.isEmpty()) {
+        if (all.size > 5) item(key = "filter") { ListFilterField(filter, { filter = it }, stringResource(R.string.free_find_in_list)) }
+        if (songs != null && all.isEmpty()) {
             item(key = "empty") {
                 Text(
                     stringResource(R.string.free_history_empty),

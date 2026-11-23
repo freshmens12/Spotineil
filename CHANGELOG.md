@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.13.0] - 2026-11-23
+
+### Added
+- **Lyrics extras**: long-press a lyric line to share it as a picture; **Karaoke mode** (full-screen button in the lyrics view) shows the current line large with the next one below.
+- **Car mode** (car button on the player): just the song and very large controls.
+- **Like from the notification and lock screen**: a heart button on the media notification.
+- **Android Auto**: Liked Songs, Your playlists, Recently played and On this device; picking a song plays the whole list from there.
+- **Voice search** (microphone in the search box) and a **filter box** in Liked Songs and History.
+- **Playlists widget**: Liked Songs and your playlists on the Home screen; one tap shuffles one.
+- **Translated lyrics**: the translate button in the lyrics view shows each line in your app language (English, Spanish or Tagalog) under the original, using Google Translate.
+
+### Changed
+- Playlists in Moods and genres, and on artist pages, now just say "Playlist" under their name.
+
 ## [1.12.0] - 2026-11-23
 
 ### Added

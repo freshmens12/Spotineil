@@ -175,4 +175,8 @@
     <plurals name="wrapped_plays"><item quantity="one">%1$d beses</item><item quantity="other">%1$d beses</item></plurals>
     <string name="wrapped_share">I-share</string>
     <string name="wrapped_share_text">Ang Spotineil Wrapped ko: %1$d minuto ng musika, nangungunang artist si %2$s.</string>
+    <string name="free_voice_search">Maghanap gamit ang boses</string>
+    <string name="free_voice_unavailable">Walang voice search sa teleponong ito</string>
+    <string name="free_find_in_list">Hanapin sa listahang ito</string>
+    <string name="discovery_playlist">Playlist</string>
 </resources>

@@ -218,7 +218,7 @@ class LocalEngine @Inject constructor(
 }
 
 /** The [PlayableMedia] a queued item was made from (as far as the controller can see it). */
-private fun androidx.media3.common.MediaItem.toPlayableMedia(): PlayableMedia {
+internal fun androidx.media3.common.MediaItem.toPlayableMedia(): PlayableMedia {
     val md = mediaMetadata
     val extras = md.extras
     return PlayableMedia(
