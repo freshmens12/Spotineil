@@ -290,6 +290,58 @@ interface UserPlaylistDao {
     suspend fun removeItem(id: String, mediaId: String)
 }
 
+
+/** One listen: a song played for at least half a minute. [json] is a serialized PlayableMedia. */
+@Entity(tableName = "play_log", indices = [androidx.room.Index("playedAt"), androidx.room.Index("mediaId")])
+data class PlayLogEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val mediaId: String,
+    val artist: String,
+    val json: String,
+    val playedAt: Long,
+    val listenedMs: Long,
+)
+
+data class PlayCountRow(val mediaId: String, val json: String, val plays: Int, val listenedMs: Long, val lastPlayed: Long)
+data class ArtistCountRow(val artist: String, val plays: Int, val listenedMs: Long, val json: String)
+
+@Dao
+interface PlayLogDao {
+    @androidx.room.Insert suspend fun insert(entity: PlayLogEntity)
+
+    @Query(
+        """SELECT mediaId, json, COUNT(*) AS plays, SUM(listenedMs) AS listenedMs, MAX(playedAt) AS lastPlayed
+           FROM play_log WHERE playedAt >= :since GROUP BY mediaId ORDER BY plays DESC, listenedMs DESC LIMIT :limit""",
+    )
+    suspend fun topSongs(since: Long, limit: Int): List<PlayCountRow>
+
+    @Query(
+        """SELECT artist, COUNT(*) AS plays, SUM(listenedMs) AS listenedMs, MAX(json) AS json
+           FROM play_log WHERE playedAt >= :since AND artist != '' GROUP BY artist ORDER BY plays DESC LIMIT :limit""",
+    )
+    suspend fun topArtists(since: Long, limit: Int): List<ArtistCountRow>
+
+    @Query("SELECT COALESCE(SUM(listenedMs), 0) FROM play_log WHERE playedAt >= :since")
+    suspend fun listenedSince(since: Long): Long
+
+    @Query("SELECT COUNT(DISTINCT mediaId) FROM play_log WHERE playedAt >= :since")
+    suspend fun distinctSongsSince(since: Long): Int
+
+    /** Songs played at least [minPlays] times before [before] but not since then. */
+    @Query(
+        """SELECT mediaId, json, COUNT(*) AS plays, SUM(listenedMs) AS listenedMs, MAX(playedAt) AS lastPlayed
+           FROM play_log GROUP BY mediaId HAVING MAX(playedAt) < :before AND COUNT(*) >= :minPlays
+           ORDER BY plays DESC LIMIT :limit""",
+    )
+    suspend fun forgotten(before: Long, minPlays: Int, limit: Int): List<PlayCountRow>
+
+    @Query("SELECT * FROM play_log")
+    suspend fun all(): List<PlayLogEntity>
+
+    @androidx.room.Insert(onConflict = androidx.room.OnConflictStrategy.IGNORE)
+    suspend fun insertAll(entities: List<PlayLogEntity>)
+}
+
 @Database(
     entities = [
         RecentSearchEntity::class,
@@ -303,10 +355,11 @@ interface UserPlaylistDao {
         FollowedPodcastEntity::class,
         UserPlaylistEntity::class,
         UserPlaylistItemEntity::class,
+        PlayLogEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = true,
-    autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(from = 2, to = 3), AutoMigration(from = 3, to = 4)],
+    autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(from = 2, to = 3), AutoMigration(from = 3, to = 4), AutoMigration(from = 4, to = 5)],
 )
 abstract class SpotineilDatabase : RoomDatabase() {
     abstract fun recentSearchDao(): RecentSearchDao
@@ -319,4 +372,5 @@ abstract class SpotineilDatabase : RoomDatabase() {
     abstract fun recentItemDao(): RecentItemDao
     abstract fun followedPodcastDao(): FollowedPodcastDao
     abstract fun userPlaylistDao(): UserPlaylistDao
+    abstract fun playLogDao(): PlayLogDao
 }

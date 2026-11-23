@@ -225,6 +225,10 @@ data class FreeNavigation(
     val onLocalMusic: () -> Unit,
     val onDownloads: () -> Unit,
     val onUserPlaylist: (String) -> Unit,
+    val onArtist: (name: String, channelId: String?, imageUrl: String?) -> Unit,
+    val onYtCollection: (browseId: String, title: String, subtitle: String, imageUrl: String?) -> Unit,
+    val onMood: (com.spotineil.core.data.innertube.YtMood) -> Unit,
+    val onWrapped: () -> Unit,
     val onSpotify: () -> Unit,
     val onSpotifyConnect: () -> Unit,
     val onSpotifyPlaylist: (id: String, name: String) -> Unit,
@@ -315,6 +319,7 @@ fun FreeHomeRoute(nav: FreeNavigation, viewModel: FreeHomeViewModel = hiltViewMo
 
             if (music) {
                 item(key = "spotify") { SpotifyHomeShelf(nav) }
+                item(key = "madeForYou") { MadeForYouTopShelves(nav) }
                 item(key = "youtube") {
                     val videos = r.youTube.orEmpty()
                     Shelf(stringResource(R.string.yt_trending), videos, key = { "yt:" + it.id }) { v ->
@@ -326,6 +331,7 @@ fun FreeHomeRoute(nav: FreeNavigation, viewModel: FreeHomeViewModel = hiltViewMo
                         )
                     }
                 }
+                item(key = "rediscover") { RediscoverShelf(nav) }
             }
             if (radioOn) {
                 item(key = "yourStations") { stationShelf(stringResource(R.string.free_your_stations), state.favoriteStations) }

@@ -234,7 +234,14 @@ private fun MainShell(mainViewModel: MainViewModel, free: Boolean) {
     val bottomPadding = NavBarHeight + navInsets + if (showMini) MiniPlayerHeight else 0.dp
     // One song menu for every list (long press on a song).
     var songMenu by remember { mutableStateOf<com.spotineil.core.model.PlayableMedia?>(null) }
-    songMenu?.let { m -> com.spotineil.core.ui.SongActionsSheet(m, onDismiss = { songMenu = null }, onMessage = showMessage) }
+    songMenu?.let { m ->
+        com.spotineil.core.ui.SongActionsSheet(
+            m,
+            onDismiss = { songMenu = null },
+            onMessage = showMessage,
+            onGoToArtist = { navController.navigate(com.spotineil.feature.discover.free.YtArtistRoute(it)) },
+        )
+    }
 
     Box(Modifier.fillMaxSize()) {
         Scaffold(
@@ -344,6 +351,10 @@ private fun AppNavHost(navController: NavHostController, onMessage: (String) -> 
             onLocalMusic = { navController.navigateToLocalFiles() },
             onDownloads = { navController.navigateToDownloads() },
             onUserPlaylist = { navController.navigate(com.spotineil.feature.discover.free.UserPlaylistRoute(it)) },
+            onArtist = { name, id, image -> navController.navigate(com.spotineil.feature.discover.free.YtArtistRoute(name, id, image)) },
+            onYtCollection = { id, title, subtitle, image -> navController.navigate(com.spotineil.feature.discover.free.YtCollectionRoute(id, title, subtitle, image)) },
+            onMood = { navController.navigate(com.spotineil.feature.discover.free.MoodRoute(it.title, it.browseId, it.params)) },
+            onWrapped = { navController.navigate(com.spotineil.feature.discover.free.WrappedRoute) },
             onSpotify = { navController.navigate(SpotifyLibraryRoute) },
             onSpotifyConnect = { navController.navigate(SpotifyConnectRoute) },
             onSpotifyPlaylist = { id, name -> navController.navigate(SpotifyPlaylistRoute(id, name)) },

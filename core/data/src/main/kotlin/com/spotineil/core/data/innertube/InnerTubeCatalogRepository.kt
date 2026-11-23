@@ -46,11 +46,36 @@ interface InnerTubeCatalogRepository {
     /** Today's top songs for the device's country. */
     suspend fun charts(): Result<List<YouTubeVideo>>
     suspend fun resolveStream(videoId: String): Result<ResolvedYouTubeStream>
+    /** The artist's YouTube Music channel (by name), for artist pages. */
+    suspend fun findArtist(name: String): Result<Artist?>
+    /** An artist page: top songs, albums & singles, similar artists. */
+    suspend fun artist(channelId: String): Result<YtArtistPage>
+    /** The songs of an album or playlist ("MPRE…", "OLAK…", "VL…"). */
+    suspend fun collectionSongs(browseId: String): Result<List<YouTubeVideo>>
+    /** YouTube Music's "Moods & genres" buttons. */
+    suspend fun moods(): Result<List<YtMood>>
+    /** The playlists of one mood or genre. */
+    suspend fun moodPlaylists(mood: YtMood): Result<List<Playlist>>
 }
 
+
+/** A YouTube Music artist page. */
+data class YtArtistPage(
+    val songs: List<YouTubeVideo>,
+    val albums: List<Album>,
+    val similar: List<Artist>,
+    val playlists: List<Playlist>,
+)
+
+/** A "Moods & genres" button: opens a page of playlists. */
+@kotlinx.serialization.Serializable
+data class YtMood(val title: String, val browseId: String, val params: String?, val color: Long? = null)
 /** InnerTube search filter for "Songs". */
 private const val SONGS_FILTER = "EgWKAQIIAWoKEAkQBRAKEAMQBA%3D%3D"
+/** InnerTube search filter for "Artists". */
+private const val ARTISTS_FILTER = "EgWKAQIgAWoKEAkQChAFEAMQBA%3D%3D"
 private val VIDEO_LIST = ListSerializer(YouTubeVideo.serializer())
+private val MOOD_LIST = ListSerializer(YtMood.serializer())
 
 @Singleton
 @OptIn(ExperimentalSabrApi::class)
@@ -156,6 +181,79 @@ class DefaultInnerTubeCatalogRepository @Inject constructor(
         thumbnailUrl = images.firstOrNull()?.url ?: "https://i.ytimg.com/vi/$id/hqdefault.jpg",
         durationMs = durationMs,
     )
+
+    override suspend fun findArtist(name: String): Result<Artist?> = runCatching {
+        val results = retry(times = 1) {
+            withTimeout(15_000) { mapSearch(parseJson(innerTube.search(YouTubeClient.WEB_REMIX, query = name, params = ARTISTS_FILTER).bodyAsText())) }
+        }
+        val wanted = name.trim().lowercase()
+        results.artists.firstOrNull { it.name.trim().lowercase() == wanted } ?: results.artists.firstOrNull()
+    }
+
+    override suspend fun artist(channelId: String): Result<YtArtistPage> = runCatching {
+        val root = retry(times = 1) {
+            withTimeout(25_000) { parseJson(innerTube.browse(YouTubeClient.WEB_REMIX, browseId = channelId).bodyAsText()) }
+        }
+        val page = mapSearch(root)
+        YtArtistPage(
+            // The same song can appear in several versions: keep the first of each title.
+            songs = page.tracks.map { it.toVideo() }.distinctBy { it.songTitle.lowercase().trim() },
+            albums = page.albums,
+            similar = page.artists.filter { it.id != channelId },
+            playlists = page.playlists,
+        )
+    }
+
+    override suspend fun collectionSongs(browseId: String): Result<List<YouTubeVideo>> = runCatching {
+        val root = retry(times = 1) {
+            withTimeout(25_000) { parseJson(innerTube.browse(YouTubeClient.WEB_REMIX, browseId = browseId).bodyAsText()) }
+        }
+        // Album rows often have no picture of their own: use the album cover for every song.
+        val cover = findThumbnail(root)
+        mapSearch(root).tracks.map { t ->
+            val v = t.toVideo()
+            if (t.images.isEmpty() && cover != null) v.copy(thumbnailUrl = cover) else v
+        }
+    }
+
+    override suspend fun moods(): Result<List<YtMood>> = runCatching {
+        val key = "innertube:moods:${Locale.getDefault().country}"
+        cache.get(key, MOOD_LIST, 24 * 60 * 60 * 1000L)?.let { return@runCatching it }
+        val root = retry(times = 1) {
+            withTimeout(25_000) { parseJson(innerTube.browse(YouTubeClient.WEB_REMIX, browseId = "FEmusic_moods_and_genres").bodyAsText()) }
+        }
+        val out = mutableListOf<YtMood>()
+        fun visit(node: JsonElement) {
+            when (node) {
+                is JsonObject -> {
+                    (node["musicNavigationButtonRenderer"] as? JsonObject)?.let { b ->
+                        val title = jsonRunsText(b["buttonText"])
+                        val endpoint = (b["clickCommand"] as? JsonObject)?.get("browseEndpoint") as? JsonObject
+                        val id = (endpoint?.get("browseId") as? JsonPrimitive)?.content
+                        val params = (endpoint?.get("params") as? JsonPrimitive)?.content
+                        val color = (((b["solid"] as? JsonObject)?.get("leftStripeColor")) as? JsonPrimitive)?.content?.toLongOrNull()
+                        if (title.isNotBlank() && id != null) out += YtMood(title, id, params, color)
+                    }
+                    node.values.forEach(::visit)
+                }
+                is JsonArray -> node.forEach(::visit)
+                else -> Unit
+            }
+        }
+        visit(root)
+        val moods = out.distinctBy { it.title }
+        if (moods.isNotEmpty()) cache.put(key, MOOD_LIST, moods)
+        moods
+    }
+
+    override suspend fun moodPlaylists(mood: YtMood): Result<List<Playlist>> = runCatching {
+        val root = retry(times = 1) {
+            withTimeout(25_000) {
+                parseJson(innerTube.browse(YouTubeClient.WEB_REMIX, browseId = mood.browseId, params = mood.params).bodyAsText())
+            }
+        }
+        mapSearch(root).playlists
+    }
 
     override suspend fun resolveStream(videoId: String): Result<ResolvedYouTubeStream> = runCatching {
         retry(times = 2) {

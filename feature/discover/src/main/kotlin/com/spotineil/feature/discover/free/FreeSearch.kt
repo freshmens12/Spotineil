@@ -288,6 +288,8 @@ fun FreeSearchRoute(nav: FreeNavigation, viewModel: FreeSearchViewModel = hiltVi
     val favorites by viewModel.favorites.collectAsStateWithLifecycle()
     val nowPlaying by viewModel.nowPlayingId.collectAsStateWithLifecycle()
     val recents by viewModel.recentSearches.collectAsStateWithLifecycle()
+    val moodsViewModel: MoodsViewModel = hiltViewModel()
+    val moods by moodsViewModel.moods.collectAsStateWithLifecycle()
     var filter by rememberSaveable { mutableStateOf(SearchFilter.All) }
     LaunchedEffect(query) { if (query.isBlank()) filter = SearchFilter.All }
     val context = LocalContext.current
@@ -353,6 +355,27 @@ fun FreeSearchRoute(nav: FreeNavigation, viewModel: FreeSearchViewModel = hiltVi
                         )
                     }
                     items(BROWSE_TILES, key = { it.route.title }) { tile -> GenreTile(tile) { nav.onBrowse(tile.route) } }
+                    if (moods.isNotEmpty()) {
+                        item(span = { GridItemSpan(2) }, key = "moodsH") {
+                            Text(
+                                stringResource(R.string.discovery_moods),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
+                            )
+                        }
+                        items(moods.size, key = { "mood_" + moods[it].title }) { i ->
+                            val mood = moods[i]
+                            Box(
+                                Modifier.padding(start = 8.dp, end = 8.dp, bottom = 12.dp).fillMaxWidth().height(64.dp)
+                                    .clip(RoundedCornerShape(6.dp)).background(moodColor(mood, i))
+                                    .clickable { nav.onMood(mood) }.padding(12.dp),
+                                contentAlignment = Alignment.CenterStart,
+                            ) {
+                                Text(mood.title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 2)
+                            }
+                        }
+                    }
                 } else if (data.isEmpty) {
                     item(span = { GridItemSpan(2) }) { MessageState(Icons.Rounded.SearchOff, stringResource(R.string.free_no_results, query), null) }
                 } else {

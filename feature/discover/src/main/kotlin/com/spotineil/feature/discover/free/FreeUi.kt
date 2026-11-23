@@ -86,6 +86,7 @@ class FreePlayer @Inject constructor(
     private val downloads: DownloadRepository,
     private val youTubeSessions: YouTubeSessionStore,
     private val positions: com.spotineil.core.data.repository.SongPositionStore,
+    private val playLog: com.spotineil.core.data.repository.PlayLogRepository,
     private val youTube: com.spotineil.core.data.repository.YouTubeRepository,
     private val lastFm: com.spotineil.core.data.repository.LastFmRepository,
     @ApplicationScope private val scope: CoroutineScope,
@@ -284,8 +285,35 @@ class FreePlayer @Inject constructor(
         _youTubeIndex.value = before.size
     }
 
+    // ---------------- Listening log (Wrapped, made-for-you shelves) ----------------
+
+    private var listening: PlayableMedia? = null
+    private var listenedMs = 0L
+    private var lastListenTick = 0L
+
+    /** Counts time while a song is really playing; logs the listen when the song changes. */
+    private suspend fun tickListening() {
+        val s = player.state.value
+        val media = s.track?.media?.takeIf { !it.isLive }
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (media?.mediaId != listening?.mediaId) {
+            listening?.let { runCatching { playLog.record(it, listenedMs) } }
+            listening = media
+            listenedMs = 0L
+        } else if (s.isPlaying && lastListenTick > 0) {
+            listenedMs += (now - lastListenTick).coerceIn(0L, 3_000L)
+        }
+        lastListenTick = now
+    }
+
     init {
         scope.launch { player.queueEdits.collect { resyncYouTubeQueue() } }
+        scope.launch {
+            while (true) {
+                kotlinx.coroutines.delay(1_000)
+                tickListening()
+            }
+        }
         // Remember where each song is, so playing it again continues from there.
         scope.launch {
             while (true) {

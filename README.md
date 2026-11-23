@@ -28,7 +28,7 @@ A free Android music app, written in Kotlin with Jetpack Compose (Material 3). I
 
 | | |
 |---|---|
-| **Music** | Full-length songs from YouTube Music: trending music, search, charts, **Start radio**, **Play similar**, autoplay, and **Continue listening**. Audio only, with the screen off. |
+| **Music** | Full-length songs from YouTube Music: trending music, search, charts, artist and album pages, moods and genres, made-for-you shelves, Spotineil Wrapped, **Start radio**, **Play similar**, autoplay, and **Continue listening**. Audio only, with the screen off. |
 | **More free music** | Independent artists on Audius and Jamendo, Creative Commons remixes on ccMixter, and live concerts and free albums from the Internet Archive. |
 | **Radio and podcasts** | Thousands of live radio stations (Radio Browser) and the Apple Podcasts directory, with episodes from each show's own RSS feed. |
 | **Your library** | Your own playlists (create, reorder, rename), Downloads, Backup & restore, Liked Songs, History of every song you played, recent searches, songs that continue where you left them, followed podcasts, saved stations, and the music files on your phone, which you can also delete from inside the app. All stored on the phone. |

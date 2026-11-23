@@ -372,7 +372,13 @@ fun YouTubePlayerScreen(nav: FreeNavigation, viewModel: YouTubePlayerViewModel =
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
-                    Text(video?.artist.orEmpty(), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
+                    Text(
+                        video?.artist.orEmpty(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        modifier = Modifier.clickable(enabled = video != null) { video?.let { nav.onArtist(it.artist, null, null) } },
+                    )
                 }
                 IconButton(onClick = { addToPlaylist = true }, enabled = video != null) {
                     Icon(Icons.AutoMirrored.Rounded.PlaylistAdd, stringResource(R.string.yt_add_to_playlist))
@@ -570,7 +576,7 @@ internal fun YouTubeRow(video: YouTubeVideo, isCurrent: Boolean, onLongClick: ((
                 listOf(
                     video.artist,
                     stringResource(if (video.isTopic) R.string.yt_kind_song else R.string.yt_kind_video),
-                    formatDuration(video.durationMs),
+                    if (video.durationMs > 0) formatDuration(video.durationMs) else "",
                 ).filter { it.isNotBlank() }.joinToString(" • "),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

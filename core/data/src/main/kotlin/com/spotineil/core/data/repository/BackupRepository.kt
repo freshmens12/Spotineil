@@ -42,9 +42,11 @@ data class SpotineilBackup(
     val playlists: List<PlaylistRow> = emptyList(),
     val playlistItems: List<PlaylistItemRow> = emptyList(),
     val settings: Map<String, String> = emptyMap(),
+    val plays: List<PlayRow> = emptyList(),
 ) {
     @Serializable data class Row(val key: String, val json: String = "", val time: Long)
     @Serializable data class PlaylistRow(val id: String, val name: String, val createdAt: Long, val updatedAt: Long, val source: String? = null)
+    @Serializable data class PlayRow(val mediaId: String, val artist: String, val json: String, val playedAt: Long, val listenedMs: Long)
     @Serializable data class PlaylistItemRow(val playlistId: String, val mediaId: String, val position: Int, val json: String, val addedAt: Long)
 }
 
@@ -65,6 +67,7 @@ class BackupRepository @Inject constructor(
     private val podcasts: FollowedPodcastDao,
     private val searches: RecentSearchDao,
     private val playlists: UserPlaylistDao,
+    private val playLog: com.spotineil.core.data.db.PlayLogDao,
     private val settings: SettingsRepository,
 ) {
     private val json = Json { ignoreUnknownKeys = true; prettyPrint = false; encodeDefaults = true }
@@ -81,6 +84,7 @@ class BackupRepository @Inject constructor(
             searches = searches.observe(Int.MAX_VALUE).first().map { SpotineilBackup.Row(it.query, "", it.timestamp) },
             playlists = playlists.allPlaylists().map { SpotineilBackup.PlaylistRow(it.id, it.name, it.createdAt, it.updatedAt, it.source) },
             playlistItems = playlists.allItems().map { SpotineilBackup.PlaylistItemRow(it.playlistId, it.mediaId, it.position, it.json, it.addedAt) },
+            plays = playLog.all().map { SpotineilBackup.PlayRow(it.mediaId, it.artist, it.json, it.playedAt, it.listenedMs) },
             settings = mapOf(
                 "theme" to s.themeMode.name,
                 "accent" to s.accent.name,
@@ -111,6 +115,9 @@ class BackupRepository @Inject constructor(
         b.settings["language"]?.let { v -> AppLanguage.entries.firstOrNull { it.name == v } }?.let { settings.setLanguage(it) }
         b.settings["dataSaver"]?.toBooleanStrictOrNull()?.let { settings.setDataSaver(it) }
         b.settings["transition"]?.let { v -> TransitionMode.entries.firstOrNull { it.name == v } }?.let { settings.setTransition(it) }
+        // Listens already on this phone (same song at the same moment) are not added twice.
+        val have = playLog.all().mapTo(HashSet()) { it.mediaId to it.playedAt }
+        playLog.insertAll(b.plays.filter { (it.mediaId to it.playedAt) !in have }.map { com.spotineil.core.data.db.PlayLogEntity(mediaId = it.mediaId, artist = it.artist, json = it.json, playedAt = it.playedAt, listenedMs = it.listenedMs) })
         RestoreSummary(liked = b.liked.size, playlists = b.playlists.size, history = b.history.size)
     }
 }

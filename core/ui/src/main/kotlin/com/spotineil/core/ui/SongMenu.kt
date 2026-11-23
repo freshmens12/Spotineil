@@ -21,6 +21,7 @@ import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.PlaylistPlay
 import androidx.compose.material.icons.rounded.RemoveCircleOutline
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -98,6 +99,8 @@ fun SongActionsSheet(
     onDismiss: () -> Unit,
     onMessage: (String) -> Unit,
     onRemoveFromPlaylist: (() -> Unit)? = null,
+    /** Opens the artist's page (shown when given and the song has an artist). */
+    onGoToArtist: ((String) -> Unit)? = null,
     viewModel: SongActionsViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -132,6 +135,10 @@ fun SongActionsSheet(
                 viewModel.setLiked(media, !isLiked)
                 onMessage(context.getString(if (isLiked) R.string.ui_removed_liked else R.string.ui_added_liked))
                 onDismiss()
+            }
+            val artist = media.artist.substringBefore(",").trim()
+            if (onGoToArtist != null && artist.isNotBlank() && !media.isLive) {
+                ActionRow(Icons.Rounded.Person, stringResource(R.string.ui_go_artist)) { onGoToArtist(artist); onDismiss() }
             }
             if (onRemoveFromPlaylist != null) {
                 ActionRow(Icons.Rounded.RemoveCircleOutline, stringResource(R.string.ui_remove_playlist)) { onRemoveFromPlaylist(); onDismiss() }

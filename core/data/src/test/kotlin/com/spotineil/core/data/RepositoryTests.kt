@@ -182,4 +182,9 @@ private class FakeCatalog(private val results: com.spotineil.core.model.SearchRe
     override suspend fun charts() = Result.success(emptyList<com.spotineil.core.model.YouTubeVideo>())
     override suspend fun resolveStream(videoId: String): Result<com.spotineil.core.data.innertube.ResolvedYouTubeStream> =
         Result.failure(UnsupportedOperationException())
+    override suspend fun findArtist(name: String) = Result.success<com.spotineil.core.model.Artist?>(null)
+    override suspend fun artist(channelId: String): Result<com.spotineil.core.data.innertube.YtArtistPage> = Result.failure(UnsupportedOperationException())
+    override suspend fun collectionSongs(browseId: String) = Result.success(emptyList<com.spotineil.core.model.YouTubeVideo>())
+    override suspend fun moods() = Result.success(emptyList<com.spotineil.core.data.innertube.YtMood>())
+    override suspend fun moodPlaylists(mood: com.spotineil.core.data.innertube.YtMood) = Result.success(emptyList<com.spotineil.core.model.Playlist>())
 }

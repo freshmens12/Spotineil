@@ -4,6 +4,15 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.12.0] - 2026-11-23
+
+### Added
+- **Made for you** on Home: "Your top artists" (last 30 days), "Because you liked …" (songs by artists like your most-liked one) and "Rediscover" (songs you played a lot but not lately).
+- **Artist pages**: tap the artist on the player (or "Go to artist" in the song menu) for their popular songs, albums and singles, similar artists and playlists they are in.
+- **Album and playlist pages** for YouTube Music albums and playlists.
+- **Moods and genres** in Search: YouTube Music's moods and genres (OPM, Chill, Workout, …) with their playlists.
+- **Spotineil Wrapped** in Your Library: minutes listened, top songs and top artists for this month, this year or all time, with a shareable card. Listens are counted on the phone only (songs played for at least 30 seconds) and are included in Backup.
+
 ## [1.11.0] - 2026-11-23
 
 ### Added

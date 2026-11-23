@@ -1,5 +1,6 @@
 package com.spotineil.feature.discover.free
 
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.Text
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
@@ -124,6 +125,13 @@ fun FreeLibraryRoute(nav: FreeNavigation, viewModel: FreeLibraryViewModel = hilt
                 LibraryRow(stringResource(R.string.free_downloads), stringResource(R.string.free_downloads_desc), nav.onDownloads) { m ->
                     Box(m.background(MaterialTheme.colorScheme.surfaceContainerHighest), contentAlignment = Alignment.Center) {
                         Icon(Icons.Rounded.DownloadDone, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
+                    }
+                }
+            }
+            item(key = "wrapped") {
+                LibraryRow(stringResource(R.string.wrapped_title), stringResource(R.string.wrapped_row_desc), nav.onWrapped) { m ->
+                    Box(m.background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(androidx.compose.ui.graphics.Color(0xFF450AF5), androidx.compose.ui.graphics.Color(0xFFE8115B)))), contentAlignment = Alignment.Center) {
+                        Icon(Icons.Rounded.AutoAwesome, null, tint = androidx.compose.ui.graphics.Color.White, modifier = Modifier.size(28.dp))
                     }
                 }
             }

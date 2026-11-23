@@ -150,4 +150,29 @@
     <string name="spotify_home_shelf">Mga playlist mo sa Spotify</string>
     <string name="library_playlist_label">Playlist</string>
     <string name="playlist_radio">Radyo ng playlist</string>
+    <string name="discovery_artist_failed">Hindi ma-load ang artist na ito</string>
+    <string name="discovery_top_songs">Sikat</string>
+    <string name="discovery_albums">Mga album at single</string>
+    <string name="discovery_fans_also_like">Gusto rin ng mga fan</string>
+    <string name="discovery_featured_on">Kasama sa</string>
+    <string name="discovery_mood_failed">Hindi ma-load ang mga playlist na ito</string>
+    <string name="discovery_moods">Mga mood at genre</string>
+    <string name="discovery_your_top_artists">Mga paborito mong artist</string>
+    <string name="discovery_because_you_liked">Dahil nagustuhan mo si %1$s</string>
+    <string name="discovery_rediscover">Balikan</string>
+    <string name="discovery_go_to_artist">Pumunta sa artist</string>
+    <string name="wrapped_title">Spotineil Wrapped</string>
+    <string name="wrapped_row_desc">Ang mga nangungunang kanta, artist at minuto mo</string>
+    <string name="wrapped_month">Ngayong buwan</string>
+    <string name="wrapped_year">Ngayong taon</string>
+    <string name="wrapped_all">Lahat</string>
+    <string name="wrapped_empty">Makinig muna ng musika: binibilang dito ang mga kantang tumugtog nang hindi bababa sa 30 segundo.</string>
+    <string name="wrapped_minutes_label">Minutong pinakinggan</string>
+    <string name="wrapped_songs_count">%1$d magkakaibang kanta</string>
+    <string name="wrapped_top_artist_is">Nangungunang artist: %1$s</string>
+    <string name="wrapped_top_songs">Mga nangungunang kanta</string>
+    <string name="wrapped_top_artists">Mga nangungunang artist</string>
+    <plurals name="wrapped_plays"><item quantity="one">%1$d beses</item><item quantity="other">%1$d beses</item></plurals>
+    <string name="wrapped_share">I-share</string>
+    <string name="wrapped_share_text">Ang Spotineil Wrapped ko: %1$d minuto ng musika, nangungunang artist si %2$s.</string>
 </resources>
