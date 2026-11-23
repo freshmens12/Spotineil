@@ -24,7 +24,10 @@ To show and play music, the app sends requests (such as your search words and yo
 - **Radio Browser**: the radio station directory.
 - **Apple Podcasts directory** and each podcast's own RSS feed.
 - **Spotify (only if you choose to connect it)**: see below.
-- **GitHub**: when the app opens it asks GitHub whether a newer version exists, and downloads it only if you agree.
+- **GitHub**: when the app opens it asks GitHub whether a newer version exists, and downloads it only if you agree. After an update it reads that version's release notes for "What's new".
+
+## Crash reports
+If the app crashes, the error is saved on your phone only. The next time you open the app it asks whether to send it. Only if you tap **Send report** does it open a GitHub issue in your browser, filled in with the app version, Android version, phone model and the error, which you can read and edit before posting. Nothing is sent automatically.
 
 Spotineil does not access your Google or YouTube accounts. Signing in is never required.
 

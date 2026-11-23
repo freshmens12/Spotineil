@@ -20,8 +20,8 @@ android {
     defaultConfig {
         applicationId = "com.spotineil.app"
         // Releases bump these; -PappVersionName / -PappVersionCode override them (used to test updates).
-        versionCode = (findProperty("appVersionCode") as String?)?.toInt() ?: 16
-        versionName = (findProperty("appVersionName") as String?) ?: "1.13.0"
+        versionCode = (findProperty("appVersionCode") as String?)?.toInt() ?: 17
+        versionName = (findProperty("appVersionName") as String?) ?: "1.14.0"
 
         buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${secret("SPOTIFY_CLIENT_ID") ?: ""}\"")
         buildConfigField("String", "SPOTIFY_REDIRECT_URI", "\"spotineil://callback\"")
@@ -102,4 +102,12 @@ dependencies {
     implementation(libs.appauth)
 
     testImplementation(libs.junit4)
+
+    // Device smoke tests (run on an emulator in CI before each release).
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

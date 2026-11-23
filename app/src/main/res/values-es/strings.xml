@@ -59,4 +59,13 @@
     <string name="widget_liked_songs">Canciones que te gustan</string>
     <string name="widget_shuffle">Aleatorio</string>
     <plurals name="widget_song_count"><item quantity="one">%1$d canción</item><item quantity="many">%1$d canciones</item><item quantity="other">%1$d canciones</item></plurals>
+    <string name="crash_title">Spotineil se cerró la última vez</string>
+    <string name="crash_message">Lo sentimos. Puedes enviar este informe para ayudar a arreglarlo: abre un issue de GitHub que puedes revisar antes de publicarlo. Contiene la versión de la app, la versión de Android, el modelo del teléfono y el error, nada personal.</string>
+    <string name="crash_send">Enviar informe</string>
+    <string name="crash_copy">Copiar</string>
+    <string name="crash_not_now">Ahora no</string>
+    <string name="whats_new_title">Novedades de la %1$s</string>
+    <string name="whats_new_fallback">Spotineil se actualizó. Toca \"Todos los cambios\" para ver las novedades.</string>
+    <string name="whats_new_ok">Entendido</string>
+    <string name="whats_new_more">Todos los cambios</string>
 </resources>

@@ -22,6 +22,7 @@ class SpotineilApplication : Application(), ImageLoaderFactory {
 
     override fun onCreate() {
         super.onCreate()
+        CrashReporter.install(this)
         widgetUpdater.start()
     }
 

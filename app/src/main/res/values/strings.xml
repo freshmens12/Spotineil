@@ -60,4 +60,13 @@
     <string name="widget_liked_songs">Liked Songs</string>
     <string name="widget_shuffle">Shuffle</string>
     <plurals name="widget_song_count"><item quantity="one">%1$d song</item><item quantity="other">%1$d songs</item></plurals>
+    <string name="crash_title">Spotineil stopped last time</string>
+    <string name="crash_message">Sorry about that. You can send this error report to help fix it: it opens a GitHub issue you can read before posting. It contains the app version, Android version, phone model and the error, nothing personal.</string>
+    <string name="crash_send">Send report</string>
+    <string name="crash_copy">Copy</string>
+    <string name="crash_not_now">Not now</string>
+    <string name="whats_new_title">What\'s new in %1$s</string>
+    <string name="whats_new_fallback">Spotineil was updated. Tap \"All changes\" to see what\'s new.</string>
+    <string name="whats_new_ok">Got it</string>
+    <string name="whats_new_more">All changes</string>
 </resources>

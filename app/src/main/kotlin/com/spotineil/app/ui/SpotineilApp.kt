@@ -170,6 +170,8 @@ fun SpotineilApp(isLoggedIn: Boolean, guestMode: Boolean, mainViewModel: MainVie
         }
     }
     UpdateDialog()
+    val crashShowing = CrashReportDialog()
+    WhatsNewDialog(enabled = !crashShowing)
 }
 
 @Composable

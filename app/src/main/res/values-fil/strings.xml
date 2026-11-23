@@ -54,4 +54,13 @@
     <string name="widget_liked_songs">Mga Paboritong Kanta</string>
     <string name="widget_shuffle">Shuffle</string>
     <plurals name="widget_song_count"><item quantity="one">%1$d kanta</item><item quantity="other">%1$d kanta</item></plurals>
+    <string name="crash_title">Huminto ang Spotineil noong huli</string>
+    <string name="crash_message">Paumanhin. Maaari mong ipadala ang ulat na ito para maayos ito: magbubukas ito ng GitHub issue na mababasa mo muna bago i-post. Naglalaman ito ng bersyon ng app, bersyon ng Android, modelo ng telepono at ang error, walang personal.</string>
+    <string name="crash_send">Ipadala ang ulat</string>
+    <string name="crash_copy">Kopyahin</string>
+    <string name="crash_not_now">Hindi muna</string>
+    <string name="whats_new_title">Bago sa %1$s</string>
+    <string name="whats_new_fallback">Na-update ang Spotineil. I-tap ang \"Lahat ng pagbabago\" para makita ang bago.</string>
+    <string name="whats_new_ok">Sige</string>
+    <string name="whats_new_more">Lahat ng pagbabago</string>
 </resources>

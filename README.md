@@ -120,7 +120,7 @@ Unit tests cover the network layer, repositories, the LRC parser, song ranking a
 ./gradlew testDebugUnitTest
 ```
 
-`.github/workflows/ci.yml` builds the debug APK and runs all tests on every push and pull request.
+`.github/workflows/ci.yml` builds the debug APK and runs all tests on every push and pull request. A second job starts the app on an Android emulator and runs the device smoke tests in `app/src/androidTest` (main screens open, a sound plays through the real player). Run them yourself with `./gradlew connectedDebugAndroidTest` while a phone or emulator is connected.
 
 ## Credits and license
 

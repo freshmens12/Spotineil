@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.14.0] - 2026-11-23
+
+### Added
+- **Crash reports you control**: after a crash, the next start asks whether to send the report. "Send report" opens a GitHub issue already filled in (app version, Android version, phone model and the error) that you can read before posting; nothing is sent on its own.
+- **What's new**: the first start after an update shows what changed in that version.
+- **Device tests before each release**: every push now also starts the app on an Android emulator on GitHub, walks Home, Search and Your Library, and plays a test sound through the real player.
+
 ## [1.13.0] - 2026-11-23
 
 ### Added
