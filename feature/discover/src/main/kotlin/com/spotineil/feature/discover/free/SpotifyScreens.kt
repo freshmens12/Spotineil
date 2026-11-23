@@ -1,5 +1,10 @@
 package com.spotineil.feature.discover.free
 
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.OutlinedTextField
@@ -319,7 +324,10 @@ fun SpotifyLibraryScreen(nav: FreeNavigation, viewModel: SpotifyLibraryViewModel
                         val p = s.playlists[i]
                         LibraryRow(
                             p.name,
-                            listOf(stringResource(R.string.spotify_playlist_songs, p.trackCount), p.owner).filter { it.isNotBlank() }.joinToString(" • "),
+                            listOf(
+                                if (p.trackCount > 0) stringResource(R.string.spotify_playlist_songs, p.trackCount) else stringResource(R.string.library_playlist_label),
+                                p.owner,
+                            ).filter { it.isNotBlank() }.joinToString(" • "),
                             { nav.onSpotifyPlaylist(p.id, p.name) },
                         ) { m -> CoverImage(p.imageUrl, null, m, placeholderIcon = Icons.Rounded.LibraryMusic) }
                     }
@@ -492,7 +500,16 @@ fun SpotifyPlaylistScreen(nav: FreeNavigation, viewModel: SpotifyPlaylistViewMod
     Column(Modifier.fillMaxSize().statusBarsPadding()) {
         Row(Modifier.padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = nav.onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.free_back)) }
-            Text(viewModel.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, maxLines = 1)
+            Column {
+                Text(viewModel.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, maxLines = 1)
+                (state as? SpotifyTracksState.Loaded)?.let { loaded ->
+                    Text(
+                        pluralStringResource(R.plurals.playlist_song_count, loaded.tracks.size, loaded.tracks.size),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
         }
         Box(Modifier.weight(1f).fillMaxWidth()) {
             when (val s = state) {
@@ -550,6 +567,62 @@ fun SpotifyPlaylistScreen(nav: FreeNavigation, viewModel: SpotifyPlaylistViewMod
                     }
                 }
             }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Home shelf: "Your Spotify playlists" (only when Spotify is connected)
+// ---------------------------------------------------------------------------------------------
+
+@HiltViewModel
+class SpotifyShelfViewModel @Inject constructor(
+    private val auth: SpotifyWebAuth,
+    private val repository: SpotifyWebRepository,
+) : ViewModel() {
+    private val _playlists = MutableStateFlow<List<SpotifyPlaylist>>(emptyList())
+    val playlists: StateFlow<List<SpotifyPlaylist>> = _playlists.asStateFlow()
+    val connected: StateFlow<Boolean> = auth.connected
+
+    init {
+        viewModelScope.launch {
+            auth.connected.collect { on ->
+                _playlists.value = if (on) runCatching { repository.playlists() }.getOrDefault(_playlists.value) else emptyList()
+            }
+        }
+    }
+}
+
+/** One card in the shelf: Liked Songs or a playlist. */
+private sealed interface SpotifyShelfItem {
+    data object Liked : SpotifyShelfItem
+    data class Playlist(val playlist: SpotifyPlaylist) : SpotifyShelfItem
+}
+
+/** Big cards of the connected Spotify account's Liked Songs and playlists, shown on Home. */
+@Composable
+fun SpotifyHomeShelf(nav: FreeNavigation, viewModel: SpotifyShelfViewModel = hiltViewModel()) {
+    val connected by viewModel.connected.collectAsStateWithLifecycle()
+    val playlists by viewModel.playlists.collectAsStateWithLifecycle()
+    if (!connected) return
+    val likedName = stringResource(R.string.free_liked_songs)
+    val items = remember(playlists) { listOf<SpotifyShelfItem>(SpotifyShelfItem.Liked) + playlists.map { SpotifyShelfItem.Playlist(it) } }
+    Shelf(stringResource(R.string.spotify_home_shelf), items, key = { if (it is SpotifyShelfItem.Playlist) "sp:" + it.playlist.id else "sp:liked" }) { item ->
+        when (item) {
+            SpotifyShelfItem.Liked -> Column(
+                Modifier.width(150.dp).clickable { nav.onSpotifyPlaylist(SPOTIFY_LIKED_ID, likedName) },
+            ) {
+                LikedArt(Modifier.size(150.dp).clip(RoundedCornerShape(4.dp)), iconSize = 48.dp)
+                Text(likedName, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, maxLines = 1, modifier = Modifier.padding(top = 8.dp))
+                Text(stringResource(R.string.spotify_title), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
+            }
+            is SpotifyShelfItem.Playlist -> BigCard(
+                title = item.playlist.name,
+                subtitle = item.playlist.owner.ifBlank { null },
+                imageUrl = item.playlist.imageUrl,
+                onClick = { nav.onSpotifyPlaylist(item.playlist.id, item.playlist.name) },
+                placeholderIcon = Icons.Rounded.LibraryMusic,
+            )
         }
     }
 }

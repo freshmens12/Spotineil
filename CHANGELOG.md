@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.10.2] - 2026-11-23
+
+### Added
+- **Your Spotify playlists** on Home, above "Trending music in Spotineil", when Spotify is connected: Liked Songs first, then your playlists, with the same big cards.
+
+### Fixed
+- Spotify playlists no longer show "0 songs" in the list (Spotify's list has no counts); the real count is shown when you open a playlist.
+
 ## [1.10.1] - 2026-11-23
 
 ### Fixed

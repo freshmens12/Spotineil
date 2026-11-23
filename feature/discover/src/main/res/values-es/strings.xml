@@ -150,4 +150,6 @@
     <string name="spotify_cookie_failed">Esa cookie no funcionó. Copia de nuevo el valor completo de sp_dc con la sesión iniciada en open.spotify.com.</string>
     <string name="spotify_cookie_privacy">La cookie es como una contraseña de tu cuenta de Spotify: se queda en este teléfono y solo se envía a Spotify. Desconéctala en Ajustes → Cuenta. Cerrar sesión en open.spotify.com también la invalida.</string>
     <string name="spotify_try_sign_in">O prueba la página de inicio de sesión de Spotify</string>
+    <string name="spotify_home_shelf">Tus playlists de Spotify</string>
+    <string name="library_playlist_label">Playlist</string>
 </resources>

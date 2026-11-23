@@ -314,6 +314,7 @@ fun FreeHomeRoute(nav: FreeNavigation, viewModel: FreeHomeViewModel = hiltViewMo
             }
 
             if (music) {
+                item(key = "spotify") { SpotifyHomeShelf(nav) }
                 item(key = "youtube") {
                     val videos = r.youTube.orEmpty()
                     Shelf(stringResource(R.string.yt_trending), videos, key = { "yt:" + it.id }) { v ->

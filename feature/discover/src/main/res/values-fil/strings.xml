@@ -147,4 +147,6 @@
     <string name="spotify_cookie_failed">Hindi gumana ang cookie na iyon. Kopyahin muli ang buong sp_dc value habang naka-log in sa open.spotify.com.</string>
     <string name="spotify_cookie_privacy">Parang password ng Spotify account mo ang cookie: nananatili ito sa teleponong ito at sa Spotify lang ipinapadala. I-disconnect sa Settings → Account para alisin ito. Natatapos din ito kapag nag-log out ka sa open.spotify.com.</string>
     <string name="spotify_try_sign_in">O subukan ang sign-in page ng Spotify</string>
+    <string name="spotify_home_shelf">Mga playlist mo sa Spotify</string>
+    <string name="library_playlist_label">Playlist</string>
 </resources>

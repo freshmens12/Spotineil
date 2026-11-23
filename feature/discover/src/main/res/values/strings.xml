@@ -149,4 +149,6 @@
     <string name="spotify_cookie_failed">That cookie didn\'t work. Copy the whole sp_dc value again, while logged in to open.spotify.com.</string>
     <string name="spotify_cookie_privacy">The cookie is like a password to your Spotify account: it stays on this phone and is sent only to Spotify. Disconnect in Settings → Account to remove it. Logging out on open.spotify.com also ends it.</string>
     <string name="spotify_try_sign_in">Or try Spotify\'s sign-in page</string>
+    <string name="spotify_home_shelf">Your Spotify playlists</string>
+    <string name="library_playlist_label">Playlist</string>
 </resources>
