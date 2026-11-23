@@ -49,6 +49,9 @@ class SpotifyWebAuth @Inject constructor(
 
     @Volatile private var token: String? = null
     @Volatile private var tokenAt = 0L
+    /** The web player's "client-token" (sent along with its queries), when it has shown one. */
+    @Volatile var clientToken: String? = null
+        private set
     private val refreshLock = Mutex()
 
     /** Called by a web player WebView whenever it sees a request carrying an access token. */
@@ -150,6 +153,9 @@ class SpotifyWebAuth @Inject constructor(
         webView.webViewClient = object : WebViewClient() {
             override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
                 val host = request.url.host.orEmpty()
+                if (host.endsWith("spotify.com")) {
+                    request.requestHeaders.entries.firstOrNull { it.key.equals("client-token", ignoreCase = true) }?.let { clientToken = it.value }
+                }
                 if (host.endsWith("spotify.com")) {
                     request.requestHeaders.entries
                         .firstOrNull { it.key.equals("Authorization", ignoreCase = true) && it.value.startsWith("Bearer ") }

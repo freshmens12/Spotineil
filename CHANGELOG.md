@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.10.1] - 2026-11-23
+
+### Fixed
+- **Connect Spotify:** Spotify's public API now refuses web-player tokens ("429 QUOTA_EXCEEDED"), which is why connecting with a cookie always said it didn't work. Spotineil now reads your profile, playlists and Liked Songs through the same queries open.spotify.com itself uses, and keeps those queries up to date by itself.
+
 ## [1.10.0] - 2026-11-23
 
 ### Added

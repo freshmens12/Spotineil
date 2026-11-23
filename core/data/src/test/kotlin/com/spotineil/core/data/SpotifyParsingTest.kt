@@ -1,48 +1,74 @@
 package com.spotineil.core.data
 
-import com.spotineil.core.data.spotifyweb.playlistFrom
-import com.spotineil.core.data.spotifyweb.trackFrom
-import com.spotineil.core.data.spotifyweb.trackFromEntry
-import org.junit.Test
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
+import com.spotineil.core.data.spotifyweb.graphErrors
+import com.spotineil.core.data.spotifyweb.libraryPlaylists
+import com.spotineil.core.data.spotifyweb.likedPageTracks
+import com.spotineil.core.data.spotifyweb.operationHashes
+import com.spotineil.core.data.spotifyweb.playlistPageTracks
+import com.spotineil.core.data.spotifyweb.profileName
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
 
+/** Samples shaped like the answers of open.spotify.com's GraphQL API (api-partner pathfinder). */
 class SpotifyParsingTest {
-    private fun parse(s: String) = Json.parseToJsonElement(s)
+    private fun parse(s: String): JsonObject = Json.parseToJsonElement(s).jsonObject
 
-    @Test fun `playlist with songs count and cover`() {
-        val p = playlistFrom(parse("""{"id":"37i9","name":"Road trip","owner":{"display_name":"Vince"},"tracks":{"total":42},"images":[{"url":"https://i/1.jpg"}]}"""))
-        assertNotNull(p)
-        assertEquals("Road trip", p!!.name)
-        assertEquals("Vince", p!!.owner)
-        assertEquals(42, p!!.trackCount)
-        assertEquals("https://i/1.jpg", p!!.imageUrl)
+    private val track = """{"__typename":"Track","name":"Wherever You Will Go","uri":"spotify:track:t1",
+        "trackDuration":{"totalMilliseconds":208810},
+        "artists":{"items":[{"profile":{"name":"The Calling"},"uri":"spotify:artist:a1"}]},
+        "albumOfTrack":{"name":"Camino Palmero","coverArt":{"sources":[{"url":"big","width":640},{"url":"mid","width":300},{"url":"small","width":64}]}}}"""
+
+    @Test fun `playlist page songs`() {
+        val root = parse("""{"data":{"playlistV2":{"__typename":"Playlist","content":{"__typename":"PlaylistItemsPage","items":[
+            {"itemV2":{"__typename":"TrackResponseWrapper","data":$track}},
+            {"itemV2":{"__typename":"EpisodeResponseWrapper","data":{"__typename":"Episode","name":"Podcast","uri":"spotify:episode:e1"}}}
+        ]}}}}""")
+        val songs = playlistPageTracks(root)
+        assertEquals(1, songs.size)
+        assertEquals("t1", songs[0].id)
+        assertEquals("Wherever You Will Go", songs[0].title)
+        assertEquals("The Calling", songs[0].artist)
+        assertEquals(208810L, songs[0].durationMs)
+        assertEquals("mid", songs[0].imageUrl)
     }
 
-    @Test fun `playlist count also read from items total`() {
-        val p = playlistFrom(parse("""{"id":"a","name":"X","items":{"total":7}}"""))
-        assertEquals(7, p?.trackCount)
+    @Test fun `liked songs take the uri from the wrapper`() {
+        val noUri = track.replace("\"uri\":\"spotify:track:t1\",", "")
+        val root = parse("""{"data":{"me":{"library":{"tracks":{"items":[{"addedAt":{},"track":{"_uri":"spotify:track:t9","data":$noUri}}],"totalCount":1}}}}}""")
+        assertEquals(listOf("t9"), likedPageTracks(root).map { it.id })
     }
 
-    @Test fun `liked song entry becomes a track`() {
-        val t = trackFromEntry(parse("""{"added_at":"2024","track":{"id":"t1","name":"Wherever You Will Go","type":"track","duration_ms":208000,"artists":[{"name":"The Calling"}],"album":{"name":"Camino","images":[{"url":"big"},{"url":"mid"},{"url":"small"}]}}}"""))
-        assertNotNull(t)
-        assertEquals("Wherever You Will Go", t!!.title)
-        assertEquals("The Calling", t!!.artist)
-        assertEquals(208000L, t!!.durationMs)
-        assertEquals("mid", t!!.imageUrl)
+    @Test fun `library playlists are found wherever they are, folders included`() {
+        val root = parse("""{"data":{"me":{"libraryV3":{"items":[
+            {"item":{"_uri":"spotify:playlist:p1","data":{"__typename":"Playlist","name":"Road trip","ownerV2":{"data":{"name":"Vince"}},"images":{"items":[{"sources":[{"url":"cover","width":300}]}]}}}},
+            {"item":{"_uri":"spotify:folder:f1","data":{"__typename":"Folder","name":"Old","items":[
+                {"item":{"_uri":"spotify:playlist:p2","data":{"__typename":"Playlist","name":"Inside folder"}}}]}}},
+            {"item":{"_uri":"spotify:collection:tracks","data":{"__typename":"PseudoPlaylist","name":"Liked Songs"}}}
+        ],"totalCount":3}}}}""")
+        val lists = libraryPlaylists(root)
+        assertEquals(listOf("p1", "p2"), lists.map { it.id })
+        assertEquals("Vince", lists[0].owner)
+        assertEquals("cover", lists[0].imageUrl)
     }
 
-    @Test fun `newer playlist entries use item`() {
-        val t = trackFromEntry(parse("""{"item":{"id":"t2","name":"Song","artists":[{"name":"A"},{"name":"B"}],"duration_ms":1000}}"""))
-        assertEquals("A, B", t?.artist)
+    @Test fun `profile name, and none for a guest`() {
+        assertEquals("Vince", profileName(parse("""{"data":{"me":{"profile":{"name":"Vince","username":"v123"}}}}""")))
+        assertNull(profileName(parse("""{"data":{"me":null},"errors":[{"message":"Unauthorized"}]}""")))
     }
 
-    @Test fun `episodes local files and removed songs are skipped`() {
-        assertNull(trackFrom(parse("""{"id":"e1","name":"Episode","type":"episode"}""")))
-        assertNull(trackFrom(parse("""{"id":null,"name":"Local file","type":"track"}""")))
-        assertNull(trackFromEntry(parse("""{"track":null}""")))
+    @Test fun `query hashes are read from the web player script`() {
+        val js = """x=new aX.l("profileAttributes","query","${"a".repeat(64)}",null);y=new aX.l("addToLibrary","mutation","${"b".repeat(64)}",null)"""
+        val map = operationHashes(js)
+        assertEquals("a".repeat(64), map["profileAttributes"])
+        assertEquals("b".repeat(64), map["addToLibrary"])
+    }
+
+    @Test fun `graphql errors are listed`() {
+        assertTrue(graphErrors(parse("""{"errors":[{"message":"PersistedQueryNotFound"}]}""")).contains("PersistedQueryNotFound"))
     }
 }
