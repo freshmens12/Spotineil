@@ -24,7 +24,11 @@ esc=$(printf '%s' "$NOTES" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' | awk '{printf 
 body=$(printf '{"tag_name":"%s","name":"Spotineil %s","body":"%s","draft":false,"prerelease":false}' "$TAG" "${TAG#v}" "$esc")
 
 out=$(mktemp)
-code=$(curl -s -o "$out" -w '%{http_code}' -X POST "https://api.github.com/repos/$REPO/releases" "${auth[@]}" -d "$body")
+# Sent from a file: on Windows, non-ASCII text (→, …) in a command-line argument gets garbled.
+bodyfile=$(mktemp)
+printf '%s' "$body" > "$bodyfile"
+code=$(curl -s -o "$out" -w '%{http_code}' -X POST "https://api.github.com/repos/$REPO/releases" "${auth[@]}" --data-binary @"$bodyfile")
+rm -f "$bodyfile"
 if [ "$code" != "201" ]; then
   # Maybe an earlier run created the release but did not finish uploading: continue with it.
   code=$(curl -s -o "$out" -w '%{http_code}' "https://api.github.com/repos/$REPO/releases/tags/$TAG" "${auth[@]}")
