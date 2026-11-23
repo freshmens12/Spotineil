@@ -151,4 +151,5 @@
     <string name="spotify_try_sign_in">Or try Spotify\'s sign-in page</string>
     <string name="spotify_home_shelf">Your Spotify playlists</string>
     <string name="library_playlist_label">Playlist</string>
+    <string name="playlist_radio">Playlist radio</string>
 </resources>

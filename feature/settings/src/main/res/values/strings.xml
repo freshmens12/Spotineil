@@ -65,4 +65,22 @@
     <string name="settings_backup_failed">Could not save the backup</string>
     <string name="settings_restore_done">Restored %1$d liked songs and %2$d playlists</string>
     <string name="settings_restore_failed">That file is not a Spotineil backup</string>
+    <string name="settings_equalizer">Equalizer</string>
+    <string name="settings_off">Off</string>
+    <string name="settings_leveling">Volume leveling</string>
+    <string name="settings_leveling_desc">Evens out loud and quiet songs</string>
+    <string name="settings_skip_silence">Skip silence</string>
+    <string name="settings_skip_silence_desc">Jumps over silent parts, handy for podcasts</string>
+    <string name="settings_podcast_speed">Podcast speed</string>
+    <string name="settings_podcast_speed_desc">Music always plays at normal speed</string>
+    <string name="eq_use">Use equalizer</string>
+    <string name="eq_desc">Shape the sound with a preset or your own settings</string>
+    <string name="eq_flat">Flat</string>
+    <string name="eq_bass">Bass boost</string>
+    <string name="eq_vocal">Vocal</string>
+    <string name="eq_rock">Rock</string>
+    <string name="eq_pop">Pop</string>
+    <string name="eq_treble">Treble</string>
+    <string name="eq_custom">Custom</string>
+    <string name="eq_note">Uses your phone\'s own audio effects; some phones support fewer bands.</string>
 </resources>

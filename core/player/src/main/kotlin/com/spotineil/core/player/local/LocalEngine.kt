@@ -76,6 +76,9 @@ class LocalEngine @Inject constructor(
     }
 
     suspend fun pause() = withContext(Dispatchers.Main) { controller?.pause(); Unit }
+
+    /** Volume of the on-device player, 0..1 (used for the sleep timer fade-out). */
+    suspend fun setVolume(volume: Float) = withContext(Dispatchers.Main) { controller?.volume = volume.coerceIn(0f, 1f); Unit }
     suspend fun next() = withContext(Dispatchers.Main) { controller().seekToNext() }
     suspend fun previous() = withContext(Dispatchers.Main) { controller().seekToPrevious() }
     suspend fun seekTo(ms: Long) = withContext(Dispatchers.Main) { controller().seekTo(ms) }

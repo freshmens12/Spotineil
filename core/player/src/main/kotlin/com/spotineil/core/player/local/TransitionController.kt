@@ -92,11 +92,20 @@ internal class TransitionController(
 
         val key = "${player.currentMediaItemIndex}:${player.currentMediaItem?.mediaId}"
         if (key == armedKey) return // already blended out of this song
+        if (sameAlbumNext()) return // gapless: live albums and continuous mixes run straight on
         val remaining = duration - player.currentPosition
         when {
             remaining <= fade -> startBlend(key, duration, fade)
             remaining <= fade + PREPARE_AHEAD_MS -> prepareTail(key, duration - fade)
         }
+    }
+
+    /** True when the next song is from the same album as this one (both named): play it gapless. */
+    private fun sameAlbumNext(): Boolean {
+        val next = player.nextMediaItemIndex.takeIf { it != C.INDEX_UNSET } ?: return false
+        val a = player.currentMediaItem?.mediaMetadata?.albumTitle?.toString()?.trim().orEmpty()
+        val b = player.getMediaItemAt(next).mediaMetadata.albumTitle?.toString()?.trim().orEmpty()
+        return a.isNotEmpty() && a.equals(b, ignoreCase = true)
     }
 
     private fun blendLengthFor(durationMs: Long): Long {
@@ -111,6 +120,8 @@ internal class TransitionController(
         discardTail()
         val item = player.currentMediaItem ?: return
         tail = createTailPlayer().also {
+            // Same audio session as the main player, so the equalizer and leveling apply to it too.
+            runCatching { it.audioSessionId = player.audioSessionId }
             it.volume = 0f
             it.setMediaItem(item, startAtMs.coerceAtLeast(0))
             it.playWhenReady = false

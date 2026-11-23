@@ -149,4 +149,5 @@
     <string name="spotify_try_sign_in">O subukan ang sign-in page ng Spotify</string>
     <string name="spotify_home_shelf">Mga playlist mo sa Spotify</string>
     <string name="library_playlist_label">Playlist</string>
+    <string name="playlist_radio">Radyo ng playlist</string>
 </resources>

@@ -1,5 +1,11 @@
 package com.spotineil.feature.discover.free
 
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.rounded.Radio
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -216,6 +222,29 @@ class FreePlayer @Inject constructor(
         }
         val videos = items.mapNotNull { it.toYouTubeVideo() }
         playYouTube(videos, videos.indexOfFirst { YOUTUBE_MEDIA_PREFIX + it.id == target.mediaId }.coerceAtLeast(0))
+        return true
+    }
+
+    /**
+     * "Radio" for a whole playlist (or Liked Songs): songs by the artists that appear most in it,
+     * plus artists that sound like the top one. Returns false when nothing could be found.
+     */
+    suspend fun playRadioFrom(songs: List<PlayableMedia>): Boolean {
+        if (songs.isEmpty()) return false
+        val artists = songs.map { it.artist.substringBefore(',').trim() }.filter { it.isNotBlank() }
+            .groupingBy { it }.eachCount().entries.sortedByDescending { it.value }.map { it.key }
+        val top = artists.firstOrNull() ?: return false
+        // A YouTube song to start from: one in the list, else the top artist's first search hit.
+        val seed = songs.firstNotNullOfOrNull { it.toYouTubeVideo()?.takeIf { v -> v.artist.equals(top, ignoreCase = true) } }
+            ?: songs.firstNotNullOfOrNull { it.toYouTubeVideo() }
+            ?: runCatching { youTube.search(top).firstOrNull() }.getOrNull()
+            ?: return false
+        val similar = runCatching { lastFm.similarArtists(top, limit = 4) }.getOrDefault(emptyList())
+        val mix = (artists.drop(1).take(3) + similar).distinct()
+            .take(com.spotineil.core.data.repository.DefaultYouTubeRepository.RADIO_ARTISTS - 1)
+        val radio = runCatching { youTube.radio(seed, mix) }.getOrDefault(emptyList())
+        if (radio.isEmpty()) return false
+        playYouTube(radio, 0)
         return true
     }
 
@@ -495,5 +524,27 @@ internal fun ScreenTitle(title: String, onProfileClick: () -> Unit, modifier: Mo
     Row(modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
         ProfileButton(onProfileClick)
         Text(title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 12.dp))
+    }
+}
+
+/** "Radio" button for a playlist: starts a radio from its artists and opens the player. */
+@Composable
+internal fun PlaylistRadioButton(nav: FreeNavigation, start: suspend () -> Boolean) {
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var busy by remember { mutableStateOf(false) }
+    IconButton(
+        onClick = {
+            if (busy) return@IconButton
+            busy = true
+            scope.launch {
+                val ok = runCatching { start() }.getOrDefault(false)
+                busy = false
+                if (ok) nav.onYouTubePlayer() else nav.onMessage(context.getString(R.string.yt_radio_empty))
+            }
+        },
+    ) {
+        if (busy) androidx.compose.material3.CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp)
+        else Icon(Icons.Rounded.Radio, stringResource(R.string.playlist_radio))
     }
 }

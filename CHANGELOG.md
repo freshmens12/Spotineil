@@ -4,6 +4,16 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.11.0] - 2026-11-23
+
+### Added
+- **Equalizer** (Settings → Playback): Flat, Bass boost, Vocal, Rock, Pop, Treble or your own 5 bands.
+- **Volume leveling**: evens out loud and quiet songs (Android 9+).
+- **Skip silence** and **Podcast speed** (0.75× to 2×; music always plays at normal speed).
+- **Sleep timer fade-out**: the music fades out over the last 30 seconds instead of stopping suddenly.
+- **Gapless albums**: no crossfade between songs of the same album, so live albums and continuous mixes run straight on.
+- **Playlist radio**: the radio button on your playlists and Liked Songs plays songs by their artists and similar ones.
+
 ## [1.10.2] - 2026-11-23
 
 ### Added

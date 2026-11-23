@@ -75,6 +75,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object SettingsRoute
 @Serializable data object LicensesRoute
 @Serializable data object AboutRoute
+@Serializable data object EqualizerRoute
 
 fun NavController.navigateToSettings() = navigate(SettingsRoute)
 
@@ -85,10 +86,11 @@ fun NavGraphBuilder.settingsScreens(
     onSpotifyLibrary: () -> Unit,
 ) {
     composable<SettingsRoute> {
-        SettingsRoute(onBack = { navController.popBackStack() }, onAbout = { navController.navigate(AboutRoute) }, onSpotifyConnect = onSpotifyConnect, onSpotifyLibrary = onSpotifyLibrary, onMessage = onMessage)
+        SettingsRoute(onBack = { navController.popBackStack() }, onAbout = { navController.navigate(AboutRoute) }, onEqualizer = { navController.navigate(EqualizerRoute) }, onSpotifyConnect = onSpotifyConnect, onSpotifyLibrary = onSpotifyLibrary, onMessage = onMessage)
     }
     composable<LicensesRoute> { LicensesScreen(onBack = { navController.popBackStack() }) }
     composable<AboutRoute> { AboutScreen(onBack = { navController.popBackStack() }, onLicenses = { navController.navigate(LicensesRoute) }) }
+    composable<EqualizerRoute> { EqualizerScreen(onBack = { navController.popBackStack() }) }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,6 +98,7 @@ fun NavGraphBuilder.settingsScreens(
 fun SettingsRoute(
     onBack: () -> Unit,
     onAbout: () -> Unit,
+    onEqualizer: () -> Unit,
     onSpotifyConnect: () -> Unit,
     onSpotifyLibrary: () -> Unit,
     onMessage: (String) -> Unit,
@@ -180,6 +183,42 @@ fun SettingsRoute(
                     supportingContent = { Text(stringResource(settings.transition.description())) },
                     trailingContent = { Text(stringResource(settings.transition.label()), color = MaterialTheme.colorScheme.primary) },
                     modifier = Modifier.clickable { dialog = "transition" },
+                )
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_equalizer)) },
+                    supportingContent = {
+                        Text(
+                            if (settings.audio.eqEnabled) stringResource(settings.audio.eqPreset.label())
+                            else stringResource(R.string.settings_off),
+                        )
+                    },
+                    modifier = Modifier.clickable(onClick = onEqualizer),
+                )
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_leveling)) },
+                    supportingContent = { Text(stringResource(R.string.settings_leveling_desc)) },
+                    trailingContent = { Switch(settings.audio.volumeLeveling, { viewModel.setAudio(settings.audio.copy(volumeLeveling = it)) }) },
+                    modifier = Modifier.clickable { viewModel.setAudio(settings.audio.copy(volumeLeveling = !settings.audio.volumeLeveling)) },
+                )
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_skip_silence)) },
+                    supportingContent = { Text(stringResource(R.string.settings_skip_silence_desc)) },
+                    trailingContent = { Switch(settings.audio.skipSilence, { viewModel.setAudio(settings.audio.copy(skipSilence = it)) }) },
+                    modifier = Modifier.clickable { viewModel.setAudio(settings.audio.copy(skipSilence = !settings.audio.skipSilence)) },
+                )
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_podcast_speed)) },
+                    supportingContent = { Text(stringResource(R.string.settings_podcast_speed_desc)) },
+                    trailingContent = { Text(speedLabel(settings.audio.podcastSpeed), color = MaterialTheme.colorScheme.primary) },
+                    modifier = Modifier.clickable { dialog = "speed" },
                 )
             }
 
@@ -304,6 +343,14 @@ fun SettingsRoute(
                     Text(stringResource(R.string.settings_spotify_disconnect), color = MaterialTheme.colorScheme.error)
                 }
             },
+        )
+        "speed" -> ChoiceDialog(
+            title = stringResource(R.string.settings_podcast_speed),
+            options = PODCAST_SPEEDS,
+            selected = settings.audio.podcastSpeed,
+            label = { speedLabel(it) },
+            onSelect = { viewModel.setAudio(settings.audio.copy(podcastSpeed = it)); dialog = null },
+            onDismiss = { dialog = null },
         )
         "transition" -> ChoiceDialog(
             title = stringResource(R.string.settings_transition),
@@ -558,5 +605,98 @@ private fun shareApp(context: Context) {
         context.startActivity(Intent.createChooser(send, context.getString(R.string.settings_share)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     } catch (_: ActivityNotFoundException) {
         // Nothing can receive shared text.
+    }
+}
+
+private val PODCAST_SPEEDS = listOf(0.75f, 1f, 1.25f, 1.5f, 1.75f, 2f)
+
+private fun speedLabel(speed: Float): String =
+    (if (speed % 1f == 0f) speed.toInt().toString() else speed.toString().trimEnd('0')) + "×"
+
+private fun com.spotineil.core.model.EqPreset.label() = when (this) {
+    com.spotineil.core.model.EqPreset.Flat -> R.string.eq_flat
+    com.spotineil.core.model.EqPreset.BassBoost -> R.string.eq_bass
+    com.spotineil.core.model.EqPreset.Vocal -> R.string.eq_vocal
+    com.spotineil.core.model.EqPreset.Rock -> R.string.eq_rock
+    com.spotineil.core.model.EqPreset.Pop -> R.string.eq_pop
+    com.spotineil.core.model.EqPreset.Treble -> R.string.eq_treble
+    com.spotineil.core.model.EqPreset.Custom -> R.string.eq_custom
+}
+
+private fun bandLabel(hz: Int): String = if (hz >= 1000) {
+    val k = hz / 1000.0
+    (if (k % 1.0 == 0.0) k.toInt().toString() else k.toString()) + " kHz"
+} else {
+    "$hz Hz"
+}
+
+/** Settings → Equalizer: on/off, a preset, or your own 5 bands. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EqualizerScreen(onBack: () -> Unit, viewModel: SettingsViewModel = hiltViewModel()) {
+    val settings by viewModel.state.collectAsStateWithLifecycle()
+    val audio = settings.audio
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.settings_equalizer)) },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, null) } },
+            )
+        },
+    ) { padding ->
+        LazyColumn(
+            Modifier.fillMaxSize().padding(top = padding.calculateTopPadding()),
+            contentPadding = PaddingValues(bottom = LocalBottomContentPadding.current + 24.dp),
+        ) {
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.eq_use)) },
+                    supportingContent = { Text(stringResource(R.string.eq_desc)) },
+                    trailingContent = { Switch(audio.eqEnabled, { viewModel.setAudio(audio.copy(eqEnabled = it)) }) },
+                    modifier = Modifier.clickable { viewModel.setAudio(audio.copy(eqEnabled = !audio.eqEnabled)) },
+                )
+            }
+            item {
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    items(com.spotineil.core.model.EqPreset.entries.toList(), key = { it.name }) { preset ->
+                        androidx.compose.material3.FilterChip(
+                            selected = audio.eqPreset == preset,
+                            onClick = { viewModel.setAudio(audio.copy(eqEnabled = true, eqPreset = preset)) },
+                            label = { Text(stringResource(preset.label())) },
+                        )
+                    }
+                }
+            }
+            items(com.spotineil.core.model.EQ_BANDS_HZ.size) { band ->
+                val gain = audio.gains[band]
+                Column(Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
+                    Row {
+                        Text(bandLabel(com.spotineil.core.model.EQ_BANDS_HZ[band]), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                        Text((if (gain > 0) "+" else "") + "$gain dB", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+                    }
+                    androidx.compose.material3.Slider(
+                        value = gain.toFloat(),
+                        onValueChange = { v ->
+                            // Moving a band switches to "Custom", starting from the gains in use.
+                            val custom = audio.gains.toMutableList().also { it[band] = kotlin.math.round(v).toInt() }
+                            viewModel.setAudio(audio.copy(eqEnabled = true, eqPreset = com.spotineil.core.model.EqPreset.Custom, eqCustom = custom))
+                        },
+                        valueRange = -10f..10f,
+                        steps = 19,
+                    )
+                }
+            }
+            item {
+                Text(
+                    stringResource(R.string.eq_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(16.dp),
+                )
+            }
+        }
     }
 }

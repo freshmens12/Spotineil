@@ -1,5 +1,7 @@
 package com.spotineil.core.player
 
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.NonCancellable
 import android.content.Context
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -293,26 +295,46 @@ class DefaultPlaybackController @Inject constructor(
         _sleepTimer.value = SleepTimerState()
         if (option == null) return
         sleepJob = scope.launch {
-            when (option) {
-                is SleepTimerOption.Minutes -> {
-                    val endsAt = clock.now() + option.minutes * 60_000L
-                    _sleepTimer.value = SleepTimerState(endsAtMs = endsAt)
-                    delay(endsAt - clock.now())
-                }
-                SleepTimerOption.EndOfTrack -> {
-                    _sleepTimer.value = SleepTimerState(endOfTrack = true)
-                    val startUri = state.value.track?.uri
-                    while (isActive) {
-                        val s = state.value
-                        val duration = s.track?.durationMs ?: 0
-                        val remaining = duration - s.estimatedPosition(clock.now())
-                        if (s.track?.uri != startUri || (duration > 0 && remaining <= 800)) break
-                        delay(500)
+            try {
+                when (option) {
+                    is SleepTimerOption.Minutes -> {
+                        val endsAt = clock.now() + option.minutes * 60_000L
+                        _sleepTimer.value = SleepTimerState(endsAtMs = endsAt)
+                        delay((endsAt - clock.now() - SLEEP_FADE_MS).coerceAtLeast(0))
+                        fadeOut((endsAt - clock.now()).coerceIn(0, SLEEP_FADE_MS))
+                    }
+                    SleepTimerOption.EndOfTrack -> {
+                        _sleepTimer.value = SleepTimerState(endOfTrack = true)
+                        val startUri = state.value.track?.uri
+                        while (isActive) {
+                            val s = state.value
+                            val duration = s.track?.durationMs ?: 0
+                            val remaining = duration - s.estimatedPosition(clock.now())
+                            if (s.track?.uri != startUri) break
+                            if (duration > 0 && remaining <= SLEEP_FADE_MS) {
+                                fadeOut((remaining - 500).coerceAtLeast(0))
+                                break
+                            }
+                            delay(500)
+                        }
                     }
                 }
+                if (state.value.isPlaying) pauseNow()
+            } finally {
+                // Back to full volume for next time (also when the timer is turned off mid-fade).
+                if (route() == Route.Local) withContext(NonCancellable) { runCatching { local.setVolume(1f) } }
+                _sleepTimer.value = SleepTimerState()
             }
-            if (state.value.isPlaying) pauseNow()
-            _sleepTimer.value = SleepTimerState()
+        }
+    }
+
+    /** Lowers the volume to silence over [durationMs] (on-device playback only). */
+    private suspend fun fadeOut(durationMs: Long) {
+        if (route() != Route.Local || durationMs <= 0) return
+        val steps = 30
+        for (i in 1..steps) {
+            runCatching { local.setVolume(1f - i.toFloat() / steps) }
+            delay(durationMs / steps)
         }
     }
 
@@ -327,3 +349,4 @@ class DefaultPlaybackController @Inject constructor(
         }
     }
 }
+private const val SLEEP_FADE_MS = 30_000L

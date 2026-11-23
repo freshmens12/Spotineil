@@ -152,4 +152,5 @@
     <string name="spotify_try_sign_in">O prueba la página de inicio de sesión de Spotify</string>
     <string name="spotify_home_shelf">Tus playlists de Spotify</string>
     <string name="library_playlist_label">Playlist</string>
+    <string name="playlist_radio">Radio de la playlist</string>
 </resources>

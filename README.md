@@ -37,7 +37,7 @@ A free Android music app, written in Kotlin with Jetpack Compose (Material 3). I
 | **Widgets** | Five home-screen widgets: **Player** (2×2), **Now playing** (4×1), **Mini player** (2×1), **Quick actions** (4×1) and **Recently played** (4×2). Long-press your Home screen, tap Widgets and pick Spotineil. |
 | **Themes and language** | System, Light, Dark, AMOLED black and **Soft glass**; 8 accent colours; English, Spanish and Tagalog (or Automatic). |
 | **Spotify (optional)** | Connect your Spotify account to see private playlists and Liked Songs; songs are played from YouTube Music. |
-| **Transitions** | Off, **Crossfade** or **AutoMix** between songs (Settings → Playback). |
+| **Sound** | Crossfade or AutoMix between songs (gapless within an album), equalizer with presets, volume leveling, skip silence, podcast speed, sleep timer that fades out. |
 | **Downloads** | A download button appears only on songs whose artist or licence allows it. |
 
 ## What Spotineil does *not* do

@@ -550,6 +550,7 @@ class LikedMediaViewModel @Inject constructor(
         return if (onDevice.isNotEmpty()) { freePlayer.playMedia(onDevice.shuffled(), 0); false } else freePlayer.playMixed(list.shuffled(), 0)
     }
     fun unlike(media: PlayableMedia) = viewModelScope.launch { repository.setLiked(media, false) }
+    suspend fun radio(list: List<PlayableMedia>): Boolean = freePlayer.playRadioFrom(list)
 }
 
 @Composable
@@ -581,6 +582,7 @@ fun LikedMediaScreen(nav: FreeNavigation, viewModel: LikedMediaViewModel = hiltV
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(start = 8.dp).weight(1f),
                     )
+                    if (list.isNotEmpty()) PlaylistRadioButton(nav) { viewModel.radio(list) }
                     if (list.isNotEmpty()) PlayShuffle(
                         onPlay = { if (viewModel.play(list, 0)) nav.onYouTubePlayer() },
                         onShuffle = { if (viewModel.shuffle(list)) nav.onYouTubePlayer() },

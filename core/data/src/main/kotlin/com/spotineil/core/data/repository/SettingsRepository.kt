@@ -31,6 +31,7 @@ interface SettingsRepository {
     suspend fun setLibraryGrid(grid: Boolean)
     suspend fun setGuestMode(enabled: Boolean)
     suspend fun setTransition(mode: TransitionMode)
+    suspend fun setAudio(audio: com.spotineil.core.model.AudioSettings)
 }
 
 @Singleton
@@ -51,11 +52,29 @@ class DataStoreSettingsRepository @Inject constructor(
             libraryGrid = p[LIB_GRID] ?: defaults.libraryGrid,
             guestMode = p[GUEST] ?: defaults.guestMode,
             transition = p[TRANSITION].toEnum(defaults.transition),
+            audio = com.spotineil.core.model.AudioSettings(
+                eqEnabled = p[EQ_ON] ?: false,
+                eqPreset = p[EQ_PRESET].toEnum(com.spotineil.core.model.EqPreset.Flat),
+                eqCustom = p[EQ_CUSTOM]?.split(",")?.mapNotNull { it.trim().toIntOrNull() }?.takeIf { it.size == 5 } ?: listOf(0, 0, 0, 0, 0),
+                volumeLeveling = p[LEVELING] ?: false,
+                skipSilence = p[SKIP_SILENCE] ?: false,
+                podcastSpeed = p[PODCAST_SPEED]?.toFloatOrNull() ?: 1f,
+            ),
         )
     }
 
     override suspend fun setGuestMode(enabled: Boolean) { store.edit { it[GUEST] = enabled } }
     override suspend fun setTransition(mode: TransitionMode) { store.edit { it[TRANSITION] = mode.name } }
+    override suspend fun setAudio(audio: com.spotineil.core.model.AudioSettings) {
+        store.edit {
+            it[EQ_ON] = audio.eqEnabled
+            it[EQ_PRESET] = audio.eqPreset.name
+            it[EQ_CUSTOM] = audio.eqCustom.joinToString(",")
+            it[LEVELING] = audio.volumeLeveling
+            it[SKIP_SILENCE] = audio.skipSilence
+            it[PODCAST_SPEED] = audio.podcastSpeed.toString()
+        }
+    }
 
     override suspend fun setThemeMode(mode: ThemeMode) { store.edit { it[THEME] = mode.name } }
     override suspend fun setAccent(accent: AccentColor) { store.edit { it[ACCENT] = accent.name } }
@@ -76,5 +95,11 @@ class DataStoreSettingsRepository @Inject constructor(
         val LIB_GRID = booleanPreferencesKey("library_grid")
         val GUEST = booleanPreferencesKey("guest_mode")
         val TRANSITION = stringPreferencesKey("transition")
+        val EQ_ON = booleanPreferencesKey("eq_on")
+        val EQ_PRESET = stringPreferencesKey("eq_preset")
+        val EQ_CUSTOM = stringPreferencesKey("eq_custom")
+        val LEVELING = booleanPreferencesKey("volume_leveling")
+        val SKIP_SILENCE = booleanPreferencesKey("skip_silence")
+        val PODCAST_SPEED = stringPreferencesKey("podcast_speed")
     }
 }

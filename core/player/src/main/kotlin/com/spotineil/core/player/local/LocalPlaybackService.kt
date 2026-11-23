@@ -73,6 +73,7 @@ class LocalPlaybackService : MediaLibraryService() {
 
     private var session: MediaLibrarySession? = null
     private var transitions: TransitionController? = null
+    private var effects: AudioEffectsController? = null
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     override fun onCreate() {
@@ -107,6 +108,13 @@ class LocalPlaybackService : MediaLibraryService() {
                 settings.settings.map { it.transition }.distinctUntilChanged().collect { controller.mode = it }
             }
         }
+        // Equalizer, volume leveling, skip silence and podcast speed (Settings → Sound).
+        effects = AudioEffectsController(player).also { fx ->
+            fx.start()
+            scope.launch {
+                settings.settings.map { it.audio }.distinctUntilChanged().collect { fx.update(it) }
+            }
+        }
 
         val builder = MediaLibrarySession.Builder(this, player, LibraryCallback())
         packageManager.getLaunchIntentForPackage(packageName)?.let { launch ->
@@ -127,6 +135,8 @@ class LocalPlaybackService : MediaLibraryService() {
 
     override fun onDestroy() {
         transitions?.release()
+        effects?.release()
+        effects = null
         transitions = null
         session?.run {
             player.release()

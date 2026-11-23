@@ -65,4 +65,22 @@
     <string name="settings_backup_failed">No se pudo guardar la copia</string>
     <string name="settings_restore_done">Restauradas %1$d canciones favoritas y %2$d playlists</string>
     <string name="settings_restore_failed">Ese archivo no es una copia de Spotineil</string>
+    <string name="settings_equalizer">Ecualizador</string>
+    <string name="settings_off">Desactivado</string>
+    <string name="settings_leveling">Nivelación de volumen</string>
+    <string name="settings_leveling_desc">Iguala las canciones fuertes y suaves</string>
+    <string name="settings_skip_silence">Saltar silencios</string>
+    <string name="settings_skip_silence_desc">Salta las partes en silencio, útil para podcasts</string>
+    <string name="settings_podcast_speed">Velocidad de podcasts</string>
+    <string name="settings_podcast_speed_desc">La música siempre suena a velocidad normal</string>
+    <string name="eq_use">Usar ecualizador</string>
+    <string name="eq_desc">Ajusta el sonido con un preajuste o a tu gusto</string>
+    <string name="eq_flat">Plano</string>
+    <string name="eq_bass">Refuerzo de graves</string>
+    <string name="eq_vocal">Voces</string>
+    <string name="eq_rock">Rock</string>
+    <string name="eq_pop">Pop</string>
+    <string name="eq_treble">Agudos</string>
+    <string name="eq_custom">Personalizado</string>
+    <string name="eq_note">Usa los efectos de audio de tu teléfono; algunos admiten menos bandas.</string>
 </resources>

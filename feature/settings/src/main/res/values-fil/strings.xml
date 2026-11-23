@@ -65,4 +65,22 @@
     <string name="settings_backup_failed">Hindi ma-save ang backup</string>
     <string name="settings_restore_done">Naibalik ang %1$d paboritong kanta at %2$d playlist</string>
     <string name="settings_restore_failed">Hindi Spotineil backup ang file na iyon</string>
+    <string name="settings_equalizer">Equalizer</string>
+    <string name="settings_off">Naka-off</string>
+    <string name="settings_leveling">Pagpantay ng volume</string>
+    <string name="settings_leveling_desc">Pinapantay ang malalakas at mahihinang kanta</string>
+    <string name="settings_skip_silence">Laktawan ang katahimikan</string>
+    <string name="settings_skip_silence_desc">Nilalaktawan ang tahimik na bahagi, mainam sa podcast</string>
+    <string name="settings_podcast_speed">Bilis ng podcast</string>
+    <string name="settings_podcast_speed_desc">Laging normal ang bilis ng musika</string>
+    <string name="eq_use">Gamitin ang equalizer</string>
+    <string name="eq_desc">Ayusin ang tunog gamit ang preset o sarili mong setting</string>
+    <string name="eq_flat">Flat</string>
+    <string name="eq_bass">Bass boost</string>
+    <string name="eq_vocal">Boses</string>
+    <string name="eq_rock">Rock</string>
+    <string name="eq_pop">Pop</string>
+    <string name="eq_treble">Treble</string>
+    <string name="eq_custom">Custom</string>
+    <string name="eq_note">Ginagamit ang sariling audio effects ng telepono; may teleponong mas kaunti ang band.</string>
 </resources>

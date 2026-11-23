@@ -93,6 +93,7 @@ class UserPlaylistViewModel @Inject constructor(
     fun delete() = viewModelScope.launch { repository.delete(id) }
     fun remove(media: PlayableMedia) = viewModelScope.launch { repository.remove(id, media.mediaId) }
     fun move(from: Int, to: Int) = viewModelScope.launch { repository.move(id, from, to) }
+    suspend fun radio(list: List<PlayableMedia>): Boolean = freePlayer.playRadioFrom(list)
 }
 
 @Composable
@@ -112,6 +113,7 @@ fun UserPlaylistScreen(nav: FreeNavigation, viewModel: UserPlaylistViewModel = h
                 Text(playlist?.name.orEmpty(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(pluralStringResource(R.plurals.playlist_song_count, order.size, order.size), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
+            if (order.isNotEmpty()) PlaylistRadioButton(nav) { viewModel.radio(order) }
             Box {
                 IconButton(onClick = { menuOpen = true }) { Icon(Icons.Rounded.MoreVert, stringResource(R.string.playlist_options)) }
                 DropdownMenu(menuOpen, onDismissRequest = { menuOpen = false }, containerColor = menuContainer()) {
