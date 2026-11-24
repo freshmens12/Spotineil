@@ -173,3 +173,70 @@ private fun openUrl(context: Context, url: String) {
 private fun copy(context: Context, text: String) {
     context.getSystemService(ClipboardManager::class.java)?.setPrimaryClip(ClipData.newPlainText("Spotineil crash report", text))
 }
+
+/**
+ * Up to 1.14.0 Spotineil was published as "com.spotineil.app.debug" (signed with a debug key).
+ * From 1.15.0 on it is its own app signed with the release key, so it installs next to the old
+ * one. While the old one is still installed, explain how to bring the music across (Back up there,
+ * Restore here) and offer to uninstall it. Returns true while it is showing.
+ */
+@Composable
+fun OldAppDialog(enabled: Boolean): Boolean {
+    val context = LocalContext.current
+    var show by remember {
+        mutableStateOf(
+            context.packageName != OLD_PACKAGE && !oldAppPostponed && isInstalled(context, OLD_PACKAGE),
+        )
+    }
+    // Close it once the old app is gone. Android removes it a moment after its "uninstall?" prompt
+    // closes, so keep checking while the notice is up (a cheap package lookup once a second).
+    LaunchedEffect(show) {
+        while (show) {
+            kotlinx.coroutines.delay(1_000)
+            if (!isInstalled(context, OLD_PACKAGE)) show = false
+        }
+    }
+    if (!show) return false
+    if (!enabled) return true
+    val later = {
+        oldAppPostponed = true
+        show = false
+    }
+    AlertDialog(
+        containerColor = dialogContainer(),
+        onDismissRequest = {},
+        title = { Text(stringResource(R.string.old_app_title)) },
+        text = {
+            Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) {
+                Text(stringResource(R.string.old_app_message))
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                runCatching {
+                    context.startActivity(
+                        Intent(Intent.ACTION_DELETE, Uri.parse("package:$OLD_PACKAGE")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                    )
+                }
+            }) { Text(stringResource(R.string.old_app_uninstall)) }
+        },
+        dismissButton = {
+            Column {
+                TextButton(onClick = {
+                    context.packageManager.getLaunchIntentForPackage(OLD_PACKAGE)?.let { intent ->
+                        runCatching { context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+                    }
+                }) { Text(stringResource(R.string.old_app_open)) }
+                TextButton(onClick = later) { Text(stringResource(R.string.old_app_later)) }
+            }
+        },
+    )
+    return true
+}
+
+private const val OLD_PACKAGE = "com.spotineil.app.debug"
+/** "Not now" hides it until the app is started again; it stops for good once the old app is gone. */
+private var oldAppPostponed = false
+
+private fun isInstalled(context: Context, pkg: String): Boolean =
+    runCatching { context.packageManager.getPackageInfo(pkg, 0); true }.getOrDefault(false)

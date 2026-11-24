@@ -69,4 +69,9 @@
     <string name="whats_new_fallback">Spotineil was updated. Tap \"All changes\" to see what\'s new.</string>
     <string name="whats_new_ok">Got it</string>
     <string name="whats_new_more">All changes</string>
+    <string name="old_app_title">Moving from the old Spotineil</string>
+    <string name="old_app_message">You also have the earlier Spotineil on this phone. From this version on, Spotineil is signed with its own key, so it is installed as a new app and your Liked Songs, playlists and history don\'t come across by themselves.\n\nTo bring them over:\n1. Open the old app → Settings → Backup &amp; restore → Back up, and save the file.\n2. Come back here → Settings → Backup &amp; restore → Restore, and pick that file.\n3. Uninstall the old app. From now on updates install over this one.</string>
+    <string name="old_app_open">Open old app</string>
+    <string name="old_app_uninstall">Uninstall old app</string>
+    <string name="old_app_later">Not now</string>
 </resources>

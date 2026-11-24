@@ -14,6 +14,8 @@ A free Android music app, written in Kotlin with Jetpack Compose (Material 3). I
 
 **Updates:** every time the app opens it checks this repository's latest release. If there is a newer version it asks you, and only downloads and installs it when you tap **Update**. Updates install over the app only if they are signed with the same key as the version you have, so always take updates from this page.
 
+**Had Spotineil 1.14.0 or older?** From 1.15.0 on, releases are signed with Spotineil's own key instead of a developer key, so 1.15.0 installs as a new app next to the old one. It explains the move when you open it: in the old app, **Settings → Backup & restore → Back up**; in the new one, **Restore** that file; then uninstall the old app. This is needed only once.
+
 ## Screenshots
 
 <table>
@@ -50,6 +52,7 @@ You need **JDK 21** (for example [Temurin 21](https://adoptium.net)) and the And
 
 ```bash
 ./gradlew assembleDebug          # build the APK  → app/build/outputs/apk/debug/app-debug.apk
+./gradlew assembleRelease        # optimized (R8) build → app/build/outputs/apk/release/ (unsigned without a keystore)
 ./gradlew installDebug           # install on a connected phone
 ./gradlew testDebugUnitTest      # unit tests + Robolectric Compose UI tests
 ```
@@ -74,11 +77,20 @@ CI and other machines can use environment variables with the same names.
 
 ## Publishing a release (maintainers)
 
-1. Raise `versionCode` and `versionName` in `app/build.gradle.kts` and build the debug APK.
-2. Run `scripts/publish-release.sh <version> <apk> "what's new"`. It creates the GitHub release on this repository and uploads the APK as `Spotineil.apk`, using the GitHub sign-in git already has.
+1. Raise `versionCode` and `versionName` in `app/build.gradle.kts` and run `./gradlew assembleRelease`.
+2. Run `scripts/publish-release.sh <version> app/build/outputs/apk/release/app-release.apk "what's new"`. It creates the GitHub release on this repository and uploads the APK as `Spotineil.apk`, using the GitHub sign-in git already has.
 3. Phones with an older version offer the update the next time the app opens.
 
-Updates only install over an existing app if they are signed with the same key, so keep building from the same machine (or back up `~/.android/debug.keystore`).
+Release builds are signed with the project's release keystore. It is kept outside the repository, and the build reads its location and passwords from `local.properties` (or environment variables):
+
+```properties
+SPOTINEIL_KEYSTORE_PATH=/path/to/spotineil-release.jks
+SPOTINEIL_KEYSTORE_PASSWORD=…
+SPOTINEIL_KEY_ALIAS=spotineil
+SPOTINEIL_KEY_PASSWORD=…
+```
+
+Updates only install over an existing app if they are signed with the same key, so **keep at least two backups of the keystore and its password** off the build machine. Losing it means every user has to uninstall and reinstall to get new versions.
 
 ## Architecture
 

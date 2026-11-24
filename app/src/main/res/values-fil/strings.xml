@@ -63,4 +63,9 @@
     <string name="whats_new_fallback">Na-update ang Spotineil. I-tap ang \"Lahat ng pagbabago\" para makita ang bago.</string>
     <string name="whats_new_ok">Sige</string>
     <string name="whats_new_more">Lahat ng pagbabago</string>
+    <string name="old_app_title">Paglipat mula sa lumang Spotineil</string>
+    <string name="old_app_message">Mayroon ka pang lumang Spotineil sa teleponong ito. Simula sa bersyong ito, may sariling key na ang Spotineil, kaya naka-install ito bilang bagong app at hindi kusang malilipat ang iyong Mga Paboritong Kanta, mga playlist at kasaysayan.\n\nPara mailipat ang mga ito:\n1. Buksan ang lumang app → Mga Setting → Backup at restore → Mag-back up, at i-save ang file.\n2. Bumalik dito → Mga Setting → Backup at restore → I-restore, at piliin ang file na iyon.\n3. I-uninstall ang lumang app. Mula ngayon, dito na mag-a-update.</string>
+    <string name="old_app_open">Buksan ang lumang app</string>
+    <string name="old_app_uninstall">I-uninstall ang luma</string>
+    <string name="old_app_later">Hindi muna</string>
 </resources>

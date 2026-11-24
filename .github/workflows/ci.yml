@@ -31,6 +31,10 @@ jobs:
       - name: Assemble debug & run unit tests (incl. Robolectric Compose UI tests)
         run: ./gradlew assembleDebug testDebugUnitTest --stacktrace
 
+      # The optimized (R8-shrunk) build that releases use. Unsigned here: the keystore never leaves the maintainer's PC.
+      - name: Assemble release (R8)
+        run: ./gradlew assembleRelease --stacktrace
+
       - name: Upload test reports
         if: failure()
         uses: actions/upload-artifact@v4

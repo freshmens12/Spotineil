@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.15.0] - 2026-11-25
+
+### Changed
+- **Spotineil now has its own release key and an optimized build.** The download is about 10 MB instead of 90 MB, and the app starts and runs faster. Updates from now on are signed with Spotineil's own key, which is kept safely off GitHub.
+- Because of the new key, 1.15.0 installs as a new app next to Spotineil 1.14.0 or older (only this once). When it opens, it shows how to bring your Liked Songs, playlists and history across: in the old app, Settings → Backup & restore → Back up; here, Restore that file; then uninstall the old app with one tap.
+
 ## [1.14.0] - 2026-11-23
 
 ### Added

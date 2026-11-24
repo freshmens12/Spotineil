@@ -7,10 +7,14 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Lets the app hand a downloaded update to Android's installer (the user still has to confirm). -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- Lets the app open Android's "uninstall" prompt for the earlier Spotineil (the user still has to confirm). -->
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
 
     <!-- Detect the official Spotify app (required for App Remote playback). -->
     <queries>
         <package android:name="com.spotify.music" />
+        <!-- The earlier Spotineil (published as a debug build up to 1.14.0), to help move over from it. -->
+        <package android:name="com.spotineil.app.debug" />
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <category android:name="android.intent.category.BROWSABLE" />

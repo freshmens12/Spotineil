@@ -68,4 +68,9 @@
     <string name="whats_new_fallback">Spotineil se actualizó. Toca \"Todos los cambios\" para ver las novedades.</string>
     <string name="whats_new_ok">Entendido</string>
     <string name="whats_new_more">Todos los cambios</string>
+    <string name="old_app_title">Pasar desde el Spotineil anterior</string>
+    <string name="old_app_message">También tienes el Spotineil anterior en este teléfono. Desde esta versión Spotineil está firmado con su propia clave, así que se instala como una app nueva y tus Canciones que te gustan, playlists e historial no pasan solos.\n\nPara traerlos:\n1. Abre la app anterior → Ajustes → Copia de seguridad → Hacer copia, y guarda el archivo.\n2. Vuelve aquí → Ajustes → Copia de seguridad → Restaurar, y elige ese archivo.\n3. Desinstala la app anterior. A partir de ahora las actualizaciones se instalan sobre esta.</string>
+    <string name="old_app_open">Abrir la app anterior</string>
+    <string name="old_app_uninstall">Desinstalar la anterior</string>
+    <string name="old_app_later">Ahora no</string>
 </resources>
