@@ -14,6 +14,9 @@ These are stored only on your device. They are deleted when you uninstall the ap
 - temporary copies of song lists (cache) so the app loads faster and uses less data;
 - your settings (theme, accent colour, language).
 
+## Karaoke "vocals off"
+Removing the singer's voice happens entirely on your phone, with an AI model stored in the app's private storage. The song is processed in memory while it plays; no audio is recorded, saved or sent anywhere.
+
 ## Services the app talks to
 To show and play music, the app sends requests (such as your search words and your approximate country) directly from your phone to the services below. Each one handles those requests under its own privacy policy. The developer does not see them.
 - **YouTube Music**: the music catalog, search, charts and audio streams.
@@ -24,7 +27,7 @@ To show and play music, the app sends requests (such as your search words and yo
 - **Radio Browser**: the radio station directory.
 - **Apple Podcasts directory** and each podcast's own RSS feed.
 - **Spotify (only if you choose to connect it)**: see below.
-- **GitHub**: when the app opens it asks GitHub whether a newer version exists, and downloads it only if you agree. After an update it reads that version's release notes for "What's new".
+- **GitHub**: when the app opens it asks GitHub whether a newer version exists, and downloads it only if you agree. After an update it reads that version's release notes for "What's new". The first time you turn vocals off in Karaoke mode, the voice model is downloaded from this project's GitHub releases (once, after you agree).
 
 ## Crash reports
 If the app crashes, the error is saved on your phone only. The next time you open the app it asks whether to send it. Only if you tap **Send report** does it open a GitHub issue in your browser, filled in with the app version, Android version, phone model and the error, which you can read and edit before posting. Nothing is sent automatically.

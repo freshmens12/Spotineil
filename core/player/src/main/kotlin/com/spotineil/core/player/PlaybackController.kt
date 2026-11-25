@@ -100,4 +100,34 @@ interface PlaybackController {
     fun transferTo(device: Device)
 
     fun setSleepTimer(option: SleepTimerOption?)
+
+    /** Karaoke "vocals off": where taking the singer's voice out of the song stands. */
+    val voiceRemoval: StateFlow<VoiceRemoval>
+
+    /** Whether the voice model (~39 MB) is on the phone; without it, turning vocals off downloads it first. */
+    val voiceModelDownloaded: Boolean
+
+    /** Karaoke mode is open (the player reads ahead so the voice can be found in time). Closing it brings vocals back. */
+    fun setKaraokeOpen(open: Boolean)
+
+    /** Takes the singer's voice out of songs played on this phone (downloading the model first if needed), or brings it back. */
+    fun setVocalsRemoved(removed: Boolean)
+}
+
+/** Karaoke "vocals off" state. */
+sealed interface VoiceRemoval {
+    /** The song plays as it is. */
+    data object Off : VoiceRemoval
+
+    /** Getting the voice model, 0..1. */
+    data class Downloading(val progress: Float) : VoiceRemoval
+
+    /** Finding the voice in the next part of the song (a few seconds). */
+    data object Preparing : VoiceRemoval
+
+    /** The voice is being taken out. */
+    data object Removing : VoiceRemoval
+
+    /** The model couldn't be downloaded or run. */
+    data object Failed : VoiceRemoval
 }

@@ -4,6 +4,15 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.16.0] - 2026-11-25
+
+### Added
+- **Vocals off in Karaoke mode (AI)**: the mic button next to Close takes the singer's voice out of the song so you can sing over the real music. An AI model on your phone (Deezer's Spleeter) finds the voice and only the voice is removed; the instruments stay as they are. The first time, it asks to download the model (39 MB, once; then it works offline). Turning vocals off pauses the music for a moment while the next part of the song is prepared, and it stays off from song to song until you turn it back on or leave Karaoke mode. Nothing is recorded or saved: the song is processed in memory while it plays.
+
+### Changed
+- Karaoke mode stays open when the next song starts, and says so when a song has no lyrics.
+- The app download is bigger (about 31 MB) because it now includes the AI engine that runs the voice model on the phone.
+
 ## [1.15.0] - 2026-11-25
 
 ### Changed

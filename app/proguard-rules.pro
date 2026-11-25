@@ -23,3 +23,6 @@
 # Tink / misc annotations
 -dontwarn com.google.errorprone.annotations.**
 -dontwarn javax.annotation.**
+
+# ONNX Runtime (karaoke voice model): its native code calls back into these classes by name
+-keep class ai.onnxruntime.** { *; }

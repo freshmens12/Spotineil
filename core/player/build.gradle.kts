@@ -12,6 +12,9 @@ dependencies {
     api(project(":core:model"))
     implementation(project(":core:common"))
     implementation(project(":core:data"))
+    implementation(project(":core:separation"))
+    // Runs the karaoke voice model on the phone (the model itself is downloaded on first use).
+    implementation(libs.onnxruntime.android)
 
     // Official Spotify App Remote SDK (resolved from GitHub releases, see settings.gradle.kts).
     implementation(libs.spotify.app.remote) { artifact { type = "aar" } }

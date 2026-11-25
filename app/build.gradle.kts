@@ -20,8 +20,8 @@ android {
     defaultConfig {
         applicationId = "com.spotineil.app"
         // Releases bump these; -PappVersionName / -PappVersionCode override them (used to test updates).
-        versionCode = (findProperty("appVersionCode") as String?)?.toInt() ?: 18
-        versionName = (findProperty("appVersionName") as String?) ?: "1.15.0"
+        versionCode = (findProperty("appVersionCode") as String?)?.toInt() ?: 19
+        versionName = (findProperty("appVersionName") as String?) ?: "1.16.0"
 
         buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${secret("SPOTIFY_CLIENT_ID") ?: ""}\"")
         buildConfigField("String", "SPOTIFY_REDIRECT_URI", "\"spotineil://callback\"")
@@ -30,6 +30,9 @@ android {
         // Optional free key from https://devportal.jamendo.com — Jamendo is hidden without it.
         buildConfigField("String", "JAMENDO_CLIENT_ID", "\"${secret("JAMENDO_CLIENT_ID") ?: ""}\"")
         buildConfigField("String", "LASTFM_API_KEY", "\"${secret("LASTFM_API_KEY") ?: ""}\"")
+        // Phones and emulators the app (and the karaoke voice model runtime) is built for. Old 32-bit
+        // Intel phones are left out: almost none exist, and each kind adds ~8 MB of AI runtime.
+        ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64") }
         // AppAuth's RedirectUriReceiverActivity listens on this scheme.
         manifestPlaceholders["appAuthRedirectScheme"] = "spotineil"
     }
@@ -63,6 +66,10 @@ android {
             }
         }
     }
+
+    // The karaoke AI runtime (ONNX Runtime) is large; storing its native libraries compressed keeps
+    // the download smaller (they are unpacked once when the app is installed).
+    packaging { jniLibs { useLegacyPackaging = true } }
 
     buildFeatures { buildConfig = true }
 }

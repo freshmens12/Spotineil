@@ -121,12 +121,12 @@ fun PlayerHost(
 
     if (karaoke && expanded) {
         val lyrics by lyricsViewModel.state.collectAsStateWithLifecycle()
-        val loaded = (lyrics as? LyricsUiState.Loaded)?.lyrics
-        if (loaded == null || loaded.isInstrumental) {
-            karaoke = false
-        } else {
+        // Stays open across songs (so vocals stay off); a song without lyrics just says so.
+        val loaded = (lyrics as? LyricsUiState.Loaded)?.lyrics?.takeUnless { it.isInstrumental }
+        run {
             KaraokeScreen(
                 lyrics = loaded,
+                lyricsLoading = lyrics is LyricsUiState.Loading || lyrics is LyricsUiState.Idle,
                 positionMs = state.positionMs,
                 durationMs = state.track?.durationMs ?: 0L,
                 title = state.track?.name.orEmpty(),
@@ -135,6 +135,10 @@ fun PlayerHost(
                 isPlaying = state.playback.isPlaying,
                 onTogglePlay = viewModel::togglePlayPause,
                 onClose = { karaoke = false },
+                voiceRemoval = viewModel.voiceRemoval.collectAsStateWithLifecycle().value,
+                voiceModelDownloaded = { viewModel.voiceModelDownloaded },
+                onKaraokeOpen = viewModel::setKaraokeOpen,
+                onVocalsRemovedChange = viewModel::setVocalsRemoved,
             )
         }
     }

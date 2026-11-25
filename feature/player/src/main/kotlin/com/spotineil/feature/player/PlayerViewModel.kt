@@ -117,6 +117,15 @@ class PlayerViewModel @Inject constructor(
     fun cycleRepeat() = player.cycleRepeat()
     fun setSleepTimer(option: SleepTimerOption?) = player.setSleepTimer(option)
 
+    /** Karaoke: lead vocal removed from the song playing. */
+    val voiceRemoval: kotlinx.coroutines.flow.StateFlow<com.spotineil.core.player.VoiceRemoval> = player.voiceRemoval
+
+    val voiceModelDownloaded: Boolean get() = player.voiceModelDownloaded
+
+    fun setKaraokeOpen(open: Boolean) = player.setKaraokeOpen(open)
+
+    fun setVocalsRemoved(removed: Boolean) = player.setVocalsRemoved(removed)
+
     fun toggleLike() {
         val state = uiState.value
         val media = state.track?.media

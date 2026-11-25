@@ -21,6 +21,12 @@ class FakePlaybackController : PlaybackController {
     override val canPlayOnDemand = MutableStateFlow<Boolean?>(true)
     override val events = MutableSharedFlow<PlayerEvent>(extraBufferCapacity = 8)
     override val sleepTimer = MutableStateFlow(SleepTimerState())
+    override val voiceRemoval = MutableStateFlow<com.spotineil.core.player.VoiceRemoval>(com.spotineil.core.player.VoiceRemoval.Off)
+    override var voiceModelDownloaded = true
+    override fun setKaraokeOpen(open: Boolean) { if (!open) voiceRemoval.value = com.spotineil.core.player.VoiceRemoval.Off }
+    override fun setVocalsRemoved(removed: Boolean) {
+        voiceRemoval.value = if (removed) com.spotineil.core.player.VoiceRemoval.Removing else com.spotineil.core.player.VoiceRemoval.Off
+    }
 
     val commands = mutableListOf<String>()
     val playRequests = mutableListOf<PlayRequest>()

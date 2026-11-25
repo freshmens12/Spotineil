@@ -5,6 +5,11 @@ import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.SkipPrevious
 import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
+import androidx.compose.material.icons.rounded.Mic
+import androidx.compose.material.icons.rounded.MicOff
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -46,6 +51,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -58,6 +64,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.spotineil.core.designsystem.component.rememberDominantColor
+import com.spotineil.core.player.VoiceRemoval
 import com.spotineil.core.model.Lyrics
 import java.io.File
 
@@ -67,7 +74,7 @@ import java.io.File
  */
 @Composable
 fun KaraokeScreen(
-    lyrics: Lyrics,
+    lyrics: Lyrics?,
     positionMs: Long,
     durationMs: Long,
     title: String,
@@ -76,13 +83,58 @@ fun KaraokeScreen(
     isPlaying: Boolean,
     onTogglePlay: () -> Unit,
     onClose: () -> Unit,
+    voiceRemoval: VoiceRemoval = VoiceRemoval.Off,
+    voiceModelDownloaded: () -> Boolean = { true },
+    onKaraokeOpen: (Boolean) -> Unit = {},
+    lyricsLoading: Boolean = false,
+    onVocalsRemovedChange: (Boolean) -> Unit = {},
 ) {
     BackHandler(onBack = onClose)
+    // Open: the player reads ahead so the voice can be found in time. Closing (by hand, or when a
+    // song without lyrics starts) brings the vocals back.
+    val latestOpen by androidx.compose.runtime.rememberUpdatedState(onKaraokeOpen)
+    androidx.compose.runtime.DisposableEffect(Unit) {
+        latestOpen(true)
+        onDispose { latestOpen(false) }
+    }
+    var askDownload by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val failedText = stringResource(R.string.karaoke_vocals_failed)
+    androidx.compose.runtime.LaunchedEffect(voiceRemoval) {
+        if (voiceRemoval == VoiceRemoval.Failed) {
+            android.widget.Toast.makeText(context, failedText, android.widget.Toast.LENGTH_LONG).show()
+            onVocalsRemovedChange(false)
+        }
+    }
+    if (askDownload) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { askDownload = false },
+            title = { Text(stringResource(R.string.karaoke_download_title)) },
+            text = { Text(stringResource(R.string.karaoke_download_message)) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    askDownload = false
+                    onVocalsRemovedChange(true)
+                }) { Text(stringResource(R.string.karaoke_download_ok)) }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { askDownload = false }) { Text(stringResource(R.string.karaoke_download_cancel)) }
+            },
+        )
+    }
+    val onVocalsClick = {
+        when {
+            voiceRemoval != VoiceRemoval.Off && voiceRemoval != VoiceRemoval.Failed -> onVocalsRemovedChange(false)
+            voiceModelDownloaded() -> onVocalsRemovedChange(true)
+            else -> askDownload = true
+        }
+    }
     val dominant by rememberDominantColor(imageUrl, Color(0xFF3A2A6A))
     val top = lerp(dominant.copy(alpha = 1f), Color.Black, 0.25f)
     val bottom = lerp(dominant.copy(alpha = 1f), Color.Black, 0.8f)
-    val lines = lyrics.lines.filter { it.text.isNotBlank() }
-    val current = if (lyrics.isSynced) lines.indexOfLast { it.timeMs <= positionMs }.coerceAtLeast(0) else 0
+    val lines = lyrics?.lines.orEmpty().filter { it.text.isNotBlank() }
+    val current = if (lyrics?.isSynced == true) lines.indexOfLast { it.timeMs <= positionMs }.coerceAtLeast(0) else 0
+    val noLyricsText = stringResource(R.string.player_lyrics_unavailable)
 
     Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(top, bottom)))) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().padding(24.dp)) {
@@ -91,6 +143,7 @@ fun KaraokeScreen(
                     Text(title, color = Color.White, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, maxLines = 1)
                     Text(artist, color = Color.White.copy(alpha = 0.7f), style = MaterialTheme.typography.bodyMedium, maxLines = 1)
                 }
+                VocalsButton(voiceRemoval, onClick = onVocalsClick)
                 IconButton(onClick = onClose) { Icon(Icons.Rounded.Close, stringResource(R.string.player_collapse), tint = Color.White) }
             }
             Column(
@@ -98,6 +151,13 @@ fun KaraokeScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                if (lines.isEmpty()) {
+                    if (lyricsLoading) {
+                        androidx.compose.material3.CircularProgressIndicator(color = Color.White.copy(alpha = 0.6f), strokeWidth = 2.dp)
+                    } else {
+                        Text(noLyricsText, color = Color.White.copy(alpha = 0.6f), fontSize = 22.sp, textAlign = TextAlign.Center)
+                    }
+                }
                 lines.getOrNull(current - 1)?.let {
                     Text(it.text, color = Color.White.copy(alpha = 0.35f), fontSize = 22.sp, textAlign = TextAlign.Center, lineHeight = 28.sp)
                     Spacer(Modifier.height(24.dp))
@@ -133,6 +193,52 @@ fun KaraokeScreen(
                     )
                 }
             }
+        }
+    }
+}
+
+/**
+ * Mic icon next to Close. Crossed out on a white circle while the singer's voice is taken out; a
+ * ring shows the model download, or spins while the next part of the song is being prepared.
+ */
+@Composable
+private fun VocalsButton(state: VoiceRemoval, onClick: () -> Unit) {
+    val removed = state == VoiceRemoval.Removing
+    val busy = state is VoiceRemoval.Downloading || state == VoiceRemoval.Preparing
+    Box(contentAlignment = Alignment.Center) {
+        when (state) {
+            is VoiceRemoval.Downloading -> androidx.compose.material3.CircularProgressIndicator(
+                progress = { state.progress },
+                modifier = Modifier.size(44.dp),
+                color = Color.White,
+                trackColor = Color.White.copy(alpha = 0.2f),
+                strokeWidth = 2.5.dp,
+            )
+            VoiceRemoval.Preparing -> androidx.compose.material3.CircularProgressIndicator(
+                modifier = Modifier.size(44.dp),
+                color = Color.White,
+                strokeWidth = 2.5.dp,
+            )
+            else -> Unit
+        }
+        IconButton(
+            onClick = onClick,
+            colors = androidx.compose.material3.IconButtonDefaults.iconButtonColors(
+                containerColor = if (removed) Color.White else Color.Transparent,
+                contentColor = if (removed) Color.Black else Color.White,
+            ),
+        ) {
+            Icon(
+                if (removed || busy) Icons.Rounded.MicOff else Icons.Rounded.Mic,
+                contentDescription = stringResource(
+                    when {
+                        state is VoiceRemoval.Downloading -> R.string.karaoke_vocals_downloading
+                        state == VoiceRemoval.Preparing -> R.string.karaoke_vocals_preparing
+                        removed -> R.string.karaoke_vocals_off
+                        else -> R.string.karaoke_vocals_on
+                    },
+                ),
+            )
         }
     }
 }

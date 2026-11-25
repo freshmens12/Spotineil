@@ -44,4 +44,13 @@
     <string name="player_translate">Isalin ang lyrics</string>
     <string name="player_translate_same">Nasa wika mo na</string>
     <string name="player_translate_failed">Hindi maisalin</string>
+    <string name="karaoke_vocals_on">May boses</string>
+    <string name="karaoke_vocals_off">Walang boses</string>
+    <string name="karaoke_vocals_failed">Hindi maalis ang boses. Tingnan ang koneksyon mo at subukan ulit.</string>
+    <string name="karaoke_download_title">Alisin ang boses ng mang-aawit?</string>
+    <string name="karaoke_download_message">Gumagamit ang Spotineil ng AI model sa iyong telepono para alisin ang boses sa mga kanta. Isang beses lang itong ida-download (39 MB); pagkatapos, gagana ito kahit offline.</string>
+    <string name="karaoke_download_ok">I-download</string>
+    <string name="karaoke_download_cancel">Hindi muna</string>
+    <string name="karaoke_vocals_downloading">Dina-download ang pang-alis ng boses</string>
+    <string name="karaoke_vocals_preparing">Inihahanda ang musika</string>
 </resources>

@@ -44,4 +44,13 @@
     <string name="player_translate">Traducir letra</string>
     <string name="player_translate_same">Ya está en tu idioma</string>
     <string name="player_translate_failed">No se pudo traducir</string>
+    <string name="karaoke_vocals_on">Voz activada</string>
+    <string name="karaoke_vocals_off">Voz desactivada</string>
+    <string name="karaoke_vocals_failed">No se pudo quitar la voz. Revisa tu conexión e inténtalo de nuevo.</string>
+    <string name="karaoke_download_title">¿Quitar la voz del cantante?</string>
+    <string name="karaoke_download_message">Spotineil usa un modelo de IA en tu teléfono para quitar la voz de las canciones. Se descarga una sola vez (39 MB) y después funciona sin conexión.</string>
+    <string name="karaoke_download_ok">Descargar</string>
+    <string name="karaoke_download_cancel">Ahora no</string>
+    <string name="karaoke_vocals_downloading">Descargando el quitador de voz</string>
+    <string name="karaoke_vocals_preparing">Preparando la música</string>
 </resources>

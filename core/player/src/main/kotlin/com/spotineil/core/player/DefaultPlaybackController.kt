@@ -77,6 +77,42 @@ class DefaultPlaybackController @Inject constructor(
 
     private val _sleepTimer = MutableStateFlow(SleepTimerState())
     override val sleepTimer: StateFlow<SleepTimerState> = _sleepTimer.asStateFlow()
+
+    private val voiceModels = com.spotineil.core.player.local.VoiceModelStore(appContext)
+    private var voiceModelDownload: kotlinx.coroutines.Job? = null
+
+    init {
+        com.spotineil.core.player.local.KaraokeAudio.loadModel = { voiceModels.load() }
+    }
+
+    override val voiceRemoval: StateFlow<VoiceRemoval> = com.spotineil.core.player.local.KaraokeAudio.state
+
+    override val voiceModelDownloaded: Boolean get() = voiceModels.installed()
+
+    override fun setKaraokeOpen(open: Boolean) {
+        if (!open) voiceModelDownload?.cancel()
+        com.spotineil.core.player.local.KaraokeAudio.setArmed(open)
+    }
+
+    override fun setVocalsRemoved(removed: Boolean) {
+        val karaoke = com.spotineil.core.player.local.KaraokeAudio
+        voiceModelDownload?.cancel()
+        if (!removed || voiceModels.installed()) {
+            karaoke.setRemoveVoice(removed)
+            return
+        }
+        voiceModelDownload = scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            karaoke.setState(VoiceRemoval.Downloading(0f))
+            val ok = runCatching {
+                kotlinx.coroutines.runInterruptible {
+                    voiceModels.download { p -> karaoke.setState(VoiceRemoval.Downloading(p)) }
+                }
+            }.isSuccess
+            if (!isActive) return@launch
+            if (ok && karaoke.armed) karaoke.setRemoveVoice(true)
+            else karaoke.setState(if (ok) VoiceRemoval.Off else VoiceRemoval.Failed)
+        }
+    }
     private var sleepJob: Job? = null
 
     init {

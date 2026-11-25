@@ -90,7 +90,7 @@ class LocalPlaybackService : MediaLibraryService() {
 
     override fun onCreate() {
         super.onCreate()
-        val player = ExoPlayer.Builder(this)
+        val player = ExoPlayer.Builder(this, karaokeRenderers())
             .setMediaSourceFactory(DefaultMediaSourceFactory(RoutingDataSourceFactory(DefaultDataSource.Factory(this), youTubeStreamFactory)))
             .setAudioAttributes(
                 AudioAttributes.Builder()
@@ -141,6 +141,27 @@ class LocalPlaybackService : MediaLibraryService() {
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) = watchLike(mediaItem)
         })
         watchLike(player.currentMediaItem)
+    }
+
+    /**
+     * Renderers whose audio goes through the karaoke vocal remover (only the main player: the
+     * crossfade tail player just plays the end of the previous song).
+     */
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    private fun karaokeRenderers() = object : androidx.media3.exoplayer.DefaultRenderersFactory(this) {
+        override fun buildAudioSink(
+            context: android.content.Context,
+            enableFloatOutput: Boolean,
+            enableAudioTrackPlaybackParams: Boolean,
+        ): androidx.media3.exoplayer.audio.AudioSink {
+            val karaoke = KaraokeAudioProcessor()
+            val sink = androidx.media3.exoplayer.audio.DefaultAudioSink.Builder(context)
+                .setEnableFloatOutput(enableFloatOutput)
+                .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
+                .setAudioProcessors(arrayOf(karaoke))
+                .build()
+            return sink
+        }
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? = session

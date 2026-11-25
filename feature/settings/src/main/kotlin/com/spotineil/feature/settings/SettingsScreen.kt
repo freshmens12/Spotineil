@@ -465,6 +465,8 @@ private val libraryCredits = listOf(
     Credit("AppAuth for Android", "Sign-in with Spotify (optional)", "Apache License 2.0"),
     Credit("Spotify Android SDK (App Remote)", "Controlling the Spotify app (optional)", "Spotify Developer Terms"),
     Credit("Reorderable (sh.calvin.reorderable)", "Drag to reorder the queue", "Apache License 2.0"),
+    Credit("ONNX Runtime", "Runs the karaoke voice model on the phone", "MIT License"),
+    Credit("Spleeter by Deezer (ONNX conversion by sherpa-onnx)", "The AI model that finds the voice in a song for karaoke \"vocals off\"", "MIT License (model), Apache License 2.0 (conversion)"),
     Credit("Manrope typeface", "The app's font", "SIL Open Font License 1.1"),
 )
 

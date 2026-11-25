@@ -44,4 +44,13 @@
     <string name="player_translate">Translate lyrics</string>
     <string name="player_translate_same">Already in your language</string>
     <string name="player_translate_failed">Couldn\'t translate</string>
+    <string name="karaoke_vocals_on">Vocals on</string>
+    <string name="karaoke_vocals_off">Vocals off</string>
+    <string name="karaoke_vocals_failed">Couldn’t turn the vocals off. Check your connection and try again.</string>
+    <string name="karaoke_download_title">Remove the singer’s voice?</string>
+    <string name="karaoke_download_message">Spotineil uses an AI model on your phone to take the voice out of songs. It’s a one-time 39 MB download; after that it works offline.</string>
+    <string name="karaoke_download_ok">Download</string>
+    <string name="karaoke_download_cancel">Not now</string>
+    <string name="karaoke_vocals_downloading">Downloading the voice remover</string>
+    <string name="karaoke_vocals_preparing">Getting the music ready</string>
 </resources>
