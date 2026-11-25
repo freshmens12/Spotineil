@@ -118,7 +118,15 @@ sealed interface LocalFilesUiState {
 class LocalFilesViewModel @Inject constructor(
     private val localMedia: LocalMediaRepository,
     private val player: PlaybackController,
+    private val downloader: com.spotineil.core.player.youtube.YouTubeDownloader,
 ) : ViewModel() {
+    /** YouTube songs being downloaded (or saved / failed), for the Downloads page. */
+    val downloads: StateFlow<List<com.spotineil.core.model.DownloadTask>> = downloader.tasks
+    fun pauseDownload(id: String) = downloader.pause(id)
+    fun resumeDownload(id: String) = downloader.resume(id)
+    fun removeDownload(id: String) = downloader.remove(id)
+    fun clearFinishedDownloads() = downloader.clearFinished()
+
     private val _state = MutableStateFlow<LocalFilesUiState>(LocalFilesUiState.NeedsPermission)
     val state: StateFlow<LocalFilesUiState> = _state.asStateFlow()
 

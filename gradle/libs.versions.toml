@@ -49,6 +49,7 @@ turbine = "1.2.0"
 mockk = "1.13.13"
 robolectric = "4.14.1"
 onnxruntime = "1.23.2"
+jump3r = "1.0.5"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
@@ -129,6 +130,7 @@ robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectr
 # On-device AI (karaoke vocal removal). The desktop build only runs the unit tests on a PC.
 onnxruntime-android = { module = "com.microsoft.onnxruntime:onnxruntime-android", version.ref = "onnxruntime" }
 onnxruntime-jvm = { module = "com.microsoft.onnxruntime:onnxruntime", version.ref = "onnxruntime" }
+jump3r = { module = "de.sciss:jump3r", version.ref = "jump3r" }
 
 # Build-logic only
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }

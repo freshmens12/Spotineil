@@ -83,4 +83,14 @@
     <string name="eq_treble">Treble</string>
     <string name="eq_custom">Custom</string>
     <string name="eq_note">Ginagamit ang sariling audio effects ng telepono; may teleponong mas kaunti ang band.</string>
+    <string name="settings_downloads">Mga download</string>
+    <string name="settings_download_format">I-save ang mga kanta bilang</string>
+    <string name="settings_download_format_auto">Awtomatiko</string>
+    <string name="settings_download_format_auto_desc">Kung paano ito ipinadala ng YouTube (.opus o .m4a): pinakamagandang kalidad at pinakamabilis, walang conversion</string>
+    <string name="settings_download_format_mp3">MP3</string>
+    <string name="settings_download_format_mp3_desc">192 kbps. Gumagana kahit saan, pati sa kotse at lumang player. Medyo mas matagal (kino-convert)</string>
+    <string name="settings_download_format_m4a">M4A (AAC)</string>
+    <string name="settings_download_format_m4a_desc">256 kbps. Gumagana kahit saan, mas maliit kaysa MP3 sa parehong kalidad</string>
+    <string name="settings_download_parallel">Sabay-sabay na download</string>
+    <string name="settings_download_parallel_desc">Maghihintay ng turno ang iba</string>
 </resources>

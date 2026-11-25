@@ -25,4 +25,9 @@
     <string name="ui_save">Save</string>
     <string name="ui_cancel">Cancel</string>
     <plurals name="ui_song_count"><item quantity="one">%1$d song</item><item quantity="other">%1$d songs</item></plurals>
+    <string name="lyrics_download">Download lyrics</string>
+    <string name="lyrics_saved">Saved to Downloads/Spotineil: %1$s</string>
+    <string name="lyrics_save_failed">Couldn’t save the lyrics</string>
+    <string name="ui_download">Download</string>
+    <string name="ui_more_options">More options</string>
 </resources>

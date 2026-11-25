@@ -67,9 +67,30 @@ data class UserSettings(
     val libraryGrid: Boolean = false,
     val transition: TransitionMode = TransitionMode.Off,
     val audio: AudioSettings = AudioSettings(),
+    val downloads: DownloadSettings = DownloadSettings(),
     /**
      * The free, no-account app is in use. False only on the very first launch, when the Welcome
      * screen is shown; its "Get started" button turns this on.
      */
     val guestMode: Boolean = false,
 )
+
+/** The file type songs are saved as. */
+enum class DownloadFormat {
+    /** As YouTube sends it (.opus or .m4a): best quality, no conversion, fastest. */
+    Automatic,
+    /** MP3 (192 kbps): plays everywhere, including old players and cars. */
+    Mp3,
+    /** M4A (AAC, 256 kbps): plays everywhere, smaller than MP3 for the same quality. */
+    M4a,
+}
+
+data class DownloadSettings(
+    val format: DownloadFormat = DownloadFormat.Automatic,
+    /** Songs downloaded at the same time (1..[MAX_PARALLEL]); the rest wait in line. */
+    val maxParallel: Int = 3,
+) {
+    companion object {
+        const val MAX_PARALLEL = 10
+    }
+}

@@ -32,6 +32,7 @@ interface SettingsRepository {
     suspend fun setGuestMode(enabled: Boolean)
     suspend fun setTransition(mode: TransitionMode)
     suspend fun setAudio(audio: com.spotineil.core.model.AudioSettings)
+    suspend fun setDownloads(downloads: com.spotineil.core.model.DownloadSettings)
 }
 
 @Singleton
@@ -60,6 +61,10 @@ class DataStoreSettingsRepository @Inject constructor(
                 skipSilence = p[SKIP_SILENCE] ?: false,
                 podcastSpeed = p[PODCAST_SPEED]?.toFloatOrNull() ?: 1f,
             ),
+            downloads = com.spotineil.core.model.DownloadSettings(
+                format = p[DL_FORMAT].toEnum(defaults.downloads.format),
+                maxParallel = (p[DL_PARALLEL] ?: defaults.downloads.maxParallel).coerceIn(1, com.spotineil.core.model.DownloadSettings.MAX_PARALLEL),
+            ),
         )
     }
 
@@ -73,6 +78,13 @@ class DataStoreSettingsRepository @Inject constructor(
             it[LEVELING] = audio.volumeLeveling
             it[SKIP_SILENCE] = audio.skipSilence
             it[PODCAST_SPEED] = audio.podcastSpeed.toString()
+        }
+    }
+
+    override suspend fun setDownloads(downloads: com.spotineil.core.model.DownloadSettings) {
+        store.edit {
+            it[DL_FORMAT] = downloads.format.name
+            it[DL_PARALLEL] = downloads.maxParallel.coerceIn(1, com.spotineil.core.model.DownloadSettings.MAX_PARALLEL)
         }
     }
 
@@ -101,5 +113,7 @@ class DataStoreSettingsRepository @Inject constructor(
         val LEVELING = booleanPreferencesKey("volume_leveling")
         val SKIP_SILENCE = booleanPreferencesKey("skip_silence")
         val PODCAST_SPEED = stringPreferencesKey("podcast_speed")
+        val DL_FORMAT = stringPreferencesKey("download_format")
+        val DL_PARALLEL = androidx.datastore.preferences.core.intPreferencesKey("download_parallel")
     }
 }

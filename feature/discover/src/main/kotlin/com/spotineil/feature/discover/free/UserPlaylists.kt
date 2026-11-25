@@ -169,6 +169,7 @@ fun UserPlaylistScreen(nav: FreeNavigation, viewModel: UserPlaylistViewModel = h
                                         maxLines = 1,
                                     )
                                 }
+                                com.spotineil.core.ui.SongMenuButton { songMenu = m }
                                 IconButton(onClick = {}, modifier = Modifier.draggableHandle()) {
                                     Icon(Icons.Rounded.DragHandle, stringResource(R.string.playlist_drag))
                                 }

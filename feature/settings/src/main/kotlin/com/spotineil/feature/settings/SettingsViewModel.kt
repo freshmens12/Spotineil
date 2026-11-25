@@ -75,6 +75,7 @@ class SettingsViewModel @Inject constructor(
     fun setLanguage(language: AppLanguage) = viewModelScope.launch { settings.setLanguage(language) }
     fun setTransition(mode: TransitionMode) = viewModelScope.launch { settings.setTransition(mode) }
     fun setAudio(audio: com.spotineil.core.model.AudioSettings) = viewModelScope.launch { settings.setAudio(audio) }
+    fun setDownloads(downloads: com.spotineil.core.model.DownloadSettings) = viewModelScope.launch { settings.setDownloads(downloads) }
 
     @OptIn(ExperimentalCoilApi::class)
     fun clearCache() = viewModelScope.launch {

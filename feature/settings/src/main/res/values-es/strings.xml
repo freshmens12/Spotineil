@@ -83,4 +83,14 @@
     <string name="eq_treble">Agudos</string>
     <string name="eq_custom">Personalizado</string>
     <string name="eq_note">Usa los efectos de audio de tu teléfono; algunos admiten menos bandas.</string>
+    <string name="settings_downloads">Descargas</string>
+    <string name="settings_download_format">Guardar canciones como</string>
+    <string name="settings_download_format_auto">Automático</string>
+    <string name="settings_download_format_auto_desc">Tal como lo envía YouTube (.opus o .m4a): mejor calidad y más rápido, sin conversión</string>
+    <string name="settings_download_format_mp3">MP3</string>
+    <string name="settings_download_format_mp3_desc">192 kbps. Se reproduce en todas partes, también en autos y reproductores antiguos. Tarda un poco más (se convierte)</string>
+    <string name="settings_download_format_m4a">M4A (AAC)</string>
+    <string name="settings_download_format_m4a_desc">256 kbps. Se reproduce en todas partes, más pequeño que MP3 con la misma calidad</string>
+    <string name="settings_download_parallel">Descargas a la vez</string>
+    <string name="settings_download_parallel_desc">Las demás esperan su turno</string>
 </resources>

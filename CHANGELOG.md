@@ -4,6 +4,18 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.17.0] - 2026-11-25
+
+### Added
+- **Download songs from YouTube**: a download button on the YouTube song page, and “Download” in every song’s ⋮ menu, saves it to Music/Spotineil, where it plays without internet in Spotineil (Library → Downloads) and in any music player. Songs are saved as they are streamed, without re-encoding, as .opus or .m4a files with the song and artist written in. A notification shows the progress. Downloading from YouTube is against YouTube’s terms, so keep it to your own personal listening.
+- **Downloads list with progress**: Library → Downloads shows every download with its percentage, then “Saved” or “Couldn’t download”, with pause, resume, retry and cancel buttons. Several songs download at once (Settings → Downloads → Downloads at the same time, 1 to 10, 3 by default; the others wait their turn). If the internet drops, a download waits and continues from where it stopped when you’re back online; it also continues after the app is closed and opened again.
+- **Choose the download format** (Settings → Downloads → Save songs as): Automatic (the default: as YouTube sends it, best quality, no conversion), MP3 (192 kbps, plays everywhere) or M4A (AAC 256 kbps). MP3 and M4A are converted on the phone, which takes a little longer. MP3 encoding uses jump3r, a Java version of the LAME encoder (LGPL).
+- **⋮ menu on every song**: search results, History, Liked Songs, your playlists, artist and album pages now have a ⋮ button with Play next, Add to queue, Add to playlist, Download, Like and Go to artist, so you don’t need to open a song first (long-press still works too).
+- **Download lyrics**: the new download button on the lyrics (in the player and on the YouTube song page) saves them to Downloads/Spotineil. Synced lyrics are saved as an .lrc file, which music players such as Poweramp, Musicolet and Samsung Music show in time with the song (and any text app can open); plain lyrics are saved as a .txt file. Files are named "Artist - Title".
+
+### Changed
+- **Vocals off no longer stops the music.** When you turn vocals off, the song keeps playing with the voice for a few seconds while the AI works ahead in the background, then the voice fades out by itself. The same happens after you skip within a song. Opening Karaoke mode now quietly gets the next part of the song ready, so the voice goes away sooner.
+
 ## [1.16.0] - 2026-11-25
 
 ### Added

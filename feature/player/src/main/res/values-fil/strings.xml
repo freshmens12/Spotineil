@@ -52,5 +52,5 @@
     <string name="karaoke_download_ok">I-download</string>
     <string name="karaoke_download_cancel">Hindi muna</string>
     <string name="karaoke_vocals_downloading">Dina-download ang pang-alis ng boses</string>
-    <string name="karaoke_vocals_preparing">Inihahanda ang musika</string>
+    <string name="karaoke_vocals_preparing">Inaalis ang boses…</string>
 </resources>

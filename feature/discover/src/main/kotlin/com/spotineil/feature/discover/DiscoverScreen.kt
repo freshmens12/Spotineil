@@ -202,6 +202,7 @@ fun StreamTrackRow(track: StreamTrack, isCurrent: Boolean, onClick: () -> Unit, 
                 Icon(Icons.Rounded.Download, stringResource(R.string.discover_download))
             }
         }
+        com.spotineil.core.ui.SongMenuButton(longClick)
     }
 }
 

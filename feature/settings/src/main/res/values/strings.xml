@@ -83,4 +83,14 @@
     <string name="eq_treble">Treble</string>
     <string name="eq_custom">Custom</string>
     <string name="eq_note">Uses your phone\'s own audio effects; some phones support fewer bands.</string>
+    <string name="settings_downloads">Downloads</string>
+    <string name="settings_download_format">Save songs as</string>
+    <string name="settings_download_format_auto">Automatic</string>
+    <string name="settings_download_format_auto_desc">As YouTube sends it (.opus or .m4a): best quality and fastest, no conversion</string>
+    <string name="settings_download_format_mp3">MP3</string>
+    <string name="settings_download_format_mp3_desc">192 kbps. Plays everywhere, also in cars and old players. Takes a little longer (it is converted)</string>
+    <string name="settings_download_format_m4a">M4A (AAC)</string>
+    <string name="settings_download_format_m4a_desc">256 kbps. Plays everywhere, smaller than MP3 for the same quality</string>
+    <string name="settings_download_parallel">Downloads at the same time</string>
+    <string name="settings_download_parallel_desc">The others wait their turn</string>
 </resources>

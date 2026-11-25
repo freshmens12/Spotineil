@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -222,6 +223,38 @@ fun SettingsRoute(
                 )
             }
 
+            item { Header(stringResource(R.string.settings_downloads)) }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_download_format)) },
+                    supportingContent = { Text(stringResource(settings.downloads.format.description())) },
+                    trailingContent = { Text(stringResource(settings.downloads.format.label()), color = MaterialTheme.colorScheme.primary) },
+                    modifier = Modifier.clickable { dialog = "dlformat" },
+                )
+            }
+            item {
+                var parallel by androidx.compose.runtime.remember(settings.downloads.maxParallel) {
+                    androidx.compose.runtime.mutableFloatStateOf(settings.downloads.maxParallel.toFloat())
+                }
+                Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text(stringResource(R.string.settings_download_parallel), style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(R.string.settings_download_parallel_desc), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        Text(parallel.toInt().toString(), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                    }
+                    androidx.compose.material3.Slider(
+                        value = parallel,
+                        onValueChange = { parallel = kotlin.math.round(it) },
+                        onValueChangeFinished = { viewModel.setDownloads(settings.downloads.copy(maxParallel = parallel.toInt())) },
+                        valueRange = 1f..com.spotineil.core.model.DownloadSettings.MAX_PARALLEL.toFloat(),
+                        steps = com.spotineil.core.model.DownloadSettings.MAX_PARALLEL - 2,
+                        modifier = Modifier.testTag("download_parallel"),
+                    )
+                }
+            }
+
             item { Header(stringResource(R.string.settings_data)) }
             item {
                 ListItem(
@@ -352,6 +385,15 @@ fun SettingsRoute(
             onSelect = { viewModel.setAudio(settings.audio.copy(podcastSpeed = it)); dialog = null },
             onDismiss = { dialog = null },
         )
+        "dlformat" -> ChoiceDialog(
+            title = stringResource(R.string.settings_download_format),
+            options = com.spotineil.core.model.DownloadFormat.entries.toList(),
+            selected = settings.downloads.format,
+            label = { stringResource(it.label()) },
+            hint = { stringResource(it.description()) },
+            onSelect = { viewModel.setDownloads(settings.downloads.copy(format = it)); dialog = null },
+            onDismiss = { dialog = null },
+        )
         "transition" -> ChoiceDialog(
             title = stringResource(R.string.settings_transition),
             options = TransitionMode.entries.toList(),
@@ -384,6 +426,18 @@ private fun AppLanguage.label() = when (this) {
     AppLanguage.English -> R.string.settings_language_en
     AppLanguage.Spanish -> R.string.settings_language_es
     AppLanguage.Tagalog -> R.string.settings_language_fil
+}
+
+private fun com.spotineil.core.model.DownloadFormat.label() = when (this) {
+    com.spotineil.core.model.DownloadFormat.Automatic -> R.string.settings_download_format_auto
+    com.spotineil.core.model.DownloadFormat.Mp3 -> R.string.settings_download_format_mp3
+    com.spotineil.core.model.DownloadFormat.M4a -> R.string.settings_download_format_m4a
+}
+
+private fun com.spotineil.core.model.DownloadFormat.description() = when (this) {
+    com.spotineil.core.model.DownloadFormat.Automatic -> R.string.settings_download_format_auto_desc
+    com.spotineil.core.model.DownloadFormat.Mp3 -> R.string.settings_download_format_mp3_desc
+    com.spotineil.core.model.DownloadFormat.M4a -> R.string.settings_download_format_m4a_desc
 }
 
 private fun TransitionMode.label() = when (this) {
@@ -467,6 +521,7 @@ private val libraryCredits = listOf(
     Credit("Reorderable (sh.calvin.reorderable)", "Drag to reorder the queue", "Apache License 2.0"),
     Credit("ONNX Runtime", "Runs the karaoke voice model on the phone", "MIT License"),
     Credit("Spleeter by Deezer (ONNX conversion by sherpa-onnx)", "The AI model that finds the voice in a song for karaoke \"vocals off\"", "MIT License (model), Apache License 2.0 (conversion)"),
+    Credit("jump3r (LAME MP3 encoder for Java)", "Saving downloads as MP3", "GNU LGPL 2.1 or later"),
     Credit("Manrope typeface", "The app's font", "SIL Open Font License 1.1"),
 )
 

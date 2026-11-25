@@ -6,4 +6,10 @@
     <string name="player_auto_playlists">Mga playlist mo</string>
     <string name="player_auto_recent">Kamakailang pinatugtog</string>
     <string name="player_auto_local">Sa device na ito</string>
+    <string name="yt_download_started">Dina-download ang “%1$s”…</string>
+    <string name="yt_download_done">Na-save sa Music/Spotineil: %1$s</string>
+    <string name="yt_download_channel">Mga download</string>
+    <string name="yt_download_already">Nasa downloads mo na ang “%1$s”</string>
+    <plurals name="yt_download_done_many"><item quantity="one">Na-save ang %1$d kanta sa Music/Spotineil</item><item quantity="other">Na-save ang %1$d kanta sa Music/Spotineil</item></plurals>
+    <plurals name="yt_downloading_many"><item quantity="one">Dina-download ang %1$d kanta</item><item quantity="other">Dina-download ang %1$d kanta</item></plurals>
 </resources>

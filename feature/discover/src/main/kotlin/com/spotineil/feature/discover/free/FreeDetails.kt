@@ -623,5 +623,6 @@ private fun LikedRow(media: PlayableMedia, isCurrent: Boolean, onClick: () -> Un
         IconButton(onClick = onUnlike) {
             Icon(Icons.Rounded.Favorite, stringResource(R.string.free_liked_songs), tint = MaterialTheme.colorScheme.primary)
         }
+        com.spotineil.core.ui.SongMenuButton(longClick)
     }
 }

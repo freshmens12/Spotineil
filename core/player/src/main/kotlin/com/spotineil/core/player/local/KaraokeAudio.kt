@@ -84,18 +84,16 @@ internal object KaraokeAudio {
  * Media3 audio processor around [StreamingVocalRemover]: PCM in, PCM out (same format), with the
  * singing voice taken out while karaoke "vocals off" is on.
  *
- * The voice is separated in ~12 s blocks, so the processor needs to hold audio well ahead of what is
- * heard. Media3's sink only gives a processor more input after its last output went to the
- * speaker, so the lookahead is built once: when vocals go off (and after a seek while they're off)
- * the processor holds the sound back for a moment, like buffering, while the decoder fills
- * [LOOKAHEAD_S] of audio. From then on input and output move in step, so that lookahead stays put
- * for the rest of the listening (songs that follow each other included). With vocals on nothing is
- * held back.
+ * The voice is separated in ~12 s blocks, so while karaoke mode is open the processor keeps
+ * [LOOKAHEAD_S] of audio ahead of what is heard. Media3's sink only gives a processor more input
+ * after its last output went to the speaker, and the speaker takes sound in real time, so the
+ * lookahead is built without ever stopping the music: while it is short, only one frame is handed
+ * on for every [RAMP] taken in (the speaker's buffer stays full, so nothing is heard), and once it
+ * is there input and output move in step. Turning vocals off then never pauses: the original plays
+ * until the voice is found, then the voice fades out. Outside karaoke mode nothing is held back.
  */
 @OptIn(UnstableApi::class)
-internal class KaraokeAudioProcessor(
-    private val nanoTime: () -> Long = System::nanoTime,
-) : AudioProcessor {
+internal class KaraokeAudioProcessor : AudioProcessor {
     private val remover = StreamingVocalRemover(
         loadModel = { KaraokeAudio.loadModel() },
         lookaheadSeconds = LOOKAHEAD_S + 5.0,
@@ -109,11 +107,8 @@ internal class KaraokeAudioProcessor(
     private var samples = FloatArray(0)
     private var registered = false
 
-    /** The lookahead has been built since the last flush. */
-    private var filled = false
-    private var fillStartNs = 0L
-    /** While vocals are off: frames that may be handed on (as many as came in, so the lookahead stays). */
-    private var owed = 0L
+    /** While karaoke mode is open: frames that may be handed on now (see the class comment). */
+    private var owed = 0.0
 
     override fun configure(inputAudioFormat: AudioFormat): AudioFormat {
         val supported = inputAudioFormat.channelCount in 1..2 &&
@@ -128,6 +123,7 @@ internal class KaraokeAudioProcessor(
         if (!inputBuffer.hasRemaining() || format == AudioFormat.NOT_SET) return
         val frames = minOf(inputBuffer.remaining() / format.bytesPerFrame, remover.writable())
         if (frames <= 0) return
+        val building = remover.readable() < LOOKAHEAD_S * format.sampleRate
         val n = frames * format.channelCount
         if (samples.size < n) samples = FloatArray(n)
         if (format.encoding == C.ENCODING_PCM_FLOAT) {
@@ -136,7 +132,7 @@ internal class KaraokeAudioProcessor(
             for (i in 0 until n) samples[i] = inputBuffer.getShort() / 32768f
         }
         remover.write(samples, frames)
-        owed += frames
+        owed += if (building) frames.toDouble() / RAMP else frames.toDouble()
     }
 
     override fun queueEndOfStream() {
@@ -148,33 +144,16 @@ internal class KaraokeAudioProcessor(
         if (outputBuffer.hasRemaining() || format == AudioFormat.NOT_SET) return outputBuffer
         val readable = remover.readable()
         if (readable == 0) return AudioProcessor.EMPTY_BUFFER
-        val vocalsOff = remover.removeVoice && remover.armed && !inputEnded
-        val maxFrames = if (!vocalsOff) {
-            filled = false
-            fillStartNs = 0L
-        owed = 0L
-            minOf(readable, CHUNK_FRAMES)
-        } else {
-            if (!filled) {
-                // Building the lookahead: hold the sound back (a short pause) while the decoder runs
-                // ahead, and until the voice is found in what plays next, so the music comes back
-                // without it.
-                if (fillStartNs == 0L) fillStartNs = nanoTime()
-                val filling = readable < LOOKAHEAD_S * format.sampleRate && remover.writable() > 0
-                val waitingForVoice = !remover.voiceReadyOrUnavailable() && nanoTime() - fillStartNs < MAX_HOLD_NS
-                if (filling || waitingForVoice) return AudioProcessor.EMPTY_BUFFER
-                filled = true
-                owed = (RESTART_S * format.sampleRate).toLong() // restart the speaker after the pause
-            }
-            // From now on: hand on as much as comes in, so the lookahead stays where it is.
-            minOf(readable.toLong(), owed, CHUNK_FRAMES.toLong()).toInt()
-        }
+        // Outside karaoke mode, at the end of the stream, or with no room for more input: as usual.
+        val paced = remover.armed && !inputEnded && remover.writable() > 0
+        val maxFrames = if (paced) minOf(readable.toDouble(), owed, CHUNK_FRAMES.toDouble()).toInt() else minOf(readable, CHUNK_FRAMES)
+        if (!paced) owed = 0.0
         if (maxFrames <= 0) return AudioProcessor.EMPTY_BUFFER
 
         val channels = format.channelCount
         if (samples.size < maxFrames * channels) samples = FloatArray(maxFrames * channels)
         val frames = remover.read(samples, maxFrames)
-        owed = (owed - frames).coerceAtLeast(0L)
+        if (paced) owed -= frames
         val bytes = frames * format.bytesPerFrame
         if (buffer.capacity() < bytes) buffer = ByteBuffer.allocateDirect(bytes).order(ByteOrder.nativeOrder())
         buffer.clear()
@@ -194,11 +173,13 @@ internal class KaraokeAudioProcessor(
     /** Frames taken in but not yet handed on (the lookahead). For tests. */
     internal fun bufferedFrames(): Int = remover.readable()
 
+    /** The voice is being removed from what plays next. For tests. */
+    internal fun removingNow(): Boolean = remover.removeVoice && remover.voiceReadyOrUnavailable()
+
     override fun flush() {
         outputBuffer = AudioProcessor.EMPTY_BUFFER
         inputEnded = false
-        filled = false
-        fillStartNs = 0L
+        owed = 0.0
         if (pendingFormat != format) {
             format = pendingFormat
             if (format != AudioFormat.NOT_SET) remover.configure(format.sampleRate, format.channelCount)
@@ -223,14 +204,13 @@ internal class KaraokeAudioProcessor(
 
     private companion object {
         const val CHUNK_FRAMES = 4096
-        /** Audio held ahead of what's heard while vocals are off: one ~12 s block plus time to separate it. */
+        /** Audio kept ahead of what's heard in karaoke mode: one ~12 s block plus time to separate it. */
         const val LOOKAHEAD_S = 18
-        /** Never hold the sound back longer than this (a very slow phone just keeps the voice at first). */
-        const val MAX_HOLD_NS = 10_000_000_000L
-        /** Sound handed on at once when playback resumes after the pause (refills the speaker). */
-        const val RESTART_S = 0.5
+        /** While building the lookahead, frames taken in per frame handed on (it grows 3 s per second). */
+        const val RAMP = 4.0
     }
 }
+
 
 /**
  * The voice model files (Spleeter 2-stems, fp16 ONNX, ~39 MB), downloaded once to the app's private

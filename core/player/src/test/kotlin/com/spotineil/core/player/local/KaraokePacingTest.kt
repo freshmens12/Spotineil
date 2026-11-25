@@ -14,13 +14,13 @@ import org.junit.Test
 /**
  * Runs the karaoke processor inside Media3's real processing pipeline, fed the way DefaultAudioSink
  * feeds it (input only after the last output fit into the AudioTrack), with a 250 ms AudioTrack that
- * plays in real time. Checks when the sound may pause and that it never drops out otherwise.
+ * plays in real time. Checks that the read-ahead karaoke needs builds up without the sound ever
+ * stopping, whatever the vocals switch does.
  */
 class KaraokePacingTest {
 
     private val rate = 48_000
-    private var now = 0L
-    private val processor = KaraokeAudioProcessor { now }
+    private val processor = KaraokeAudioProcessor()
     private val pipeline = AudioProcessingPipeline(ImmutableList.of(processor))
 
     // simulated DefaultAudioSink + AudioTrack
@@ -84,7 +84,6 @@ class KaraokePacingTest {
         var underruns = 0
         var pending: ByteBuffer? = null
         repeat(seconds * 100) { tick ->
-            now += 10_000_000L
             val drained = minOf(trackFill, rate / 100)
             if (drained < rate / 100 && tick > 50) underruns++
             trackFill -= drained
@@ -112,36 +111,54 @@ class KaraokePacingTest {
     }
 
     @Test
-    fun withVocalsOnNothingIsHeldBack() {
+    fun openingKaraokeReadsAheadWithoutStoppingTheMusic() {
         start()
         KaraokeAudio.setArmed(true) // karaoke mode open, vocals on
-        assertEquals(0, play(seconds = 6))
-        assertTrue("buffered ${processor.bufferedFrames()}", processor.bufferedFrames() < rate / 2)
+        assertEquals(0, play(seconds = 10))
+        val ahead = processor.bufferedFrames().toDouble() / rate
+        assertTrue("lookahead only $ahead s", ahead >= 17.5)
+        assertEquals("dropouts once it is built", 0, play(seconds = 10))
+        assertTrue(processor.bufferedFrames().toDouble() / rate >= 17.5)
     }
 
     @Test
-    fun vocalsOffPausesBrieflyOnceThenNeverDropsOut() {
+    fun turningVocalsOffNeverStopsTheMusic() {
         start()
         KaraokeAudio.setArmed(true)
         assertEquals(0, play(seconds = 3))
-        KaraokeAudio.setRemoveVoice(true) // no model in tests: the voice is "unavailable" at once
-        play(seconds = 2) // the short pause while ~18 s are read ahead
-        assertEquals("dropouts after the pause", 0, play(seconds = 15))
-        val ahead = processor.bufferedFrames().toDouble() / rate
-        assertTrue("lookahead only $ahead s", ahead >= 17)
+        KaraokeAudio.setRemoveVoice(true) // no model in tests: the original just keeps playing
+        assertEquals(0, play(seconds = 15))
+        assertTrue(processor.bufferedFrames().toDouble() / rate >= 17.5)
     }
 
     @Test
-    fun afterASeekWithVocalsOffItPausesOnceAgainThenPlaysOn() {
+    fun aSeekWithVocalsOffNeverStopsTheMusic() {
         start()
         KaraokeAudio.setArmed(true)
         KaraokeAudio.setRemoveVoice(true)
-        play(seconds = 2)
         assertEquals(0, play(seconds = 5))
         seek()
-        play(seconds = 2)
-        assertEquals("dropouts after the seek", 0, play(seconds = 8))
+        assertEquals(0, play(seconds = 10))
         assertTrue(processor.bufferedFrames() > rate * 15)
+    }
+
+    @Test
+    fun aDecoderOnlySixTimesFasterThanPlaybackStillKeepsUp() {
+        start()
+        KaraokeAudio.setArmed(true)
+        KaraokeAudio.setRemoveVoice(true)
+        assertEquals(0, play(seconds = 20, decoderBuffersPerTick = 3))
+        assertTrue(processor.bufferedFrames().toDouble() / rate >= 17.5)
+    }
+
+    @Test
+    fun closingKaraokePlaysTheReadAheadOutSmoothly() {
+        start()
+        KaraokeAudio.setArmed(true)
+        play(seconds = 10)
+        KaraokeAudio.setArmed(false)
+        assertEquals(0, play(seconds = 25))
+        assertTrue(processor.bufferedFrames() <= 4096)
     }
 
     @Test

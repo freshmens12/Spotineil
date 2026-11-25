@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.rounded.Translate
+import androidx.compose.material.icons.rounded.Download
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.animateScrollBy
@@ -58,6 +59,8 @@ fun LyricsPanel(
     translation: TranslationState = TranslationState.Off,
     /** Turns the translation under each line on or off. */
     onTranslate: (() -> Unit)? = null,
+    /** Saves the lyrics as a file. */
+    onDownload: ((com.spotineil.core.model.Lyrics) -> Unit)? = null,
 ) {
     Box(modifier.fillMaxSize().testTag("lyrics_panel"), contentAlignment = Alignment.Center) {
         when (state) {
@@ -89,6 +92,11 @@ fun LyricsPanel(
                                     stringResource(R.string.player_translate),
                                     tint = if (translation != TranslationState.Off) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                 )
+                            }
+                        }
+                        if (onDownload != null) {
+                            androidx.compose.material3.IconButton(onClick = { onDownload(lyrics) }) {
+                                androidx.compose.material3.Icon(Icons.Rounded.Download, stringResource(com.spotineil.core.ui.R.string.lyrics_download))
                             }
                         }
                         if (onKaraoke != null) {

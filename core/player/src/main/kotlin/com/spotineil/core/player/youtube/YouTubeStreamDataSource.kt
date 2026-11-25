@@ -25,10 +25,17 @@ class YouTubeStreamDataSourceFactory @Inject constructor(
     private val catalog: InnerTubeCatalogRepository,
 ) : DataSource.Factory {
     override fun createDataSource(): DataSource = YouTubeStreamDataSource(catalog)
+
+    /**
+     * For saving a song: uses YouTube's direct audio link when there is one (it downloads at full
+     * speed; the SABR stream only runs a little ahead of playback).
+     */
+    internal fun createDownloadSource(): YouTubeStreamDataSource = YouTubeStreamDataSource(catalog, preferDirect = true)
 }
 
-private class YouTubeStreamDataSource(
+internal class YouTubeStreamDataSource(
     private val catalog: InnerTubeCatalogRepository,
+    private val preferDirect: Boolean = false,
 ) : BaseDataSource(/* isNetwork = */ true) {
     private var streamPosition = 0L
     private var remaining = C.LENGTH_UNSET.toLong()
@@ -44,15 +51,17 @@ private class YouTubeStreamDataSource(
 
     override fun open(dataSpec: DataSpec): Long {
         transferInitializing(dataSpec)
+        totalLength = null
         openedUri = dataSpec.uri
         openedDataSpec = dataSpec
         val videoId = dataSpec.uri.pathSegments.lastOrNull()
             ?: throw IOException("Missing YouTube video id")
-        val resolved = resolve(videoId)
+        // A download opens the stream piece by piece: look it up once.
+        val resolved = lastResolved?.takeIf { preferDirect && it.videoId == videoId } ?: resolve(videoId)
         streamPosition = dataSpec.position
         retried = false
 
-        val sabrBytes = resolved.sabrBytes(dataSpec.position)
+        val sabrBytes = if (preferDirect && resolved.directUrl != null) null else resolved.sabrBytes(dataSpec.position)
         if (sabrBytes != null) {
             val queue = LinkedBlockingQueue<SabrPacket>(8)
             sabrQueue = queue
@@ -85,7 +94,13 @@ private class YouTubeStreamDataSource(
     private fun resolve(videoId: String): ResolvedYouTubeStream =
         kotlinx.coroutines.runBlocking {
             catalog.resolveStream(videoId).getOrElse { throw IOException("Stream resolution failed", it) }
-        }
+        }.also { lastResolved = it }
+
+    private var lastResolved: ResolvedYouTubeStream? = null
+
+    /** The whole stream's size in bytes, when the last direct response said it (downloads only). */
+    var totalLength: Long? = null
+        private set
 
     private fun openDirect(url: String, headers: Map<String, String>, dataSpec: DataSpec): Long {
         var attemptedUrl = url
@@ -96,7 +111,12 @@ private class YouTubeStreamDataSource(
                     connectTimeout = 10_000
                     readTimeout = 20_000
                     headers.forEach { (name, value) -> setRequestProperty(name, value) }
-                    if (dataSpec.position > 0) setRequestProperty("Range", "bytes=${dataSpec.position}-")
+                    if (preferDirect && dataSpec.length != C.LENGTH_UNSET.toLong()) {
+                        // Downloads ask for one piece at a time: YouTube slows down long requests.
+                        setRequestProperty("Range", "bytes=${dataSpec.position}-${dataSpec.position + dataSpec.length - 1}")
+                    } else if (dataSpec.position > 0) {
+                        setRequestProperty("Range", "bytes=${dataSpec.position}-")
+                    }
                 }
                 val code = connection.responseCode
                 if (code == 403 && attempt == 0) {
@@ -115,6 +135,12 @@ private class YouTubeStreamDataSource(
                 val lengthHeader = connection.getHeaderField("Content-Length")?.toLongOrNull()
                 directConnection = connection
                 directInput = connection.inputStream
+                if (preferDirect) {
+                    // "bytes 0-1048575/4292623" (a piece) or just the length (the whole stream).
+                    totalLength = connection.getHeaderField("Content-Range")?.substringAfterLast('/')?.toLongOrNull()
+                        ?: lengthHeader?.takeIf { code == 200 }
+                    if (lengthHeader != null) return lengthHeader.also { retried = true }
+                }
                 val length = if (dataSpec.length >= 0) dataSpec.length else
                     if (lengthHeader != null) lengthHeader else C.LENGTH_UNSET.toLong()
                 retried = true

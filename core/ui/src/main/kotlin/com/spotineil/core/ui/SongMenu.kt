@@ -17,6 +17,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.PlaylistPlay
@@ -39,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -69,11 +72,14 @@ class SongActionsViewModel @Inject constructor(
     private val player: PlaybackController,
     private val liked: LikedMediaRepository,
     private val playlistRepo: UserPlaylistRepository,
+    private val youTubeDownloader: com.spotineil.core.player.youtube.YouTubeDownloader,
 ) : ViewModel() {
     val playlists: StateFlow<List<UserPlaylist>> = playlistRepo.playlists
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     fun isLiked(mediaId: String): Flow<Boolean> = liked.isLiked(mediaId)
+    fun canDownload(media: PlayableMedia): Boolean = youTubeDownloader.canDownload(media)
+    fun download(media: PlayableMedia) = youTubeDownloader.download(media)
     fun setLiked(media: PlayableMedia, value: Boolean) = viewModelScope.launch { liked.setLiked(media, value) }
     fun playNext(songs: List<PlayableMedia>) = player.playNext(songs)
     fun addToQueue(songs: List<PlayableMedia>) = player.addToQueueEnd(songs)
@@ -89,7 +95,7 @@ class SongActionsViewModel @Inject constructor(
 }
 
 /**
- * Options for one song: Play next, Add to queue, Add to playlist, Like. Opened with a long press
+ * Options for one song: Play next, Add to queue, Add to playlist, Download (YouTube songs), Like. Opened with a long press
  * on a song (or its ⋮ button). [onRemoveFromPlaylist] adds "Remove from this playlist".
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -127,6 +133,9 @@ fun SongActionsSheet(
                     viewModel.addToQueue(listOf(media)); onMessage(context.getString(R.string.ui_added_queue)); onDismiss()
                 }
                 ActionRow(Icons.AutoMirrored.Rounded.PlaylistAdd, stringResource(R.string.ui_add_playlist)) { picking = true }
+            }
+            if (viewModel.canDownload(media)) {
+                ActionRow(Icons.Rounded.Download, stringResource(R.string.ui_download)) { viewModel.download(media); onDismiss() }
             }
             ActionRow(
                 if (isLiked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
@@ -241,3 +250,12 @@ private fun ActionRow(icon: ImageVector, label: String, onClick: () -> Unit) {
  * for a long press, so every list gets the menu without wiring it screen by screen.
  */
 val LocalSongMenu = androidx.compose.runtime.staticCompositionLocalOf<((PlayableMedia) -> Unit)?> { null }
+
+/** The ⋮ button at the end of a song row: opens the same menu as a long press. Nothing when [onClick] is null. */
+@Composable
+fun SongMenuButton(onClick: (() -> Unit)?) {
+    if (onClick == null) return
+    androidx.compose.material3.IconButton(onClick = onClick, modifier = Modifier.testTag("song_menu")) {
+        Icon(Icons.Rounded.MoreVert, stringResource(R.string.ui_more_options), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}

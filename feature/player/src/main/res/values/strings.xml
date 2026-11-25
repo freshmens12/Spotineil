@@ -52,5 +52,5 @@
     <string name="karaoke_download_ok">Download</string>
     <string name="karaoke_download_cancel">Not now</string>
     <string name="karaoke_vocals_downloading">Downloading the voice remover</string>
-    <string name="karaoke_vocals_preparing">Getting the music ready</string>
+    <string name="karaoke_vocals_preparing">Taking the voice out…</string>
 </resources>

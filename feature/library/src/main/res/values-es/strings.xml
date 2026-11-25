@@ -37,4 +37,20 @@
     <string name="library_downloads">Descargas</string>
     <string name="library_no_downloads">Aún no hay descargas. Las canciones de artistas libres que lo permiten tienen un botón de descarga.</string>
     <plurals name="library_downloads_size"><item quantity="one">%1$d canción • %2$s en este teléfono</item><item quantity="many">%1$d canciones • %2$s en este teléfono</item><item quantity="other">%1$d canciones • %2$s en este teléfono</item></plurals>
+    <string name="library_download_list">Lista de descargas</string>
+    <string name="library_download_clear">Quitar guardadas</string>
+    <string name="library_download_queued">En espera</string>
+    <string name="library_download_starting">Empezando…</string>
+    <string name="library_download_offline">Sin internet. Seguirá cuando vuelva la conexión (%1$d%%)</string>
+    <string name="library_download_paused">En pausa (%1$d%%)</string>
+    <string name="library_download_saving">Guardando…</string>
+    <string name="library_download_done">Guardada: %1$s</string>
+    <string name="library_download_failed">No se pudo descargar. Toca reintentar.</string>
+    <string name="library_download_pause">Pausar</string>
+    <string name="library_download_resume">Reanudar</string>
+    <string name="library_download_retry">Reintentar</string>
+    <string name="library_download_cancel">Cancelar descarga</string>
+    <string name="library_download_hide">Quitar de la lista</string>
+    <string name="library_download_size">%1$s de %2$s</string>
+    <string name="library_download_speed">%1$s/s</string>
 </resources>

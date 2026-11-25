@@ -39,6 +39,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
+import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.GraphicEq
@@ -150,6 +151,7 @@ class YouTubePlayerViewModel @Inject constructor(
     private val lyricsRepository: LyricsRepository,
     private val youTube: YouTubeRepository,
     private val lastFm: LastFmRepository,
+    private val downloader: com.spotineil.core.player.youtube.YouTubeDownloader,
 ) : ViewModel() {
 
     private val _busy = MutableStateFlow(YouTubeBusy.None)
@@ -231,6 +233,12 @@ class YouTubePlayerViewModel @Inject constructor(
         waitingForNext = false
         lastSavedAt = 0
         freePlayer.selectYouTube(i)
+    }
+
+    /** Saves the song as an audio file in Music/Spotineil. */
+    fun download() {
+        val v = state.value.current ?: return
+        downloader.download(v.toPlayable())
     }
 
     fun toggleLike() {
@@ -338,6 +346,7 @@ fun YouTubePlayerScreen(nav: FreeNavigation, viewModel: YouTubePlayerViewModel =
     val background = MaterialTheme.colorScheme.background
     val dominant by rememberDominantColor(video?.thumbnailUrl, MaterialTheme.colorScheme.surfaceContainerHigh)
     var showAllLyrics by remember { mutableStateOf(false) }
+    val saveLyrics = com.spotineil.core.ui.rememberLyricsSaver()
     var addToPlaylist by remember { mutableStateOf(false) }
     if (addToPlaylist && video != null) {
         com.spotineil.core.ui.AddToPlaylistSheet(listOf(video.toPlayable()), onDismiss = { addToPlaylist = false }, onMessage = nav.onMessage)
@@ -382,6 +391,9 @@ fun YouTubePlayerScreen(nav: FreeNavigation, viewModel: YouTubePlayerViewModel =
                 }
                 IconButton(onClick = { addToPlaylist = true }, enabled = video != null) {
                     Icon(Icons.AutoMirrored.Rounded.PlaylistAdd, stringResource(R.string.yt_add_to_playlist))
+                }
+                IconButton(onClick = viewModel::download, enabled = video != null, modifier = Modifier.testTag("yt_download")) {
+                    Icon(Icons.Rounded.Download, stringResource(com.spotineil.core.ui.R.string.ui_download))
                 }
                 IconButton(onClick = viewModel::toggleLike, modifier = Modifier.testTag("yt_like")) {
                     Icon(
@@ -443,7 +455,10 @@ fun YouTubePlayerScreen(nav: FreeNavigation, viewModel: YouTubePlayerViewModel =
             }
 
             state.lyrics?.takeIf { !it.isInstrumental && it.lines.isNotEmpty() }?.let { lyrics ->
-                YouTubeLyricsCard(lyrics, position, expanded = showAllLyrics) { showAllLyrics = !showAllLyrics }
+                YouTubeLyricsCard(
+                    lyrics, position, expanded = showAllLyrics,
+                    onDownload = { video?.let { saveLyrics(lyrics, it.songTitle, it.artist) } },
+                ) { showAllLyrics = !showAllLyrics }
             }
             if (state.queue.size > 1) {
                 Text(
@@ -526,7 +541,7 @@ private fun SeekBar(positionMs: Long, durationMs: Long, onSeek: (Long) -> Unit) 
 }
 
 @Composable
-private fun YouTubeLyricsCard(lyrics: Lyrics, positionMs: Long, expanded: Boolean, onToggle: () -> Unit) {
+private fun YouTubeLyricsCard(lyrics: Lyrics, positionMs: Long, expanded: Boolean, onDownload: () -> Unit, onToggle: () -> Unit) {
     val current = if (lyrics.isSynced) lyrics.indexAt(positionMs).coerceAtLeast(0) else 0
     val lines = if (expanded) lyrics.lines else lyrics.lines.drop(current).filter { it.text.isNotBlank() }.take(2)
     Surface(
@@ -535,8 +550,13 @@ private fun YouTubeLyricsCard(lyrics: Lyrics, positionMs: Long, expanded: Boolea
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).testTag("yt_lyrics"),
     ) {
-        Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-            Text(stringResource(R.string.yt_lyrics), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+        Column(Modifier.padding(start = 16.dp, end = 4.dp, top = 2.dp, bottom = 12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.yt_lyrics), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                IconButton(onClick = onDownload, modifier = Modifier.testTag("yt_lyrics_download")) {
+                    Icon(Icons.Rounded.Download, stringResource(com.spotineil.core.ui.R.string.lyrics_download), Modifier.size(20.dp))
+                }
+            }
             // Same look as the full lyrics view: big lines with room between them, whole lines (no cut-off).
             lines.forEachIndexed { i, line ->
                 val active = if (expanded) lyrics.isSynced && i == current else i == 0
@@ -545,7 +565,7 @@ private fun YouTubeLyricsCard(lyrics: Lyrics, positionMs: Long, expanded: Boolea
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = if (active) FontWeight.ExtraBold else FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (active || !lyrics.isSynced) 1f else 0.5f),
-                    modifier = Modifier.padding(top = 10.dp),
+                    modifier = Modifier.padding(top = 10.dp, end = 12.dp),
                 )
             }
         }
@@ -557,7 +577,7 @@ private fun YouTubeLyricsCard(lyrics: Lyrics, positionMs: Long, expanded: Boolea
 internal fun YouTubeRow(video: YouTubeVideo, isCurrent: Boolean, onLongClick: (() -> Unit)? = null, onClick: () -> Unit) {
     val longClick = onLongClick ?: com.spotineil.core.ui.LocalSongMenu.current?.let { open -> { open(video.toPlayable()) } }
     Row(
-        Modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = longClick).padding(horizontal = 16.dp, vertical = 6.dp).testTag("yt_${video.id}"),
+        Modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = longClick).padding(start = 16.dp, end = if (longClick != null) 4.dp else 16.dp, top = 6.dp, bottom = 6.dp).testTag("yt_${video.id}"),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(contentAlignment = Alignment.Center) {
@@ -584,5 +604,6 @@ internal fun YouTubeRow(video: YouTubeVideo, isCurrent: Boolean, onLongClick: ((
                 overflow = TextOverflow.Ellipsis,
             )
         }
+        com.spotineil.core.ui.SongMenuButton(longClick)
     }
 }

@@ -34,17 +34,17 @@ A free Android music app, written in Kotlin with Jetpack Compose (Material 3). I
 | **More free music** | Independent artists on Audius and Jamendo, Creative Commons remixes on ccMixter, and live concerts and free albums from the Internet Archive. |
 | **Radio and podcasts** | Thousands of live radio stations (Radio Browser) and the Apple Podcasts directory, with episodes from each show's own RSS feed. |
 | **Your library** | Your own playlists (create, reorder, rename), Downloads, Backup & restore, Liked Songs, History of every song you played, recent searches, songs that continue where you left them, followed podcasts, saved stations, and the music files on your phone, which you can also delete from inside the app. All stored on the phone. |
-| **Lyrics** | Synced, line-by-line lyrics from LRCLIB, translated lyrics, karaoke mode with AI "vocals off" (the singer's voice removed on the phone), and lyric lines shared as pictures. |
+| **Lyrics** | Synced, line-by-line lyrics from LRCLIB, translated lyrics, lyrics downloads (.lrc or .txt), karaoke mode with AI "vocals off" (the singer's voice removed on the phone), and lyric lines shared as pictures. |
 | **Player** | Full player screen, mini player, queue, sleep timer, output-device picker (Bluetooth, wired, cast), notification, lock-screen and Bluetooth controls, Android Auto browsing. |
 | **Widgets** | Six home-screen widgets: **Your playlists** (tap to shuffle), **Player** (2×2), **Now playing** (4×1), **Mini player** (2×1), **Quick actions** (4×1) and **Recently played** (4×2). Long-press your Home screen, tap Widgets and pick Spotineil. |
 | **Themes and language** | System, Light, Dark, AMOLED black and **Soft glass**; 8 accent colours; English, Spanish and Tagalog (or Automatic). |
 | **Spotify (optional)** | Connect your Spotify account to see private playlists and Liked Songs; songs are played from YouTube Music. |
 | **Sound** | Crossfade or AutoMix between songs (gapless within an album), equalizer with presets, volume leveling, skip silence, podcast speed, sleep timer that fades out. |
-| **Downloads** | A download button appears only on songs whose artist or licence allows it. |
+| **Downloads** | Save songs to Music/Spotineil to play without internet in any music player. YouTube songs are saved as they are streamed (.opus or .m4a, no re-encoding) or converted to MP3 or M4A, with the song and artist written in; several download at once, with progress in Library → Downloads, and they continue after a lost connection; free-catalog songs can be saved when their artist or licence allows it. |
 
 ## What Spotineil does *not* do
 
-Spotineil does not block ads, and it does not save or download YouTube audio as files. It is an independent, unofficial project: it is **not affiliated with, endorsed or sponsored by YouTube, Google, Spotify or any music service**, and all music, artwork and lyrics belong to their artists and rights holders. Accessing YouTube Music this way is not something Google officially supports, and Google's terms may restrict it, so use it for personal listening and at your own risk.
+Spotineil does not block ads. Its Download button saves YouTube songs as audio files on your phone; YouTube’s terms do not allow downloading except where YouTube offers it, so only download for your own personal listening. It is an independent, unofficial project: it is **not affiliated with, endorsed or sponsored by YouTube, Google, Spotify or any music service**, and all music, artwork and lyrics belong to their artists and rights holders. Accessing YouTube Music this way is not something Google officially supports, and Google's terms may restrict it, so use it for personal listening and at your own risk.
 
 ## Build it yourself
 

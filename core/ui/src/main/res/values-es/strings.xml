@@ -25,4 +25,9 @@
     <string name="ui_save">Guardar</string>
     <string name="ui_cancel">Cancelar</string>
     <plurals name="ui_song_count"><item quantity="one">%1$d canción</item><item quantity="many">%1$d canciones</item><item quantity="other">%1$d canciones</item></plurals>
+    <string name="lyrics_download">Descargar letra</string>
+    <string name="lyrics_saved">Guardada en Descargas/Spotineil: %1$s</string>
+    <string name="lyrics_save_failed">No se pudo guardar la letra</string>
+    <string name="ui_download">Descargar</string>
+    <string name="ui_more_options">Más opciones</string>
 </resources>

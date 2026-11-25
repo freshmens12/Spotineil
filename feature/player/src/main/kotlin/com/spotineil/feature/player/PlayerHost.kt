@@ -97,6 +97,7 @@ fun PlayerHost(
                     lyricsContent = {
                         val lyrics by lyricsViewModel.state.collectAsStateWithLifecycle()
                         val context = androidx.compose.ui.platform.LocalContext.current
+                        val saveLyrics = com.spotineil.core.ui.rememberLyricsSaver()
                         LyricsPanel(
                             lyrics,
                             state.positionMs,
@@ -105,6 +106,7 @@ fun PlayerHost(
                             onKaraoke = { karaoke = true },
                             translation = lyricsViewModel.translation.collectAsStateWithLifecycle().value,
                             onTranslate = lyricsViewModel::toggleTranslate,
+                            onDownload = { loaded -> saveLyrics(loaded, state.track?.name.orEmpty(), state.track?.artists.orEmpty()) },
                         )
                     },
                     artworkModifier = artwork,

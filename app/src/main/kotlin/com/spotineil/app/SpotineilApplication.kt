@@ -19,10 +19,12 @@ import javax.inject.Singleton
 class SpotineilApplication : Application(), ImageLoaderFactory {
 
     @Inject lateinit var widgetUpdater: WidgetUpdater
+    @Inject lateinit var youTubeDownloader: com.spotineil.core.player.youtube.YouTubeDownloader
 
     override fun onCreate() {
         super.onCreate()
         CrashReporter.install(this)
+        youTubeDownloader.start()
         widgetUpdater.start()
     }
 

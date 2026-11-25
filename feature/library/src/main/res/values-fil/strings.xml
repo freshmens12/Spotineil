@@ -37,4 +37,20 @@
     <string name="library_downloads">Mga download</string>
     <string name="library_no_downloads">Wala pang download. May download button ang mga kanta ng libreng artist na pumapayag dito.</string>
     <plurals name="library_downloads_size"><item quantity="one">%1$d kanta • %2$s sa teleponong ito</item><item quantity="other">%1$d kanta • %2$s sa teleponong ito</item></plurals>
+    <string name="library_download_list">Listahan ng download</string>
+    <string name="library_download_clear">Alisin ang na-save</string>
+    <string name="library_download_queued">Naghihintay ng turno</string>
+    <string name="library_download_starting">Nagsisimula…</string>
+    <string name="library_download_offline">Walang internet. Magpapatuloy pagbalik ng koneksyon (%1$d%%)</string>
+    <string name="library_download_paused">Naka-pause (%1$d%%)</string>
+    <string name="library_download_saving">Sine-save…</string>
+    <string name="library_download_done">Na-save: %1$s</string>
+    <string name="library_download_failed">Hindi ma-download. I-tap ang retry.</string>
+    <string name="library_download_pause">I-pause</string>
+    <string name="library_download_resume">Ituloy</string>
+    <string name="library_download_retry">Subukan ulit</string>
+    <string name="library_download_cancel">Kanselahin ang download</string>
+    <string name="library_download_hide">Alisin sa listahan</string>
+    <string name="library_download_size">%1$s sa %2$s</string>
+    <string name="library_download_speed">%1$s/s</string>
 </resources>

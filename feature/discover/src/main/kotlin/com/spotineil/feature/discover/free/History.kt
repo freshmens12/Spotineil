@@ -125,7 +125,7 @@ fun HistoryScreen(nav: FreeNavigation, viewModel: HistoryViewModel = hiltViewMod
 private fun HistoryRow(media: PlayableMedia, isCurrent: Boolean, onLongClick: (() -> Unit)? = null, onClick: () -> Unit) {
     val longClick = onLongClick ?: com.spotineil.core.ui.LocalSongMenu.current?.let { open -> { open(media) } }
     Row(
-        Modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = longClick).padding(horizontal = 16.dp, vertical = 6.dp),
+        Modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = longClick).padding(start = 16.dp, end = if (longClick != null) 4.dp else 16.dp, top = 6.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         CoverImage(media.artworkUrl, null, Modifier.size(48.dp))
@@ -145,6 +145,7 @@ private fun HistoryRow(media: PlayableMedia, isCurrent: Boolean, onLongClick: ((
                 overflow = TextOverflow.Ellipsis,
             )
         }
+        com.spotineil.core.ui.SongMenuButton(longClick)
     }
 }
 

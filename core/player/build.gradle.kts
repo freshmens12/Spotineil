@@ -15,6 +15,8 @@ dependencies {
     implementation(project(":core:separation"))
     // Runs the karaoke voice model on the phone (the model itself is downloaded on first use).
     implementation(libs.onnxruntime.android)
+    // MP3 encoder for downloads (pure-Java LAME port, LGPL 2.1+)
+    implementation(libs.jump3r)
 
     // Official Spotify App Remote SDK (resolved from GitHub releases, see settings.gradle.kts).
     implementation(libs.spotify.app.remote) { artifact { type = "aar" } }
