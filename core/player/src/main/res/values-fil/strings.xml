@@ -12,4 +12,6 @@
     <string name="yt_download_already">Nasa downloads mo na ang “%1$s”</string>
     <plurals name="yt_download_done_many"><item quantity="one">Na-save ang %1$d kanta sa Music/Spotineil</item><item quantity="other">Na-save ang %1$d kanta sa Music/Spotineil</item></plurals>
     <plurals name="yt_downloading_many"><item quantity="one">Dina-download ang %1$d kanta</item><item quantity="other">Dina-download ang %1$d kanta</item></plurals>
+    <string name="yt_download_size">%1$s sa %2$s</string>
+    <string name="yt_download_speed">%1$s/s</string>
 </resources>

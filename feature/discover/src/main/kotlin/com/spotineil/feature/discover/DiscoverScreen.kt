@@ -172,7 +172,14 @@ private fun LazyListScope.trackSection(
 
 @Composable
 fun StreamTrackRow(track: StreamTrack, isCurrent: Boolean, onClick: () -> Unit, onDownload: (() -> Unit)?, onLongClick: (() -> Unit)? = null) {
-    val longClick = onLongClick ?: com.spotineil.core.ui.LocalSongMenu.current?.let { open -> { open(track.toPlayable()) } }
+    val withDownload = com.spotineil.core.ui.LocalSongMenuWithDownload.current
+    val plain = com.spotineil.core.ui.LocalSongMenu.current
+    // The ⋮ menu (and a long press) offers Download when the artist or licence allows it.
+    val longClick = onLongClick ?: when {
+        onDownload != null && withDownload != null -> ({ withDownload(track.toPlayable(), onDownload) })
+        plain != null -> ({ plain(track.toPlayable()) })
+        else -> null
+    }
     Row(
         Modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = longClick).padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = 6.dp)
             .testTag("stream_${track.source.name}_${track.id}"),
@@ -196,11 +203,6 @@ fun StreamTrackRow(track: StreamTrack, isCurrent: Boolean, onClick: () -> Unit, 
                 track.durationMs.takeIf { it > 0 }?.let { formatDuration(it) },
             ).joinToString(" • ")
             Text(meta, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        }
-        if (onDownload != null) {
-            IconButton(onClick = onDownload, modifier = Modifier.testTag("download_${track.id}")) {
-                Icon(Icons.Rounded.Download, stringResource(R.string.discover_download))
-            }
         }
         com.spotineil.core.ui.SongMenuButton(longClick)
     }

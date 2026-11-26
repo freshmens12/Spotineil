@@ -12,4 +12,6 @@
     <string name="yt_download_already">“%1$s” is already in your downloads</string>
     <plurals name="yt_download_done_many"><item quantity="one">Saved %1$d song to Music/Spotineil</item><item quantity="other">Saved %1$d songs to Music/Spotineil</item></plurals>
     <plurals name="yt_downloading_many"><item quantity="one">Downloading %1$d song</item><item quantity="other">Downloading %1$d songs</item></plurals>
+    <string name="yt_download_size">%1$s of %2$s</string>
+    <string name="yt_download_speed">%1$s/s</string>
 </resources>

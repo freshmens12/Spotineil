@@ -251,10 +251,11 @@ fun FullPlayer(
                 if (showLyrics) {
                     lyricsContent()
                 } else {
-                    CoverImage(
+                    com.spotineil.core.ui.LivingCover(
                         track?.imageUrl,
                         track?.album,
-                        artworkModifier.fillMaxWidth().aspectRatio(1f),
+                        isPlaying = state.playback.isPlaying,
+                        modifier = artworkModifier.fillMaxWidth().aspectRatio(1f),
                         shape = MaterialTheme.shapes.medium,
                     )
                 }

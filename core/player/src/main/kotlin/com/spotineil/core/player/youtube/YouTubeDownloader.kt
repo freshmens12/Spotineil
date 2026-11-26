@@ -539,12 +539,22 @@ class YouTubeDownloader @Inject constructor(
         val progress = if (known.isEmpty()) null else known.sumOf { it.bytesDone }.toFloat() / known.sumOf { it.totalBytes!! }
         val title = if (active.size == 1) active.first().title
         else context.resources.getQuantityString(R.plurals.yt_downloading_many, active.size, active.size)
+        // Same as the Downloads page: "45% • 3.1 MB of 6.9 MB • 1.2 MB/s" (all downloads together).
+        fun size(bytes: Long) = android.text.format.Formatter.formatShortFileSize(context, bytes)
+        val speed = active.filter { it.status == DownloadStatus.Downloading }.sumOf { it.bytesPerSecond }
+        val details = listOfNotNull(
+            progress?.let { "${(it * 100).toInt()}%" },
+            known.takeIf { it.isNotEmpty() }?.let {
+                context.getString(R.string.yt_download_size, size(it.sumOf { t -> t.bytesDone }), size(it.sumOf { t -> t.totalBytes!! }))
+            },
+            speed.takeIf { it > 0 }?.let { context.getString(R.string.yt_download_speed, size(it)) },
+        ).joinToString(" • ")
         manager.notify(
             NOTIFICATION_ID,
             NotificationCompat.Builder(context, CHANNEL)
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setContentTitle(title)
-                .setContentText(progress?.let { "${(it * 100).toInt()}%" } ?: context.getString(R.string.yt_download_channel))
+                .setContentText(details.ifEmpty { context.getString(R.string.yt_download_channel) })
                 .setOnlyAlertOnce(true)
                 .setOngoing(true)
                 .setProgress(100, ((progress ?: 0f) * 100).toInt(), progress == null)

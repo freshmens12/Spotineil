@@ -68,6 +68,8 @@ data class UserSettings(
     val transition: TransitionMode = TransitionMode.Off,
     val audio: AudioSettings = AudioSettings(),
     val downloads: DownloadSettings = DownloadSettings(),
+    /** The cover on Now playing zooms, drifts and pulses with the music. */
+    val animatedCover: Boolean = true,
     /**
      * The free, no-account app is in use. False only on the very first launch, when the Welcome
      * screen is shown; its "Get started" button turns this on.

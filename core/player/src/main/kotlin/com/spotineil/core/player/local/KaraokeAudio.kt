@@ -153,6 +153,7 @@ internal class KaraokeAudioProcessor : AudioProcessor {
         val channels = format.channelCount
         if (samples.size < maxFrames * channels) samples = FloatArray(maxFrames * channels)
         val frames = remover.read(samples, maxFrames)
+        com.spotineil.core.player.AudioLevel.record(samples, frames * channels) // for the living cover
         if (paced) owed -= frames
         val bytes = frames * format.bytesPerFrame
         if (buffer.capacity() < bytes) buffer = ByteBuffer.allocateDirect(bytes).order(ByteOrder.nativeOrder())

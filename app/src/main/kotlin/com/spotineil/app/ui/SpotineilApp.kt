@@ -237,10 +237,12 @@ private fun MainShell(mainViewModel: MainViewModel, free: Boolean) {
     val bottomPadding = NavBarHeight + navInsets + if (showMini) MiniPlayerHeight else 0.dp
     // One song menu for every list (long press on a song).
     var songMenu by remember { mutableStateOf<com.spotineil.core.model.PlayableMedia?>(null) }
+    var songMenuDownload by remember { mutableStateOf<(() -> Unit)?>(null) }
     songMenu?.let { m ->
         com.spotineil.core.ui.SongActionsSheet(
             m,
-            onDismiss = { songMenu = null },
+            onDismiss = { songMenu = null; songMenuDownload = null },
+            onDownload = songMenuDownload,
             onMessage = showMessage,
             onGoToArtist = { navController.navigate(com.spotineil.feature.discover.free.YtArtistRoute(it)) },
         )
@@ -253,7 +255,8 @@ private fun MainShell(mainViewModel: MainViewModel, free: Boolean) {
         ) { _ ->
             CompositionLocalProvider(
                 LocalBottomContentPadding provides bottomPadding,
-                com.spotineil.core.ui.LocalSongMenu provides { songMenu = it },
+                com.spotineil.core.ui.LocalSongMenu provides { songMenuDownload = null; songMenu = it },
+                com.spotineil.core.ui.LocalSongMenuWithDownload provides { media, download -> songMenuDownload = download; songMenu = media },
             ) {
                 AppNavHost(navController, showMessage, startDestination = tabs.first().route)
             }

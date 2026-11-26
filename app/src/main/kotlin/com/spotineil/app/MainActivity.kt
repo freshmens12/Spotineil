@@ -103,7 +103,10 @@ class MainActivity : AppCompatActivity() {
                 // background and onBackground content color.
                 androidx.compose.material3.Surface(color = androidx.compose.material3.MaterialTheme.colorScheme.background) {
                     if (ready != null) {
-                        CompositionLocalProvider(LocalPipState provides pip) {
+                        CompositionLocalProvider(
+                            LocalPipState provides pip,
+                            com.spotineil.core.ui.LocalAnimatedCovers provides ready.settings.animatedCover,
+                        ) {
                             SpotineilApp(isLoggedIn = ready.isLoggedIn, guestMode = ready.settings.guestMode, mainViewModel = viewModel)
                         }
                     }

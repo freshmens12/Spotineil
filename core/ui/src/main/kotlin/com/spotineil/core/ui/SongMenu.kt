@@ -107,6 +107,8 @@ fun SongActionsSheet(
     onRemoveFromPlaylist: (() -> Unit)? = null,
     /** Opens the artist's page (shown when given and the song has an artist). */
     onGoToArtist: ((String) -> Unit)? = null,
+    /** Saves a free song whose artist or licence allows it (YouTube songs are handled here). */
+    onDownload: (() -> Unit)? = null,
     viewModel: SongActionsViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -134,8 +136,11 @@ fun SongActionsSheet(
                 }
                 ActionRow(Icons.AutoMirrored.Rounded.PlaylistAdd, stringResource(R.string.ui_add_playlist)) { picking = true }
             }
-            if (viewModel.canDownload(media)) {
-                ActionRow(Icons.Rounded.Download, stringResource(R.string.ui_download)) { viewModel.download(media); onDismiss() }
+            if (onDownload != null || viewModel.canDownload(media)) {
+                ActionRow(Icons.Rounded.Download, stringResource(R.string.ui_download)) {
+                    if (onDownload != null) onDownload() else viewModel.download(media)
+                    onDismiss()
+                }
             }
             ActionRow(
                 if (isLiked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
@@ -250,6 +255,9 @@ private fun ActionRow(icon: ImageVector, label: String, onClick: () -> Unit) {
  * for a long press, so every list gets the menu without wiring it screen by screen.
  */
 val LocalSongMenu = androidx.compose.runtime.staticCompositionLocalOf<((PlayableMedia) -> Unit)?> { null }
+
+/** Like [LocalSongMenu], for a free song that can be downloaded: the menu gets a Download row running the given action. */
+val LocalSongMenuWithDownload = androidx.compose.runtime.staticCompositionLocalOf<((PlayableMedia, () -> Unit) -> Unit)?> { null }
 
 /** The ⋮ button at the end of a song row: opens the same menu as a long press. Nothing when [onClick] is null. */
 @Composable

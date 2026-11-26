@@ -4,6 +4,15 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.18.0] - 2026-11-26
+
+### Added
+- **Living cover**: on the Now playing screen the album cover slowly zooms and drifts, pulses with the music and glows in its own colours while the song plays, and rests when you pause. It follows how loud the music is right now, measured inside the player (no microphone, nothing recorded). Turn it off in Settings → Appearance → Animated cover; it also stays still when the phone's "Remove animations" is on.
+- **Download progress in the notification**: it now shows the same as the Downloads page, for example "45% • 3.1 MB of 6.9 MB • 1.2 MB/s" (all downloads together).
+
+### Changed
+- Song rows no longer have a separate download button: Download is in every song's ⋮ menu (also for free songs whose artist or licence allows it).
+
 ## [1.17.0] - 2026-11-25
 
 ### Added

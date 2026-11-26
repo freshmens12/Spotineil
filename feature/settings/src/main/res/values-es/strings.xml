@@ -93,4 +93,6 @@
     <string name="settings_download_format_m4a_desc">256 kbps. Se reproduce en todas partes, más pequeño que MP3 con la misma calidad</string>
     <string name="settings_download_parallel">Descargas a la vez</string>
     <string name="settings_download_parallel_desc">Las demás esperan su turno</string>
+    <string name="settings_animated_cover">Portada animada</string>
+    <string name="settings_animated_cover_desc">En Reproduciendo, la portada se mueve despacio y late con la música</string>
 </resources>

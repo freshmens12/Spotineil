@@ -93,4 +93,6 @@
     <string name="settings_download_format_m4a_desc">256 kbps. Gumagana kahit saan, mas maliit kaysa MP3 sa parehong kalidad</string>
     <string name="settings_download_parallel">Sabay-sabay na download</string>
     <string name="settings_download_parallel_desc">Maghihintay ng turno ang iba</string>
+    <string name="settings_animated_cover">Gumagalaw na cover</string>
+    <string name="settings_animated_cover_desc">Sa Now playing, dahan-dahang gumagalaw ang cover at pumipintig kasabay ng musika</string>
 </resources>

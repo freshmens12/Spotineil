@@ -43,7 +43,7 @@ class PlayerUiTest {
     fun miniPlayerShowsTrackAndTogglesPlayback() {
         val calls = mutableListOf<String>()
         compose.setContent {
-            SpotineilTheme {
+            TestTheme {
                 MiniPlayer(uiState(), PlayerActions(onTogglePlay = { calls += "toggle" }, onExpand = { calls += "expand" }))
             }
         }
@@ -57,7 +57,7 @@ class PlayerUiTest {
     fun fullPlayerControlsInvokeActions() {
         val calls = mutableListOf<String>()
         compose.setContent {
-            SpotineilTheme {
+            TestTheme {
                 FullPlayer(
                     state = uiState(isPlaying = false),
                     actions = PlayerActions(
@@ -82,7 +82,7 @@ class PlayerUiTest {
     @Test
     fun freeTierNoticeIsShownForFreeAccounts() {
         compose.setContent {
-            SpotineilTheme { FullPlayer(uiState(freeNotice = true), PlayerActions(), showLyrics = false, lyricsContent = {}) }
+            TestTheme { FullPlayer(uiState(freeNotice = true), PlayerActions(), showLyrics = false, lyricsContent = {}) }
         }
         compose.onNodeWithText("You're on Spotify Free", substring = true).assertIsDisplayed()
     }
@@ -91,7 +91,7 @@ class PlayerUiTest {
     fun restrictedSkipIsDisabled() {
         val calls = mutableListOf<String>()
         compose.setContent {
-            SpotineilTheme {
+            TestTheme {
                 FullPlayer(
                     uiState(restrictions = PlaybackRestrictions(canSkipNext = false)),
                     PlayerActions(onNext = { calls += "next" }),
@@ -112,7 +112,7 @@ class PlayerUiTest {
             isSynced = true,
         )
         compose.setContent {
-            SpotineilTheme { LyricsPanel(LyricsUiState.Loaded(lyrics), positionMs = 1_500, onSeek = { seeks += it }) }
+            TestTheme { LyricsPanel(LyricsUiState.Loaded(lyrics), positionMs = 1_500, onSeek = { seeks += it }) }
         }
         compose.onNodeWithText("placeholder line two").performClick()
         assertEquals(listOf(4_000L), seeks)
@@ -120,7 +120,15 @@ class PlayerUiTest {
 
     @Test
     fun lyricsNotAvailableState() {
-        compose.setContent { SpotineilTheme { LyricsPanel(LyricsUiState.NotAvailable, 0, {}) } }
+        compose.setContent { TestTheme { LyricsPanel(LyricsUiState.NotAvailable, 0, {}) } }
         compose.onNodeWithText("Lyrics not available").assertIsDisplayed()
+    }
+}
+
+/** The app theme with the living cover still: an endless animation would keep the test from ever settling. */
+@androidx.compose.runtime.Composable
+private fun TestTheme(content: @androidx.compose.runtime.Composable () -> Unit) {
+    SpotineilTheme {
+        androidx.compose.runtime.CompositionLocalProvider(com.spotineil.core.ui.LocalAnimatedCovers provides false, content = content)
     }
 }

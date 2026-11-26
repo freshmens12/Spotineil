@@ -177,6 +177,15 @@ fun SettingsRoute(
                 }
             }
 
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_animated_cover)) },
+                    supportingContent = { Text(stringResource(R.string.settings_animated_cover_desc)) },
+                    trailingContent = { Switch(settings.animatedCover, viewModel::setAnimatedCover) },
+                    modifier = Modifier.clickable { viewModel.setAnimatedCover(!settings.animatedCover) },
+                )
+            }
+
             item { Header(stringResource(R.string.settings_playback)) }
             item {
                 ListItem(

@@ -12,4 +12,6 @@
     <string name="yt_download_already">«%1$s» ya está en tus descargas</string>
     <plurals name="yt_download_done_many"><item quantity="one">%1$d canción guardada en Música/Spotineil</item><item quantity="many">%1$d canciones guardadas en Música/Spotineil</item><item quantity="other">%1$d canciones guardadas en Música/Spotineil</item></plurals>
     <plurals name="yt_downloading_many"><item quantity="one">Descargando %1$d canción</item><item quantity="many">Descargando %1$d canciones</item><item quantity="other">Descargando %1$d canciones</item></plurals>
+    <string name="yt_download_size">%1$s de %2$s</string>
+    <string name="yt_download_speed">%1$s/s</string>
 </resources>
