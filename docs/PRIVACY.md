@@ -20,7 +20,7 @@ Removing the singer's voice happens entirely on your phone, with an AI model sto
 ## Services the app talks to
 To show and play music, the app sends requests (such as your search words and your approximate country) directly from your phone to the services below. Each one handles those requests under its own privacy policy. The developer does not see them.
 - **YouTube Music**: the music catalog, search, charts and audio streams. When you tap Download on a YouTube song, its audio is fetched the same way and saved on your phone (in Music/Spotineil, or the folder you picked in Settings); nothing is uploaded.
-- **LRCLIB**: song lyrics.
+- **LRCLIB**: song lyrics (the song name, artist, album and length). With "Lyrics on the lock screen" on, this happens for each song as it starts playing, so its lines can show on the lock screen; answers are kept on the phone.
 - **Google Translate** (only when you turn on "Translate lyrics"): the lyric lines of the song, to translate them into your language.
 - **Last.fm**: similar artists, used for radio and "Play similar".
 - **Audius, Jamendo, ccMixter, Internet Archive**: free and Creative Commons music.

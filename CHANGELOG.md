@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.20.0] - 2026-11-28
+
+### Added
+- **Lyrics on the lock screen**: while a song plays, the line being sung shows in the media notification, on the lock screen and in pop-ups that read it, like Dynamic Island apps. It appears where the artist name usually is, and the artist moves next to the song name ("Lavender Haze · Taylor Swift"). It changes line by line with the song and shows ♪ between sung parts. It works with the app closed. Songs without synced lyrics, radio and podcasts show as usual. Car screens show the line too. Turn it off in Settings → Playback → Lyrics on the lock screen.
+- **The line being sung on Now playing**: it shows right under the song name, and each new line slides up into place. Tap it to open the full lyrics (all lines, auto-scroll, translate, download and full screen). It replaces the lyrics card at the bottom of YouTube's Now playing, which you had to scroll down to.
+
 ## [1.19.0] - 2026-11-28
 
 ### Added

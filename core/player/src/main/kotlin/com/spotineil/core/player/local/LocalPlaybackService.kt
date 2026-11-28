@@ -82,10 +82,12 @@ class LocalPlaybackService : MediaLibraryService() {
     @Inject lateinit var userPlaylists: com.spotineil.core.data.repository.UserPlaylistRepository
     @Inject lateinit var recents: com.spotineil.core.data.repository.RecentsRepository
     @Inject lateinit var youTubeStreamFactory: YouTubeStreamDataSourceFactory
+    @Inject lateinit var lyricsRepository: com.spotineil.core.data.repository.LyricsRepository
 
     private var session: MediaLibrarySession? = null
     private var transitions: TransitionController? = null
     private var effects: AudioEffectsController? = null
+    private var lockScreenLyrics: LockScreenLyrics? = null
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     override fun onCreate() {
@@ -131,7 +133,16 @@ class LocalPlaybackService : MediaLibraryService() {
             }
         }
 
-        val builder = MediaLibrarySession.Builder(this, player, LibraryCallback())
+        // The session sees the player through LyricsSessionPlayer: lyric lines on the lock screen.
+        val sessionPlayer = LyricsSessionPlayer(player)
+        lockScreenLyrics = LockScreenLyrics(player, sessionPlayer, lyricsRepository, scope).also { lyrics ->
+            lyrics.start()
+            scope.launch {
+                settings.settings.map { it.lockScreenLyrics }.distinctUntilChanged().collect { lyrics.enabled = it }
+            }
+        }
+
+        val builder = MediaLibrarySession.Builder(this, sessionPlayer, LibraryCallback())
         packageManager.getLaunchIntentForPackage(packageName)?.let { launch ->
             launch.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
             builder.setSessionActivity(
@@ -175,6 +186,8 @@ class LocalPlaybackService : MediaLibraryService() {
     }
 
     override fun onDestroy() {
+        lockScreenLyrics?.release()
+        lockScreenLyrics = null
         transitions?.release()
         effects?.release()
         effects = null

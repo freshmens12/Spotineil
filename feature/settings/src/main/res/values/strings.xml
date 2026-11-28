@@ -100,4 +100,6 @@
     <string name="settings_download_folder_change">Change</string>
     <string name="settings_download_folder_reset">Default</string>
     <string name="settings_download_folder_unavailable">This phone has no folder picker</string>
+    <string name="settings_lock_screen_lyrics">Lyrics on the lock screen</string>
+    <string name="settings_lock_screen_lyrics_desc">While a song plays, the line being sung shows in the notification, on the lock screen and in pop-ups like Dynamic Island, in place of the artist name (which moves next to the song name). Car screens show it too.</string>
 </resources>

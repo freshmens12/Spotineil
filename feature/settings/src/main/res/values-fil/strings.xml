@@ -100,4 +100,6 @@
     <string name="settings_download_folder_change">Palitan</string>
     <string name="settings_download_folder_reset">Default</string>
     <string name="settings_download_folder_unavailable">Walang folder picker ang phone na ito</string>
+    <string name="settings_lock_screen_lyrics">Lyrics sa lock screen</string>
+    <string name="settings_lock_screen_lyrics_desc">Habang tumutugtog ang kanta, makikita ang linyang kinakanta sa notification, sa lock screen at sa mga pop-up tulad ng Dynamic Island, kapalit ng pangalan ng artist (na lilipat sa tabi ng pangalan ng kanta). Makikita rin ito sa screen ng kotse.</string>
 </resources>

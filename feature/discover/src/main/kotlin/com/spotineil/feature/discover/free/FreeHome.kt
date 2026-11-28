@@ -235,6 +235,8 @@ data class FreeNavigation(
     val onSettings: () -> Unit,
     val onBack: () -> Unit,
     val onMessage: (String) -> Unit,
+    /** Opens the full player on its lyrics (all the lines of the song playing). */
+    val onLyrics: () -> Unit = {},
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

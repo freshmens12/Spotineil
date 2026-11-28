@@ -77,6 +77,8 @@ class SettingsViewModel @Inject constructor(
     fun setAudio(audio: com.spotineil.core.model.AudioSettings) = viewModelScope.launch { settings.setAudio(audio) }
     fun setAnimatedArtwork(enabled: Boolean) = viewModelScope.launch { settings.setAnimatedArtwork(enabled) }
 
+    fun setLockScreenLyrics(enabled: Boolean) = viewModelScope.launch { settings.setLockScreenLyrics(enabled) }
+
     /** A folder picked for downloads ([tree] from the folder picker), or null for Music/Spotineil. */
     fun setDownloadFolder(current: com.spotineil.core.model.DownloadSettings, tree: android.net.Uri?) = viewModelScope.launch {
         val Folder = com.spotineil.core.player.youtube.DownloadFolder

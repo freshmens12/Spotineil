@@ -49,4 +49,5 @@
     <string name="ui_download_all">Download all</string>
     <string name="ui_download_all_title">Download “%1$s”?</string>
     <plurals name="ui_download_all_body"><item quantity="one">%1$d song will be saved in its own folder, “%2$s”, inside your downloads folder, with a playlist file so music players show it as one.</item><item quantity="other">%1$d songs will be saved in their own folder, “%2$s”, inside your downloads folder, numbered in order and with a playlist file so music players show them as one.</item></plurals>
+    <string name="ui_lyrics_open">Show all lyrics</string>
 </resources>

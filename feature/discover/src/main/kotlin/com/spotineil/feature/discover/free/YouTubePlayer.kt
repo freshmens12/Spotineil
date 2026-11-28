@@ -183,7 +183,8 @@ class YouTubePlayerViewModel @Inject constructor(
             val playback = freePlayer.playback.value
             val id = state.value.current?.let { YOUTUBE_MEDIA_PREFIX + it.id }
             emit(if (id != null && playback.track?.uri == id) playback.estimatedPosition(System.currentTimeMillis()) else 0L)
-            delay(500)
+            // Often enough for the lyric line to change on time.
+            delay(250)
         }
     }.distinctUntilChanged().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0L)
 
@@ -345,8 +346,6 @@ fun YouTubePlayerScreen(nav: FreeNavigation, viewModel: YouTubePlayerViewModel =
 
     val background = MaterialTheme.colorScheme.background
     val dominant by rememberDominantColor(video?.thumbnailUrl, MaterialTheme.colorScheme.surfaceContainerHigh)
-    var showAllLyrics by remember { mutableStateOf(false) }
-    val saveLyrics = com.spotineil.core.ui.rememberLyricsSaver()
     var addToPlaylist by remember { mutableStateOf(false) }
     if (addToPlaylist && video != null) {
         com.spotineil.core.ui.AddToPlaylistSheet(listOf(video.toPlayable()), onDismiss = { addToPlaylist = false }, onMessage = nav.onMessage)
@@ -411,6 +410,14 @@ fun YouTubePlayerScreen(nav: FreeNavigation, viewModel: YouTubePlayerViewModel =
                 }
             }
 
+            // The line being sung (as on the lock screen); tap it for all the lyrics.
+            com.spotineil.core.ui.LyricPeek(
+                state.lyrics,
+                position,
+                onClick = nav.onLyrics,
+                modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 4.dp),
+            )
+
             SeekBar(position, duration.takeIf { it > 0 } ?: video?.durationMs ?: 0L, viewModel::seekTo)
 
             Row(
@@ -461,12 +468,6 @@ fun YouTubePlayerScreen(nav: FreeNavigation, viewModel: YouTubePlayerViewModel =
                 )
             }
 
-            state.lyrics?.takeIf { !it.isInstrumental && it.lines.isNotEmpty() }?.let { lyrics ->
-                YouTubeLyricsCard(
-                    lyrics, position, expanded = showAllLyrics,
-                    onDownload = { video?.let { saveLyrics(lyrics, it.songTitle, it.artist) } },
-                ) { showAllLyrics = !showAllLyrics }
-            }
             if (state.queue.size > 1) {
                 Text(
                     stringResource(R.string.yt_up_next),
@@ -562,38 +563,6 @@ private fun SeekBar(positionMs: Long, durationMs: Long, onSeek: (Long) -> Unit) 
             Text(formatDuration((fraction * durationMs).toLong()), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.weight(1f))
             Text(formatDuration(durationMs), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-    }
-}
-
-@Composable
-private fun YouTubeLyricsCard(lyrics: Lyrics, positionMs: Long, expanded: Boolean, onDownload: () -> Unit, onToggle: () -> Unit) {
-    val current = if (lyrics.isSynced) lyrics.indexAt(positionMs).coerceAtLeast(0) else 0
-    val lines = if (expanded) lyrics.lines else lyrics.lines.drop(current).filter { it.text.isNotBlank() }.take(2)
-    Surface(
-        onClick = onToggle,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        shape = MaterialTheme.shapes.medium,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).testTag("yt_lyrics"),
-    ) {
-        Column(Modifier.padding(start = 16.dp, end = 4.dp, top = 2.dp, bottom = 12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.yt_lyrics), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                IconButton(onClick = onDownload, modifier = Modifier.testTag("yt_lyrics_download")) {
-                    Icon(Icons.Rounded.Download, stringResource(com.spotineil.core.ui.R.string.lyrics_download), Modifier.size(20.dp))
-                }
-            }
-            // Same look as the full lyrics view: big lines with room between them, whole lines (no cut-off).
-            lines.forEachIndexed { i, line ->
-                val active = if (expanded) lyrics.isSynced && i == current else i == 0
-                Text(
-                    line.text.ifBlank { "♪" },
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = if (active) FontWeight.ExtraBold else FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (active || !lyrics.isSynced) 1f else 0.5f),
-                    modifier = Modifier.padding(top = 10.dp, end = 12.dp),
-                )
-            }
         }
     }
 }

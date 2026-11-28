@@ -196,6 +196,8 @@ fun FullPlayer(
     modifier: Modifier = Modifier,
     artworkModifier: Modifier = Modifier,
     titleModifier: Modifier = Modifier,
+    /** The line being sung, under the song's name while the cover shows (tapping it opens the lyrics). */
+    lyricPeek: (@Composable () -> Unit)? = null,
 ) {
     val track = state.track
     val background = opaqueBackground()
@@ -299,6 +301,7 @@ fun FullPlayer(
                 }
                 if (state.canLike) IconButton(onClick = actions.onLike, Modifier.testTag("like_button")) { LikeIcon(state.isLiked == true) }
             }
+            if (!showLyrics) lyricPeek?.invoke()
 
             SeekBar(state, actions.onSeek)
             Controls(state, controlActions)

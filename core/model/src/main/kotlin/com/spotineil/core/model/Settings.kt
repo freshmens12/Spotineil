@@ -96,6 +96,8 @@ data class UserSettings(
     val coverStyle: CoverStyle = CoverStyle.Living,
     /** Albums with motion artwork on Apple Music play it as the cover. */
     val animatedArtwork: Boolean = true,
+    /** The line being sung shows in the media notification, on the lock screen and in pop-ups. */
+    val lockScreenLyrics: Boolean = true,
     /**
      * The free, no-account app is in use. False only on the very first launch, when the Welcome
      * screen is shown; its "Get started" button turns this on.

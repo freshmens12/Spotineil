@@ -46,4 +46,5 @@
     <string name="ui_download_all">I-download lahat</string>
     <string name="ui_download_all_title">I-download ang “%1$s”?</string>
     <plurals name="ui_download_all_body"><item quantity="one">Mase-save ang %1$d kanta sa sarili nitong folder, “%2$s”, sa loob ng downloads folder mo, kasama ang playlist file para makita ito ng mga music player.</item><item quantity="other">Mase-save ang %1$d kanta sa sarili nilang folder, “%2$s”, sa loob ng downloads folder mo, nakanumero ayon sa pagkakasunod at may playlist file para makita sila ng mga music player bilang isa.</item></plurals>
+    <string name="ui_lyrics_open">Ipakita ang buong lyrics</string>
 </resources>

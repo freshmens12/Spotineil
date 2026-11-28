@@ -100,4 +100,6 @@
     <string name="settings_download_folder_change">Cambiar</string>
     <string name="settings_download_folder_reset">Predeterminada</string>
     <string name="settings_download_folder_unavailable">Este teléfono no tiene selector de carpetas</string>
+    <string name="settings_lock_screen_lyrics">Letra en la pantalla de bloqueo</string>
+    <string name="settings_lock_screen_lyrics_desc">Mientras suena una canción, la línea que se canta aparece en la notificación, en la pantalla de bloqueo y en ventanas como Dynamic Island, en lugar del nombre del artista (que pasa junto al nombre de la canción). También se ve en la pantalla del coche.</string>
 </resources>

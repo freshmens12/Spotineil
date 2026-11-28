@@ -38,6 +38,9 @@ fun PlayerHost(
     onAlbumClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     miniPlayerModifier: Modifier = Modifier,
+    /** True to open on the lyrics (the line on another Now playing screen was tapped). */
+    openLyrics: Boolean = false,
+    onLyricsOpened: () -> Unit = {},
     viewModel: PlayerViewModel = hiltViewModel(),
     lyricsViewModel: LyricsViewModel = hiltViewModel(),
 ) {
@@ -46,6 +49,12 @@ fun PlayerHost(
     var sheet by rememberSaveable { mutableStateOf<String?>(null) }
     var karaoke by rememberSaveable { mutableStateOf(false) }
     var carMode by rememberSaveable { mutableStateOf(false) }
+    androidx.compose.runtime.LaunchedEffect(openLyrics) {
+        if (openLyrics) {
+            showLyrics = true
+            onLyricsOpened()
+        }
+    }
 
     if (!state.hasTrack) return
     BackHandler(enabled = expanded) { onExpandedChange(false) }
@@ -111,6 +120,15 @@ fun PlayerHost(
                     },
                     artworkModifier = artwork,
                     titleModifier = title,
+                    lyricPeek = {
+                        val lyrics by lyricsViewModel.state.collectAsStateWithLifecycle()
+                        com.spotineil.core.ui.LyricPeek(
+                            (lyrics as? LyricsUiState.Loaded)?.lyrics,
+                            state.positionMs,
+                            onClick = { showLyrics = true },
+                            modifier = Modifier.padding(top = 8.dp),
+                        )
+                    },
                 )
             } else {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {

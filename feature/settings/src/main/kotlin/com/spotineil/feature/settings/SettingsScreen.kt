@@ -203,6 +203,14 @@ fun SettingsRoute(
             item { Header(stringResource(R.string.settings_playback)) }
             item {
                 ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_lock_screen_lyrics)) },
+                    supportingContent = { Text(stringResource(R.string.settings_lock_screen_lyrics_desc)) },
+                    trailingContent = { Switch(settings.lockScreenLyrics, viewModel::setLockScreenLyrics) },
+                    modifier = Modifier.clickable { viewModel.setLockScreenLyrics(!settings.lockScreenLyrics) }.testTag("settings_lock_screen_lyrics"),
+                )
+            }
+            item {
+                ListItem(
                     headlineContent = { Text(stringResource(R.string.settings_transition)) },
                     supportingContent = { Text(stringResource(settings.transition.description())) },
                     trailingContent = { Text(stringResource(settings.transition.label()), color = MaterialTheme.colorScheme.primary) },

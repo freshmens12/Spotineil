@@ -49,4 +49,5 @@
     <string name="ui_download_all">Descargar todo</string>
     <string name="ui_download_all_title">¿Descargar «%1$s»?</string>
     <plurals name="ui_download_all_body"><item quantity="one">Se guardará %1$d canción en su propia carpeta, «%2$s», dentro de tu carpeta de descargas, con un archivo de lista para que los reproductores la muestren.</item><item quantity="many">Se guardarán %1$d canciones en su propia carpeta, «%2$s», dentro de tu carpeta de descargas, numeradas en orden y con un archivo de lista para que los reproductores las muestren como una.</item><item quantity="other">Se guardarán %1$d canciones en su propia carpeta, «%2$s», dentro de tu carpeta de descargas, numeradas en orden y con un archivo de lista para que los reproductores las muestren como una.</item></plurals>
+    <string name="ui_lyrics_open">Ver toda la letra</string>
 </resources>

@@ -184,6 +184,9 @@ private fun MainShell(mainViewModel: MainViewModel, free: Boolean) {
     val context = LocalContext.current
     val hasTrack by mainViewModel.hasTrack.collectAsStateWithLifecycle()
     var playerExpanded by rememberSaveable { mutableStateOf(false) }
+    // The lyric line on YouTube's Now playing was tapped: open the full player on its lyrics.
+    var lyricsRequested by remember { mutableStateOf(false) }
+    val openLyrics = remember { { lyricsRequested = true; playerExpanded = true } }
     val showMessage: (String) -> Unit = { msg -> scope.launch { snackbar.showSnackbar(msg) } }
 
     // Media notification for local playback (Android 13+).
@@ -258,7 +261,7 @@ private fun MainShell(mainViewModel: MainViewModel, free: Boolean) {
                 com.spotineil.core.ui.LocalSongMenu provides { songMenuDownload = null; songMenu = it },
                 com.spotineil.core.ui.LocalSongMenuWithDownload provides { media, download -> songMenuDownload = download; songMenu = media },
             ) {
-                AppNavHost(navController, showMessage, startDestination = tabs.first().route)
+                AppNavHost(navController, showMessage, startDestination = tabs.first().route, onOpenLyrics = openLyrics)
             }
         }
         // In the floating PiP window only the YouTube video is shown: no bar, mini player or sheets.
@@ -270,6 +273,8 @@ private fun MainShell(mainViewModel: MainViewModel, free: Boolean) {
                 onArtistClick = { navController.navigateToArtist(it) },
                 onAlbumClick = { navController.navigateToAlbum(it) },
                 miniPlayerModifier = Modifier.navigationBarsPadding().padding(bottom = NavBarHeight + 2.dp),
+                openLyrics = lyricsRequested,
+                onLyricsOpened = { lyricsRequested = false },
             )
         }
     }
@@ -341,7 +346,7 @@ private fun BottomBar(navController: NavHostController, tabs: List<TopLevel>, mo
 }
 
 @Composable
-private fun AppNavHost(navController: NavHostController, onMessage: (String) -> Unit, startDestination: Any) {
+private fun AppNavHost(navController: NavHostController, onMessage: (String) -> Unit, startDestination: Any, onOpenLyrics: () -> Unit = {}) {
     val back: () -> Unit = { navController.popBackStack() }
     val toArtist: (String) -> Unit = { navController.navigateToArtist(it) }
     val toAlbum: (String) -> Unit = { navController.navigateToAlbum(it) }
@@ -367,6 +372,7 @@ private fun AppNavHost(navController: NavHostController, onMessage: (String) -> 
             onSettings = { navController.navigateToSettings() },
             onBack = back,
             onMessage = onMessage,
+            onLyrics = onOpenLyrics,
         )
     }
 

@@ -35,6 +35,7 @@ interface SettingsRepository {
     suspend fun setDownloads(downloads: com.spotineil.core.model.DownloadSettings)
     suspend fun setCoverStyle(style: com.spotineil.core.model.CoverStyle)
     suspend fun setAnimatedArtwork(enabled: Boolean)
+    suspend fun setLockScreenLyrics(enabled: Boolean)
 }
 
 @Singleton
@@ -68,6 +69,7 @@ class DataStoreSettingsRepository @Inject constructor(
                 if (p[ANIMATED_COVER] == false) com.spotineil.core.model.CoverStyle.Still else defaults.coverStyle,
             ),
             animatedArtwork = p[ANIMATED_ARTWORK] ?: defaults.animatedArtwork,
+            lockScreenLyrics = p[LOCK_SCREEN_LYRICS] ?: defaults.lockScreenLyrics,
             downloads = com.spotineil.core.model.DownloadSettings(
                 folderUri = p[DL_FOLDER_URI],
                 folderName = p[DL_FOLDER_NAME],
@@ -91,6 +93,8 @@ class DataStoreSettingsRepository @Inject constructor(
     }
 
     override suspend fun setAnimatedArtwork(enabled: Boolean) { store.edit { it[ANIMATED_ARTWORK] = enabled } }
+
+    override suspend fun setLockScreenLyrics(enabled: Boolean) { store.edit { it[LOCK_SCREEN_LYRICS] = enabled } }
 
     override suspend fun setCoverStyle(style: com.spotineil.core.model.CoverStyle) { store.edit { it[COVER_STYLE] = style.name } }
 
@@ -132,6 +136,7 @@ class DataStoreSettingsRepository @Inject constructor(
         val ANIMATED_COVER = booleanPreferencesKey("animated_cover")
         val COVER_STYLE = stringPreferencesKey("cover_style")
         val ANIMATED_ARTWORK = booleanPreferencesKey("animated_artwork")
+        val LOCK_SCREEN_LYRICS = booleanPreferencesKey("lock_screen_lyrics")
         val DL_FOLDER_URI = stringPreferencesKey("download_folder_uri")
         val DL_FOLDER_NAME = stringPreferencesKey("download_folder_name")
         val DL_PARALLEL = androidx.datastore.preferences.core.intPreferencesKey("download_parallel")
