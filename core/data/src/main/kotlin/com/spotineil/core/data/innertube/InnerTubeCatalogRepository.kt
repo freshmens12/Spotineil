@@ -41,6 +41,8 @@ import com.spotineil.core.data.cache.JsonCache
 
 interface InnerTubeCatalogRepository {
     suspend fun search(query: String): Result<SearchResults>
+    /** What YouTube Music suggests for a search that is still being typed ("taylor sw" → "taylor swift"). */
+    suspend fun searchSuggestions(query: String): Result<List<String>> = Result.success(emptyList())
     /** Songs only (studio audio first), ready to play. */
     suspend fun searchSongs(query: String): Result<List<YouTubeVideo>>
     /** Today's top songs for the device's country. */
@@ -101,6 +103,15 @@ class DefaultInnerTubeCatalogRepository @Inject constructor(
         }
         return result.recoverCatching { failure ->
             cache.get(key, SearchResults.serializer()) ?: throw failure
+        }
+    }
+
+    override suspend fun searchSuggestions(query: String): Result<List<String>> = runCatching {
+        val q = query.trim()
+        if (q.isEmpty()) return@runCatching emptyList()
+        withTimeout(6_000) {
+            val response = innerTube.getSearchSuggestions(YouTubeClient.WEB_REMIX, q)
+            suggestionTexts(parseJson(response.bodyAsText()))
         }
     }
 

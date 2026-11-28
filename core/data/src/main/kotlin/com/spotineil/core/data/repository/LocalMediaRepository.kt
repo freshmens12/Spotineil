@@ -16,8 +16,13 @@ import kotlinx.coroutines.withContext
 interface LocalMediaRepository {
     suspend fun tracks(): List<LocalTrack>
 
-    /** Songs Spotineil downloaded (Music/Spotineil). */
-    suspend fun downloads(): List<LocalTrack> = tracks(DOWNLOADS_SELECTION, arrayOf("%Music/Spotineil%"))
+    /** Songs Spotineil downloaded (Music/Spotineil, and [folder] when one was picked, e.g. "Music/Mine/"). */
+    suspend fun downloads(folder: String? = null): List<LocalTrack> =
+        if (folder.isNullOrBlank()) {
+            tracks(DOWNLOADS_SELECTION, arrayOf("%Music/Spotineil%"))
+        } else {
+            tracks("$DOWNLOADS_SELECTION OR $DOWNLOADS_SELECTION", arrayOf("%Music/Spotineil%", folder.trimEnd('/') + "/%"))
+        }
 
     suspend fun tracks(selection: String, args: Array<String>): List<LocalTrack> = emptyList()
 }

@@ -33,7 +33,8 @@ interface SettingsRepository {
     suspend fun setTransition(mode: TransitionMode)
     suspend fun setAudio(audio: com.spotineil.core.model.AudioSettings)
     suspend fun setDownloads(downloads: com.spotineil.core.model.DownloadSettings)
-    suspend fun setAnimatedCover(enabled: Boolean)
+    suspend fun setCoverStyle(style: com.spotineil.core.model.CoverStyle)
+    suspend fun setAnimatedArtwork(enabled: Boolean)
 }
 
 @Singleton
@@ -62,8 +63,14 @@ class DataStoreSettingsRepository @Inject constructor(
                 skipSilence = p[SKIP_SILENCE] ?: false,
                 podcastSpeed = p[PODCAST_SPEED]?.toFloatOrNull() ?: 1f,
             ),
-            animatedCover = p[ANIMATED_COVER] ?: defaults.animatedCover,
+            // Before there were styles, the animation could only be switched off.
+            coverStyle = p[COVER_STYLE].toEnum(
+                if (p[ANIMATED_COVER] == false) com.spotineil.core.model.CoverStyle.Still else defaults.coverStyle,
+            ),
+            animatedArtwork = p[ANIMATED_ARTWORK] ?: defaults.animatedArtwork,
             downloads = com.spotineil.core.model.DownloadSettings(
+                folderUri = p[DL_FOLDER_URI],
+                folderName = p[DL_FOLDER_NAME],
                 format = p[DL_FORMAT].toEnum(defaults.downloads.format),
                 maxParallel = (p[DL_PARALLEL] ?: defaults.downloads.maxParallel).coerceIn(1, com.spotineil.core.model.DownloadSettings.MAX_PARALLEL),
             ),
@@ -83,12 +90,16 @@ class DataStoreSettingsRepository @Inject constructor(
         }
     }
 
-    override suspend fun setAnimatedCover(enabled: Boolean) { store.edit { it[ANIMATED_COVER] = enabled } }
+    override suspend fun setAnimatedArtwork(enabled: Boolean) { store.edit { it[ANIMATED_ARTWORK] = enabled } }
+
+    override suspend fun setCoverStyle(style: com.spotineil.core.model.CoverStyle) { store.edit { it[COVER_STYLE] = style.name } }
 
     override suspend fun setDownloads(downloads: com.spotineil.core.model.DownloadSettings) {
         store.edit {
             it[DL_FORMAT] = downloads.format.name
             it[DL_PARALLEL] = downloads.maxParallel.coerceIn(1, com.spotineil.core.model.DownloadSettings.MAX_PARALLEL)
+            downloads.folderUri?.let { uri -> it[DL_FOLDER_URI] = uri } ?: it.remove(DL_FOLDER_URI)
+            downloads.folderName?.let { name -> it[DL_FOLDER_NAME] = name } ?: it.remove(DL_FOLDER_NAME)
         }
     }
 
@@ -119,6 +130,10 @@ class DataStoreSettingsRepository @Inject constructor(
         val PODCAST_SPEED = stringPreferencesKey("podcast_speed")
         val DL_FORMAT = stringPreferencesKey("download_format")
         val ANIMATED_COVER = booleanPreferencesKey("animated_cover")
+        val COVER_STYLE = stringPreferencesKey("cover_style")
+        val ANIMATED_ARTWORK = booleanPreferencesKey("animated_artwork")
+        val DL_FOLDER_URI = stringPreferencesKey("download_folder_uri")
+        val DL_FOLDER_NAME = stringPreferencesKey("download_folder_name")
         val DL_PARALLEL = androidx.datastore.preferences.core.intPreferencesKey("download_parallel")
     }
 }

@@ -31,6 +31,58 @@ class YouTubeStreamDataSourceFactory @Inject constructor(
      * speed; the SABR stream only runs a little ahead of playback).
      */
     internal fun createDownloadSource(): YouTubeStreamDataSource = YouTubeStreamDataSource(catalog, preferDirect = true)
+
+    private val prefetchScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val prefetching = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+
+    /**
+     * Looks up a song's stream ahead of time (the next song, just before a crossfade), so it starts
+     * without waiting for YouTube when the player gets to it.
+     */
+    fun prefetch(uri: Uri?) {
+        if (uri?.scheme != "ytmusic") return
+        val videoId = uri.pathSegments.lastOrNull() ?: return
+        if (ResolvedStreamCache.get(videoId) != null || !prefetching.add(videoId)) return
+        prefetchScope.launch {
+            try {
+                catalog.resolveStream(videoId).onSuccess { ResolvedStreamCache.put(it) }
+            } finally {
+                prefetching.remove(videoId)
+            }
+        }
+    }
+}
+
+/**
+ * Streams looked up in the last few minutes. Opening the same song again (a seek, the crossfade's
+ * second player) or a song looked up ahead then skips the network round trip. A link that has
+ * stopped working is looked up again by the data source, which also replaces it here.
+ */
+internal object ResolvedStreamCache {
+    private const val MAX_AGE_MS = 15 * 60_000L
+    private const val EXPIRY_MARGIN_MS = 2 * 60_000L
+    private const val MAX_ENTRIES = 24
+
+    private class Entry(val stream: ResolvedYouTubeStream, val at: Long)
+
+    private val entries = java.util.concurrent.ConcurrentHashMap<String, Entry>()
+
+    fun get(videoId: String, now: Long = System.currentTimeMillis()): ResolvedYouTubeStream? {
+        val entry = entries[videoId] ?: return null
+        val expires = entry.stream.expiresAtEpochMillis
+        if (now - entry.at > MAX_AGE_MS || (expires != null && expires - now < EXPIRY_MARGIN_MS)) {
+            entries.remove(videoId, entry)
+            return null
+        }
+        return entry.stream
+    }
+
+    fun put(stream: ResolvedYouTubeStream, now: Long = System.currentTimeMillis()) {
+        if (entries.size >= MAX_ENTRIES) entries.clear()
+        entries[stream.videoId] = Entry(stream, now)
+    }
+
+    fun clear() = entries.clear()
 }
 
 internal class YouTubeStreamDataSource(
@@ -57,7 +109,9 @@ internal class YouTubeStreamDataSource(
         val videoId = dataSpec.uri.pathSegments.lastOrNull()
             ?: throw IOException("Missing YouTube video id")
         // A download opens the stream piece by piece: look it up once.
-        val resolved = lastResolved?.takeIf { preferDirect && it.videoId == videoId } ?: resolve(videoId)
+        val resolved = lastResolved?.takeIf { preferDirect && it.videoId == videoId }
+            ?: ResolvedStreamCache.get(videoId)
+            ?: resolve(videoId)
         streamPosition = dataSpec.position
         retried = false
 
@@ -91,10 +145,14 @@ internal class YouTubeStreamDataSource(
         return remaining
     }
 
+    /** Looks the stream up on YouTube (always fresh: also used when a link stopped working). */
     private fun resolve(videoId: String): ResolvedYouTubeStream =
         kotlinx.coroutines.runBlocking {
             catalog.resolveStream(videoId).getOrElse { throw IOException("Stream resolution failed", it) }
-        }.also { lastResolved = it }
+        }.also {
+            lastResolved = it
+            ResolvedStreamCache.put(it)
+        }
 
     private var lastResolved: ResolvedYouTubeStream? = null
 

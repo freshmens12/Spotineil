@@ -7,11 +7,13 @@
     <string name="player_auto_recent">Recently played</string>
     <string name="player_auto_local">On this device</string>
     <string name="yt_download_started">Downloading “%1$s”…</string>
-    <string name="yt_download_done">Saved to Music/Spotineil: %1$s</string>
+    <string name="yt_download_done">Saved to %2$s: %1$s</string>
     <string name="yt_download_channel">Downloads</string>
     <string name="yt_download_already">“%1$s” is already in your downloads</string>
-    <plurals name="yt_download_done_many"><item quantity="one">Saved %1$d song to Music/Spotineil</item><item quantity="other">Saved %1$d songs to Music/Spotineil</item></plurals>
+    <plurals name="yt_download_done_many"><item quantity="one">Saved %1$d song to %2$s</item><item quantity="other">Saved %1$d songs to %2$s</item></plurals>
     <plurals name="yt_downloading_many"><item quantity="one">Downloading %1$d song</item><item quantity="other">Downloading %1$d songs</item></plurals>
     <string name="yt_download_size">%1$s of %2$s</string>
     <string name="yt_download_speed">%1$s/s</string>
+    <string name="yt_download_collection_none">The songs of “%1$s” are already in your downloads</string>
+    <plurals name="yt_download_collection_started"><item quantity="one">Downloading %1$d song into the folder “%2$s”…</item><item quantity="other">Downloading %1$d songs into the folder “%2$s”…</item></plurals>
 </resources>

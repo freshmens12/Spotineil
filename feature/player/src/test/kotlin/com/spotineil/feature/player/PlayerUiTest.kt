@@ -129,6 +129,6 @@ class PlayerUiTest {
 @androidx.compose.runtime.Composable
 private fun TestTheme(content: @androidx.compose.runtime.Composable () -> Unit) {
     SpotineilTheme {
-        androidx.compose.runtime.CompositionLocalProvider(com.spotineil.core.ui.LocalAnimatedCovers provides false, content = content)
+        androidx.compose.runtime.CompositionLocalProvider(com.spotineil.core.ui.LocalCoverStyle provides com.spotineil.core.model.CoverStyle.Still, content = content)
     }
 }

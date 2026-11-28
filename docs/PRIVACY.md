@@ -19,13 +19,14 @@ Removing the singer's voice happens entirely on your phone, with an AI model sto
 
 ## Services the app talks to
 To show and play music, the app sends requests (such as your search words and your approximate country) directly from your phone to the services below. Each one handles those requests under its own privacy policy. The developer does not see them.
-- **YouTube Music**: the music catalog, search, charts and audio streams. When you tap Download on a YouTube song, its audio is fetched the same way and saved in Music/Spotineil on your phone; nothing is uploaded.
+- **YouTube Music**: the music catalog, search, charts and audio streams. When you tap Download on a YouTube song, its audio is fetched the same way and saved on your phone (in Music/Spotineil, or the folder you picked in Settings); nothing is uploaded.
 - **LRCLIB**: song lyrics.
 - **Google Translate** (only when you turn on "Translate lyrics"): the lyric lines of the song, to translate them into your language.
 - **Last.fm**: similar artists, used for radio and "Play similar".
 - **Audius, Jamendo, ccMixter, Internet Archive**: free and Creative Commons music.
 - **Radio Browser**: the radio station directory.
 - **Apple Podcasts directory** and each podcast's own RSS feed.
+- **Apple Music** (only while "Animated artwork" is on, and not with Data saver): the name and artist of the song playing, sent to Apple's public iTunes search to find its album, then that album's public page on music.apple.com and its moving-cover video. Answers are kept on the phone for a week.
 - **Spotify (only if you choose to connect it)**: see below.
 - **GitHub**: when the app opens it asks GitHub whether a newer version exists, and downloads it only if you agree. After an update it reads that version's release notes for "What's new". The first time you turn vocals off in Karaoke mode, the voice model is downloaded from this project's GitHub releases (once, after you agree).
 

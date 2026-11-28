@@ -179,4 +179,5 @@
     <string name="free_voice_unavailable">Walang voice search sa teleponong ito</string>
     <string name="free_find_in_list">Hanapin sa listahang ito</string>
     <string name="discovery_playlist">Playlist</string>
+    <string name="free_search_fill">Ilagay sa search box</string>
 </resources>

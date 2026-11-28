@@ -86,6 +86,8 @@ class YouTubeDownloader @Inject constructor(
     private val jobs = ConcurrentHashMap<String, Job>()
     @Volatile private var maxParallel = 3
     @Volatile private var format = DownloadFormat.Automatic
+    /** The folder picked in Settings (storage-access tree), or null for Music/Spotineil. */
+    @Volatile private var folderUri: String? = null
     @Volatile private var started = false
     /** Songs saved since the list last went quiet (for the "finished" notification). */
     @Volatile private var savedInRun = 0
@@ -106,6 +108,7 @@ class YouTubeDownloader @Inject constructor(
             settings.settings.map { it.downloads }.distinctUntilChanged().collect {
                 maxParallel = it.maxParallel
                 format = it.format
+                folderUri = it.folderUri
                 schedule()
             }
         }
@@ -137,6 +140,42 @@ class YouTubeDownloader @Inject constructor(
         toast(context.getString(R.string.yt_download_started, task.title))
         schedule()
         return true
+    }
+
+    /**
+     * Downloads a whole album or playlist into its own folder ([name], inside the downloads folder),
+     * numbered in its order, with a playlist file (.m3u8) so music players show it as one.
+     * Returns how many songs were added (songs already on their way are left as they are).
+     */
+    fun downloadCollection(name: String, items: List<PlayableMedia>): Int {
+        start()
+        val folder = folderName(name)
+        val now = System.currentTimeMillis()
+        val tasks = items.mapIndexedNotNull { i, media ->
+            val id = videoId(media) ?: return@mapIndexedNotNull null
+            if (media.isLive) return@mapIndexedNotNull null
+            DownloadTask(
+                id = id,
+                title = media.title.ifBlank { id },
+                artist = media.artist,
+                artworkUrl = media.artworkUrl,
+                addedAt = now + i, // keeps the album's order in the queue
+                folder = folder,
+                track = i + 1,
+            )
+        }.distinctBy { it.id }
+        val busy = _tasks.value.filter { it.isActive || it.status == DownloadStatus.Paused }.map { it.id }.toSet()
+        val fresh = tasks.filter { it.id !in busy }
+        if (fresh.isEmpty()) {
+            toast(context.getString(R.string.yt_download_collection_none, name))
+            return 0
+        }
+        fresh.forEach { partFile(it.id).delete() }
+        val ids = fresh.map { it.id }.toSet()
+        update { list -> fresh.reversed() + list.filter { it.id !in ids } }
+        toast(context.resources.getQuantityString(R.plurals.yt_download_collection_started, fresh.size, fresh.size, name))
+        schedule()
+        return fresh.size
     }
 
     /** Stops a download for now; [resume] continues it from where it was. */
@@ -231,11 +270,13 @@ class YouTubeDownloader @Inject constructor(
             updateTask(id) { it.copy(status = DownloadStatus.Done, fileName = name) }
             savedInRun++
             onSaved(name)
+            task.folder?.let { writePlaylistWhenComplete(it) }
         } catch (e: CancellationException) {
             throw e // paused or removed
         } catch (e: Throwable) {
             val status = if (e !is ConversionException && !isOnline()) DownloadStatus.WaitingForNetwork else DownloadStatus.Failed
             if (find(id)?.status != DownloadStatus.Paused) updateTask(id) { it.copy(status = status) }
+            if (status == DownloadStatus.Failed) task.folder?.let { writePlaylistWhenComplete(it) }
         }
     }
 
@@ -342,7 +383,10 @@ class YouTubeDownloader @Inject constructor(
         val tagged = File(dir, "${task.id}.tagged")
         try {
             val mime = AudioConvert.audioMime(part) ?: throw ConversionException("No audio in the stream")
-            val base = fileBaseName(task.title, task.artist, task.id)
+            val base = fileBaseName(task.title, task.artist, task.id).let { name ->
+                // "01 Artist - Title": keeps an album or playlist in order in any file list.
+                task.track?.let { "%02d %s".format(java.util.Locale.ROOT, it, name) } ?: name
+            }
             val wanted = format
             val (file, extension, fileMime) = try {
                 when {
@@ -373,7 +417,7 @@ class YouTubeDownloader @Inject constructor(
             } catch (e: Exception) {
                 throw ConversionException("Conversion failed", e)
             }
-            return publish(file, "$base.$extension", fileMime, task.title, task.artist)
+            return publish(file, "$base.$extension", fileMime, task.title, task.artist, task.folder)
         } finally {
             work.delete()
             tagged.delete()
@@ -418,12 +462,24 @@ class YouTubeDownloader @Inject constructor(
         }
     }
 
-    private fun publish(file: File, name: String, mime: String, title: String, artist: String): String {
+    /** Saves [file] in the picked folder, or else in Music/Spotineil (in [folder] inside it, if given). */
+    private fun publish(file: File, name: String, mime: String, title: String, artist: String, folder: String?): String {
+        folderUri?.let { tree ->
+            try {
+                return DownloadFolder.write(context, Uri.parse(tree), folder, name) { out ->
+                    file.inputStream().use { it.copyTo(out, 256 * 1024) }
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                // The folder is gone or access was taken back: save in the usual place instead.
+            }
+        }
         val resolver = context.contentResolver
         val values = ContentValues().apply {
             put(MediaStore.Audio.Media.DISPLAY_NAME, name)
             put(MediaStore.Audio.Media.MIME_TYPE, mime)
-            put(MediaStore.Audio.Media.RELATIVE_PATH, Environment.DIRECTORY_MUSIC + "/Spotineil")
+            put(MediaStore.Audio.Media.RELATIVE_PATH, mediaStorePath(folder))
             if (title.isNotBlank()) put(MediaStore.Audio.Media.TITLE, title)
             if (artist.isNotBlank()) put(MediaStore.Audio.Media.ARTIST, artist)
             put(MediaStore.Audio.Media.IS_PENDING, 1)
@@ -456,6 +512,59 @@ class YouTubeDownloader @Inject constructor(
     }
 
     private fun partFile(id: String) = File(dir, "$id.part")
+
+    private fun mediaStorePath(folder: String?) =
+        Environment.DIRECTORY_MUSIC + "/Spotineil" + (folder?.let { "/$it" } ?: "") + "/"
+
+    /**
+     * Once every song of an album or playlist is done (saved or failed), writes its playlist file
+     * "<name>.m3u8" next to the songs, listing the saved ones in order.
+     */
+    private fun writePlaylistWhenComplete(folder: String) {
+        val songs = _tasks.value.filter { it.folder == folder }
+        if (songs.any { it.isActive || it.status == DownloadStatus.Paused }) return
+        val saved = songs.filter { it.status == DownloadStatus.Done && it.fileName != null }.sortedBy { it.track ?: Int.MAX_VALUE }
+        if (saved.isEmpty()) return
+        val text = buildString {
+            append("#EXTM3U\n")
+            for (t in saved) {
+                append("#EXTINF:-1,").append(listOf(t.artist, t.title).filter { it.isNotBlank() }.joinToString(" - ")).append('\n')
+                append(t.fileName).append('\n')
+            }
+        }.toByteArray(Charsets.UTF_8)
+        val name = "$folder.m3u8"
+        runCatching {
+            val tree = folderUri
+            if (tree != null) {
+                runCatching { DownloadFolder.write(context, Uri.parse(tree), folder, name, replace = true) { it.write(text) } }
+                    .onSuccess { return }
+            }
+            writeMediaStorePlaylist(folder, name, text)
+        }
+    }
+
+    private fun writeMediaStorePlaylist(folder: String, name: String, text: ByteArray) {
+        val resolver = context.contentResolver
+        val files = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val path = mediaStorePath(folder)
+        // Replace the one written last time (the album was downloaded again).
+        val existing = resolver.query(
+            files,
+            arrayOf(MediaStore.MediaColumns._ID),
+            "${MediaStore.MediaColumns.RELATIVE_PATH} = ? AND ${MediaStore.MediaColumns.DISPLAY_NAME} = ?",
+            arrayOf(path, name),
+            null,
+        )?.use { c -> if (c.moveToFirst()) android.content.ContentUris.withAppendedId(files, c.getLong(0)) else null }
+        val uri = existing ?: resolver.insert(
+            files,
+            ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+                put(MediaStore.MediaColumns.MIME_TYPE, "audio/x-mpegurl")
+                put(MediaStore.MediaColumns.RELATIVE_PATH, path)
+            },
+        ) ?: return
+        resolver.openOutputStream(uri, "wt")?.use { it.write(text) }
+    }
 
     // ------------------------------------------------------------------------------- network
 
@@ -493,11 +602,14 @@ class YouTubeDownloader @Inject constructor(
         if (_tasks.value.none { it.isActive }) {
             val count = savedInRun
             toast(
-                if (count <= 1) context.getString(R.string.yt_download_done, name)
-                else context.resources.getQuantityString(R.plurals.yt_download_done_many, count, count),
+                if (count <= 1) context.getString(R.string.yt_download_done, name, savedWhere())
+                else context.resources.getQuantityString(R.plurals.yt_download_done_many, count, count, savedWhere()),
             )
         }
     }
+
+    /** Where songs are saved, for messages: the picked folder or Music/Spotineil. */
+    private fun savedWhere(): String = folderUri?.let { DownloadFolder.displayPath(Uri.parse(it)) } ?: "Music/Spotineil"
 
     private fun canNotify(): Boolean =
         ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
@@ -522,7 +634,7 @@ class YouTubeDownloader @Inject constructor(
                         NOTIFICATION_ID,
                         NotificationCompat.Builder(context, CHANNEL)
                             .setSmallIcon(android.R.drawable.stat_sys_download_done)
-                            .setContentTitle(context.resources.getQuantityString(R.plurals.yt_download_done_many, count, count))
+                            .setContentTitle(context.resources.getQuantityString(R.plurals.yt_download_done_many, count, count, savedWhere()))
                             .setAutoCancel(true)
                             .build(),
                     )
@@ -585,6 +697,10 @@ class YouTubeDownloader @Inject constructor(
             media.mediaId.startsWith(YOUTUBE_MEDIA_PREFIX) -> media.mediaId.removePrefix(YOUTUBE_MEDIA_PREFIX)
             else -> null
         }?.takeIf { it.isNotBlank() && it.all { c -> c.isLetterOrDigit() || c == '-' || c == '_' } }
+
+        /** A folder name for an album or playlist, without characters file names can't hold. */
+        fun folderName(name: String): String =
+            name.replace(Regex("[\\\\/:*?\"<>|\\p{Cntrl}]"), "_").trim().trim('.').take(80).ifBlank { "Playlist" }
 
         /** "Artist - Title", without characters file names can't hold. */
         fun fileBaseName(title: String, artist: String, fallback: String): String =

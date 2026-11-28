@@ -105,7 +105,8 @@ class MainActivity : AppCompatActivity() {
                     if (ready != null) {
                         CompositionLocalProvider(
                             LocalPipState provides pip,
-                            com.spotineil.core.ui.LocalAnimatedCovers provides ready.settings.animatedCover,
+                            com.spotineil.core.ui.LocalCoverStyle provides ready.settings.coverStyle,
+                            com.spotineil.core.ui.LocalAnimatedArtwork provides (ready.settings.animatedArtwork && !ready.settings.dataSaver),
                         ) {
                             SpotineilApp(isLoggedIn = ready.isLoggedIn, guestMode = ready.settings.guestMode, mainViewModel = viewModel)
                         }

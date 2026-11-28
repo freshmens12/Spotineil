@@ -75,7 +75,20 @@ class SettingsViewModel @Inject constructor(
     fun setLanguage(language: AppLanguage) = viewModelScope.launch { settings.setLanguage(language) }
     fun setTransition(mode: TransitionMode) = viewModelScope.launch { settings.setTransition(mode) }
     fun setAudio(audio: com.spotineil.core.model.AudioSettings) = viewModelScope.launch { settings.setAudio(audio) }
-    fun setAnimatedCover(enabled: Boolean) = viewModelScope.launch { settings.setAnimatedCover(enabled) }
+    fun setAnimatedArtwork(enabled: Boolean) = viewModelScope.launch { settings.setAnimatedArtwork(enabled) }
+
+    /** A folder picked for downloads ([tree] from the folder picker), or null for Music/Spotineil. */
+    fun setDownloadFolder(current: com.spotineil.core.model.DownloadSettings, tree: android.net.Uri?) = viewModelScope.launch {
+        val Folder = com.spotineil.core.player.youtube.DownloadFolder
+        current.folderUri?.let { old -> if (old != tree?.toString()) Folder.releaseAccess(context, android.net.Uri.parse(old)) }
+        if (tree == null) {
+            settings.setDownloads(current.copy(folderUri = null, folderName = null))
+        } else {
+            runCatching { Folder.keepAccess(context, tree) }
+            settings.setDownloads(current.copy(folderUri = tree.toString(), folderName = Folder.displayPath(tree)))
+        }
+    }
+
     fun setDownloads(downloads: com.spotineil.core.model.DownloadSettings) = viewModelScope.launch { settings.setDownloads(downloads) }
 
     @OptIn(ExperimentalCoilApi::class)

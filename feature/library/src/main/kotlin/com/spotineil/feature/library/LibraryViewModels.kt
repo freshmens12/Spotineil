@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -119,6 +120,7 @@ class LocalFilesViewModel @Inject constructor(
     private val localMedia: LocalMediaRepository,
     private val player: PlaybackController,
     private val downloader: com.spotineil.core.player.youtube.YouTubeDownloader,
+    private val settings: com.spotineil.core.data.repository.SettingsRepository,
 ) : ViewModel() {
     /** YouTube songs being downloaded (or saved / failed), for the Downloads page. */
     val downloads: StateFlow<List<com.spotineil.core.model.DownloadTask>> = downloader.tasks
@@ -133,7 +135,12 @@ class LocalFilesViewModel @Inject constructor(
     /** True on the Downloads page: only songs Spotineil saved. */
     var downloadsOnly = false
 
-    private suspend fun load() = if (downloadsOnly) localMedia.downloads() else localMedia.tracks()
+    private suspend fun load() = if (downloadsOnly) localMedia.downloads(pickedFolder()) else localMedia.tracks()
+
+    /** The folder picked in Settings → Downloads → Save to, as the music library knows it ("Music/Mine/"). */
+    private suspend fun pickedFolder(): String? =
+        settings.settings.first().downloads.folderUri
+            ?.let { com.spotineil.core.player.youtube.DownloadFolder.relativePath(android.net.Uri.parse(it)) }
 
     fun onPermissionResult(granted: Boolean) {
         if (!granted) { _state.value = LocalFilesUiState.NeedsPermission; return }

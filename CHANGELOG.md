@@ -4,6 +4,23 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.19.0] - 2026-11-28
+
+### Added
+- **Cover styles**: pick how the cover moves on Now playing: **Living** (slow drift, pulse and glow), **Vinyl** (a spinning record with the cover as its label; the tonearm drops on it when you press play and lifts when you pause), **CD** (a spinning disc with a rainbow shine), **Beat** (bounces and flashes on the beat), **3D tilt** (floats and tilts with a glossy shine), **Ripples** (rings ripple out on the beat) or **Still**. Touch and hold the cover to choose, with a live preview of each, or go to Settings → Appearance → Cover style. If you had turned the animated cover off, it stays Still.
+- **Slide between songs**: on Next the cover slides away to the left and the next one comes in from the right; on Previous the other way round.
+- **Swipe the cover to skip**: swipe it left for the next song, right for the previous one.
+- **Apple Music animated artwork**: when a song's album has a moving cover on Apple Music, it plays on Now playing (silent and looping, inside whichever cover style you chose, and pausing with the music). To find it, the song and artist name are sent to Apple's public iTunes search. Videos already seen are kept on the phone (up to 150 MB) so they don't use data again. Turn it off in Settings → Appearance → Animated artwork; it is also off with Data saver.
+- **Search suggestions**: while you type, suggestions from YouTube Music appear under the search box (with your matching recent searches first), so you don't need to type the whole name. Tap one to search for it, or the arrow to put it in the box and keep typing.
+- **Choose where downloads go**: Settings → Downloads → Save to opens Android's folder picker; pick any folder on the phone or SD card. "Default" puts it back to Music/Spotineil. Library → Downloads also lists the songs in the folder you picked.
+- **Download a whole album or playlist into its own folder**: the new download button on album and playlist pages, your own playlists and Liked Songs saves every song into a folder named after it (for example Music/Spotineil/Midnights), numbered in order ("01 Taylor Swift - Lavender Haze") and with a playlist file (.m3u8), so other music players show it as a playlist.
+
+### Fixed
+- **Home-screen widgets stuck on loading**: since 1.15.0 every widget stayed on its loading picture. The optimized build removed a part that Android's background-work system (which widgets run on) creates by name. All six widgets show up and work again.
+- **Crossfade and AutoMix no longer skip or stutter**: during a blend, a second player takes over the end of the old song. It used to swap in up to half a second off, so a bit of the song was repeated or skipped. It is now lined up to within a few milliseconds first. Spotineil learns how fast your phone starts playing and needs fewer tries each time. If it can't line up in time, that one song just plays to its end instead of stuttering.
+- **The next song starts faster during a blend**: its stream is looked up while the old song is still playing, and a song's stream link is remembered for a few minutes, so seeking and blending don't wait for YouTube again.
+- Crossfade now uses the same smooth equal-power curve as AutoMix, so there is no dip in loudness halfway through.
+
 ## [1.18.0] - 2026-11-26
 
 ### Added

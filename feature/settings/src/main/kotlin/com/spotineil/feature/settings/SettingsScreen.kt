@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.platform.testTag
+import com.spotineil.core.ui.descriptionRes
+import com.spotineil.core.ui.labelRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -117,6 +119,10 @@ fun SettingsRoute(
     val exportLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/json"),
     ) { uri -> uri?.let(viewModel::exportBackup) }
+    // Settings → Downloads → Save to: Android's folder picker.
+    val folderLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree(),
+    ) { tree -> tree?.let { viewModel.setDownloadFolder(settings.downloads, it) } }
     val restoreLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.OpenDocument(),
     ) { uri -> uri?.let(viewModel::restoreBackup) }
@@ -179,10 +185,18 @@ fun SettingsRoute(
 
             item {
                 ListItem(
-                    headlineContent = { Text(stringResource(R.string.settings_animated_cover)) },
-                    supportingContent = { Text(stringResource(R.string.settings_animated_cover_desc)) },
-                    trailingContent = { Switch(settings.animatedCover, viewModel::setAnimatedCover) },
-                    modifier = Modifier.clickable { viewModel.setAnimatedCover(!settings.animatedCover) },
+                    headlineContent = { Text(stringResource(com.spotineil.core.ui.R.string.ui_cover_style)) },
+                    supportingContent = { Text(stringResource(settings.coverStyle.descriptionRes())) },
+                    trailingContent = { Text(stringResource(settings.coverStyle.labelRes()), color = MaterialTheme.colorScheme.primary) },
+                    modifier = Modifier.clickable { dialog = "cover" }.testTag("settings_cover_style"),
+                )
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_animated_artwork)) },
+                    supportingContent = { Text(stringResource(R.string.settings_animated_artwork_desc)) },
+                    trailingContent = { Switch(settings.animatedArtwork, viewModel::setAnimatedArtwork) },
+                    modifier = Modifier.clickable { viewModel.setAnimatedArtwork(!settings.animatedArtwork) }.testTag("settings_animated_artwork"),
                 )
             }
 
@@ -239,6 +253,32 @@ fun SettingsRoute(
                     supportingContent = { Text(stringResource(settings.downloads.format.description())) },
                     trailingContent = { Text(stringResource(settings.downloads.format.label()), color = MaterialTheme.colorScheme.primary) },
                     modifier = Modifier.clickable { dialog = "dlformat" },
+                )
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_download_folder)) },
+                    supportingContent = {
+                        Text(settings.downloads.folderName ?: stringResource(R.string.settings_download_folder_default))
+                    },
+                    trailingContent = {
+                        if (settings.downloads.folderUri != null) {
+                            androidx.compose.material3.TextButton(onClick = { viewModel.setDownloadFolder(settings.downloads, null) }) {
+                                Text(stringResource(R.string.settings_download_folder_reset))
+                            }
+                        } else {
+                            Text(stringResource(R.string.settings_download_folder_change), color = MaterialTheme.colorScheme.primary)
+                        }
+                    },
+                    modifier = Modifier
+                        .clickable {
+                            try {
+                                folderLauncher.launch(null)
+                            } catch (_: android.content.ActivityNotFoundException) {
+                                onMessage(context.getString(R.string.settings_download_folder_unavailable))
+                            }
+                        }
+                        .testTag("settings_download_folder"),
                 )
             }
             item {
@@ -403,6 +443,7 @@ fun SettingsRoute(
             onSelect = { viewModel.setDownloads(settings.downloads.copy(format = it)); dialog = null },
             onDismiss = { dialog = null },
         )
+        "cover" -> com.spotineil.core.ui.CoverStyleSheet(previewImageUrl = null, onDismiss = { dialog = null })
         "transition" -> ChoiceDialog(
             title = stringResource(R.string.settings_transition),
             options = TransitionMode.entries.toList(),
@@ -546,6 +587,7 @@ private val serviceCredits = listOf(
     Credit("Internet Archive", "Live concerts and free albums", "Each item's own license, see archive.org"),
     Credit("Radio Browser", "Live radio stations", "radio-browser.info · community database"),
     Credit("Apple Podcasts directory (iTunes Search)", "Finding podcasts and their charts", "Apple Terms of Use. Episodes come from each show's own feed"),
+    Credit("Apple Music (iTunes Search and music.apple.com)", "Animated album artwork, when an album has one", "Apple Terms of Use. Only while Animated artwork is on"),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

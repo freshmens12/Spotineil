@@ -27,4 +27,23 @@
     <string name="lyrics_save_failed">Hindi ma-save ang lyrics</string>
     <string name="ui_download">I-download</string>
     <string name="ui_more_options">Iba pang opsyon</string>
+    <string name="ui_cover_style">Istilo ng cover</string>
+    <string name="ui_cover_style_hint">Tip: pindutin nang matagal ang cover sa Now playing para palitan ito, at i-swipe ito para lumaktaw.</string>
+    <string name="ui_cover_still">Tahimik</string>
+    <string name="ui_cover_still_desc">Karaniwang cover na hindi gumagalaw</string>
+    <string name="ui_cover_living">Buhay</string>
+    <string name="ui_cover_living_desc">Dahan-dahang gumagalaw, pumipintig sa musika at kumikinang sa sariling kulay</string>
+    <string name="ui_cover_vinyl">Plaka</string>
+    <string name="ui_cover_vinyl_desc">Umiikot na plaka; bumababa ang braso kapag pinindot ang play</string>
+    <string name="ui_cover_disc">CD</string>
+    <string name="ui_cover_disc_desc">Umiikot na CD na may kinang ng bahaghari</string>
+    <string name="ui_cover_beat">Beat</string>
+    <string name="ui_cover_beat_desc">Tumatalbog at kumikislap sa beat</string>
+    <string name="ui_cover_tilt">3D tilt</string>
+    <string name="ui_cover_tilt_desc">Lumulutang at tumatagilid sa 3D na may kinang</string>
+    <string name="ui_cover_ripples">Alon</string>
+    <string name="ui_cover_ripples_desc">May mga bilog na lumalabas sa cover sa bawat beat</string>
+    <string name="ui_download_all">I-download lahat</string>
+    <string name="ui_download_all_title">I-download ang “%1$s”?</string>
+    <plurals name="ui_download_all_body"><item quantity="one">Mase-save ang %1$d kanta sa sarili nitong folder, “%2$s”, sa loob ng downloads folder mo, kasama ang playlist file para makita ito ng mga music player.</item><item quantity="other">Mase-save ang %1$d kanta sa sarili nilang folder, “%2$s”, sa loob ng downloads folder mo, nakanumero ayon sa pagkakasunod at may playlist file para makita sila ng mga music player bilang isa.</item></plurals>
 </resources>

@@ -17,6 +17,30 @@ enum class AccentColor(val argb: Long) {
 /** How one song hands over to the next. */
 enum class TransitionMode { Off, Crossfade, AutoMix }
 
+/** How the cover moves on the Now playing screen (Settings → Appearance → Cover style). */
+enum class CoverStyle {
+    /** A plain, still cover. */
+    Still,
+
+    /** Slowly zooms and drifts, pulses with the music and glows in its own colours. */
+    Living,
+
+    /** A spinning vinyl record with the cover as its label, and a tonearm that drops on play. */
+    Vinyl,
+
+    /** A spinning CD with the cover printed on it and a rainbow sheen. */
+    Disc,
+
+    /** Bounces on the beat. */
+    Beat,
+
+    /** Floats and tilts in 3D. */
+    Tilt,
+
+    /** Rings ripple out from the cover on the beat. */
+    Ripples,
+}
+
 /**
  * Equalizer presets as gains in dB for 5 bands (60 Hz, 230 Hz, 910 Hz, 3.6 kHz, 14 kHz).
  * [Custom] uses the gains the person set.
@@ -68,8 +92,10 @@ data class UserSettings(
     val transition: TransitionMode = TransitionMode.Off,
     val audio: AudioSettings = AudioSettings(),
     val downloads: DownloadSettings = DownloadSettings(),
-    /** The cover on Now playing zooms, drifts and pulses with the music. */
-    val animatedCover: Boolean = true,
+    /** How the cover moves on the Now playing screen. */
+    val coverStyle: CoverStyle = CoverStyle.Living,
+    /** Albums with motion artwork on Apple Music play it as the cover. */
+    val animatedArtwork: Boolean = true,
     /**
      * The free, no-account app is in use. False only on the very first launch, when the Welcome
      * screen is shown; its "Get started" button turns this on.
@@ -91,6 +117,10 @@ data class DownloadSettings(
     val format: DownloadFormat = DownloadFormat.Automatic,
     /** Songs downloaded at the same time (1..[MAX_PARALLEL]); the rest wait in line. */
     val maxParallel: Int = 3,
+    /** A folder picked by the person (a storage-access tree link), or null for Music/Spotineil. */
+    val folderUri: String? = null,
+    /** That folder's name, to show in Settings. */
+    val folderName: String? = null,
 ) {
     companion object {
         const val MAX_PARALLEL = 10

@@ -30,4 +30,23 @@
     <string name="lyrics_save_failed">No se pudo guardar la letra</string>
     <string name="ui_download">Descargar</string>
     <string name="ui_more_options">Más opciones</string>
+    <string name="ui_cover_style">Estilo de portada</string>
+    <string name="ui_cover_style_hint">Consejo: mantén pulsada la portada en Reproduciendo para cambiarlo, y deslízala para saltar.</string>
+    <string name="ui_cover_still">Quieta</string>
+    <string name="ui_cover_still_desc">Una portada normal que no se mueve</string>
+    <string name="ui_cover_living">Viva</string>
+    <string name="ui_cover_living_desc">Se mueve despacio, late con la música y brilla en sus colores</string>
+    <string name="ui_cover_vinyl">Vinilo</string>
+    <string name="ui_cover_vinyl_desc">Un disco que gira; el brazo baja al darle a reproducir</string>
+    <string name="ui_cover_disc">CD</string>
+    <string name="ui_cover_disc_desc">Un CD que gira con un brillo de arcoíris</string>
+    <string name="ui_cover_beat">Ritmo</string>
+    <string name="ui_cover_beat_desc">Rebota y destella con el ritmo</string>
+    <string name="ui_cover_tilt">Inclinación 3D</string>
+    <string name="ui_cover_tilt_desc">Flota y se inclina en 3D con un brillo</string>
+    <string name="ui_cover_ripples">Ondas</string>
+    <string name="ui_cover_ripples_desc">Salen ondas de la portada con el ritmo</string>
+    <string name="ui_download_all">Descargar todo</string>
+    <string name="ui_download_all_title">¿Descargar «%1$s»?</string>
+    <plurals name="ui_download_all_body"><item quantity="one">Se guardará %1$d canción en su propia carpeta, «%2$s», dentro de tu carpeta de descargas, con un archivo de lista para que los reproductores la muestren.</item><item quantity="many">Se guardarán %1$d canciones en su propia carpeta, «%2$s», dentro de tu carpeta de descargas, numeradas en orden y con un archivo de lista para que los reproductores las muestren como una.</item><item quantity="other">Se guardarán %1$d canciones en su propia carpeta, «%2$s», dentro de tu carpeta de descargas, numeradas en orden y con un archivo de lista para que los reproductores las muestren como una.</item></plurals>
 </resources>

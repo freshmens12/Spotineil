@@ -26,3 +26,11 @@
 
 # ONNX Runtime (karaoke voice model): its native code calls back into these classes by name
 -keep class ai.onnxruntime.** { *; }
+
+# WorkManager creates its input mergers and workers by reflection. Without these, the optimized
+# build drops their constructors and Glance (which runs every home-screen widget through a
+# WorkManager worker) never gets past the loading layout.
+-keep class * extends androidx.work.InputMerger { <init>(); }
+-keep class * extends androidx.work.ListenableWorker {
+    <init>(android.content.Context, androidx.work.WorkerParameters);
+}

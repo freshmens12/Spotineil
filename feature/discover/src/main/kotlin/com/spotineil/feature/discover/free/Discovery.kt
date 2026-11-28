@@ -49,6 +49,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.spotineil.core.model.toPlayable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -128,8 +129,12 @@ private fun BackHeader(title: String, subtitle: String? = null, onBack: () -> Un
 }
 
 @Composable
-private fun PlayRow(onPlay: () -> Unit, onShuffle: () -> Unit) {
-    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+private fun PlayRow(onPlay: () -> Unit, onShuffle: () -> Unit, extra: (@Composable () -> Unit)? = null) {
+    Row(
+        Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Button(onClick = onPlay, modifier = Modifier.weight(1f)) {
             Icon(Icons.Rounded.PlayArrow, null, Modifier.size(18.dp))
             Text(stringResource(R.string.free_play), Modifier.padding(start = 6.dp))
@@ -138,6 +143,7 @@ private fun PlayRow(onPlay: () -> Unit, onShuffle: () -> Unit) {
             Icon(Icons.Rounded.Shuffle, null, Modifier.size(18.dp))
             Text(stringResource(R.string.free_shuffle), Modifier.padding(start = 6.dp))
         }
+        extra?.invoke()
     }
 }
 
@@ -271,6 +277,10 @@ fun CollectionSongsScreen(nav: FreeNavigation, viewModel: CollectionSongsViewMod
                     PlayRow(
                         onPlay = { viewModel.play(s.data, 0); nav.onYouTubePlayer() },
                         onShuffle = { viewModel.play(s.data.shuffled(), 0); nav.onYouTubePlayer() },
+                        extra = {
+                            val songs = remember(s.data) { s.data.map { it.toPlayable() } }
+                            com.spotineil.core.ui.DownloadCollectionButton(viewModel.route.title, songs)
+                        },
                     )
                 }
                 itemsIndexed(s.data, key = { i, v -> "c$i${v.id}" }) { i, v ->

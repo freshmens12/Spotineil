@@ -1,5 +1,13 @@
 package com.spotineil.feature.discover.free
 
+import androidx.compose.material.icons.rounded.NorthWest
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.foundation.layout.isImeVisible
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.mapLatest
+import androidx.compose.runtime.remember
+
 import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -123,6 +131,7 @@ class FreeSearchViewModel @Inject constructor(
     private val podcasts: PodcastRepository,
     private val youTube: YouTubeRepository,
     private val recentDao: RecentSearchDao,
+    private val catalog: com.spotineil.core.data.innertube.InnerTubeCatalogRepository,
     val freePlayer: FreePlayer,
 ) : ViewModel() {
 
@@ -237,6 +246,28 @@ class FreeSearchViewModel @Inject constructor(
         rememberQuery()
     }
 
+    /**
+     * Suggestions for the text being typed, so it need not be typed in full: your recent searches
+     * that match first, then what YouTube Music suggests.
+     */
+    @OptIn(kotlinx.coroutines.FlowPreview::class, kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    val suggestions: StateFlow<List<SearchSuggestion>> = _query
+        .map { it.trim() }
+        .distinctUntilChanged()
+        .debounce(SUGGEST_PAUSE_MS)
+        .mapLatest { q ->
+            if (q.isEmpty()) return@mapLatest emptyList()
+            val recent = recentSearches.value
+                .filter { it.contains(q, ignoreCase = true) && !it.equals(q, ignoreCase = true) }
+                .take(3)
+                .map { SearchSuggestion(it, fromHistory = true) }
+            val online = catalog.searchSuggestions(q).getOrDefault(emptyList())
+                .filter { s -> !s.equals(q, ignoreCase = true) && recent.none { it.text.equals(s, ignoreCase = true) } }
+                .map { SearchSuggestion(it, fromHistory = false) }
+            (recent + online).take(8)
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
     fun removeRecent(text: String) { viewModelScope.launch { recentDao.delete(text) } }
     fun clearRecents() { viewModelScope.launch { recentDao.clear() } }
 
@@ -251,6 +282,7 @@ class FreeSearchViewModel @Inject constructor(
     private companion object {
         /** Wait for a pause in typing before searching. */
         const val TYPING_PAUSE_MS = 450L
+        const val SUGGEST_PAUSE_MS = 120L
         const val RECENT_LIMIT = 12
     }
 }
@@ -289,6 +321,13 @@ fun FreeSearchRoute(nav: FreeNavigation, viewModel: FreeSearchViewModel = hiltVi
     val favorites by viewModel.favorites.collectAsStateWithLifecycle()
     val nowPlaying by viewModel.nowPlayingId.collectAsStateWithLifecycle()
     val recents by viewModel.recentSearches.collectAsStateWithLifecycle()
+    val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+    var fieldFocused by remember { mutableStateOf(false) }
+    // Suggestions while typing (the keyboard is up); the results once it is put away or a suggestion is picked.
+    @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+    val keyboardUp = androidx.compose.foundation.layout.WindowInsets.isImeVisible
+    val showSuggestions = fieldFocused && keyboardUp && query.isNotBlank() && suggestions.isNotEmpty()
     val moodsViewModel: MoodsViewModel = hiltViewModel()
     val moods by moodsViewModel.moods.collectAsStateWithLifecycle()
     var filter by rememberSaveable { mutableStateOf(SearchFilter.All) }
@@ -309,12 +348,24 @@ fun FreeSearchRoute(nav: FreeNavigation, viewModel: FreeSearchViewModel = hiltVi
     val voice = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()) { result ->
         result.data?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()?.takeIf { it.isNotBlank() }?.let(viewModel::searchRecent)
     }
-    SearchField(query, viewModel::onQueryChange, onSearch = viewModel::submit, onVoice = {
+    SearchField(query, viewModel::onQueryChange, onSearch = viewModel::submit, onFocusChange = { fieldFocused = it }, onVoice = {
         val intent = android.content.Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
             .putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL, android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             .putExtra(android.speech.RecognizerIntent.EXTRA_PROMPT, context.getString(R.string.free_search_hint))
         try { voice.launch(intent) } catch (_: android.content.ActivityNotFoundException) { nav.onMessage(context.getString(R.string.free_voice_unavailable)) }
     })
+    if (showSuggestions) {
+        SuggestionList(
+            typed = query.trim(),
+            suggestions = suggestions,
+            onPick = { text ->
+                viewModel.searchRecent(text)
+                focusManager.clearFocus()
+            },
+            onFill = { text -> viewModel.onQueryChange("$text ") },
+            modifier = Modifier.fillMaxWidth().weight(1f),
+        )
+    } else
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier.fillMaxWidth().weight(1f),
@@ -470,11 +521,23 @@ fun FreeSearchRoute(nav: FreeNavigation, viewModel: FreeSearchViewModel = hiltVi
 }
 
 @Composable
-private fun SearchField(value: String, onChange: (String) -> Unit, onSearch: () -> Unit, onVoice: (() -> Unit)? = null) {
+private fun SearchField(
+    value: String,
+    onChange: (String) -> Unit,
+    onSearch: () -> Unit,
+    onFocusChange: (Boolean) -> Unit = {},
+    onVoice: (() -> Unit)? = null,
+) {
     val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+    // The cursor goes to the end when a suggestion fills the box.
+    var field by remember { mutableStateOf(androidx.compose.ui.text.input.TextFieldValue(value, androidx.compose.ui.text.TextRange(value.length))) }
+    if (field.text != value) field = androidx.compose.ui.text.input.TextFieldValue(value, androidx.compose.ui.text.TextRange(value.length))
     TextField(
-        value = value,
-        onValueChange = onChange,
+        value = field,
+        onValueChange = {
+            field = it
+            if (it.text != value) onChange(it.text)
+        },
         singleLine = true,
         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Search),
         keyboardActions = androidx.compose.foundation.text.KeyboardActions(onSearch = {
@@ -500,9 +563,74 @@ private fun SearchField(value: String, onChange: (String) -> Unit, onSearch: () 
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
         ),
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).testTag("free_search_field"),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .onFocusChanged { onFocusChange(it.isFocused) }
+            .testTag("free_search_field"),
     )
 }
+
+/** One suggestion while typing a search. */
+data class SearchSuggestion(val text: String, val fromHistory: Boolean)
+
+/**
+ * Suggestions under the search box while typing: tap one to search for it, or the arrow to put it
+ * in the box and keep typing. The part still to type is in bold, as on YouTube Music.
+ */
+@Composable
+private fun SuggestionList(
+    typed: String,
+    suggestions: List<SearchSuggestion>,
+    onPick: (String) -> Unit,
+    onFill: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    androidx.compose.foundation.lazy.LazyColumn(modifier.testTag("search_suggestions")) {
+        items(suggestions.size, key = { "s_" + suggestions[it].text }) { i ->
+            val s = suggestions[i]
+            Row(
+                Modifier.fillMaxWidth().clickable { onPick(s.text) }.padding(start = 16.dp, end = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    if (s.fromHistory) Icons.Rounded.History else Icons.Rounded.Search,
+                    null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    highlightRest(s.text, typed),
+                    Modifier.weight(1f).padding(horizontal = 16.dp, vertical = 14.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                IconButton(onClick = { onFill(s.text) }) {
+                    Icon(
+                        Icons.Rounded.NorthWest,
+                        stringResource(R.string.free_search_fill),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** [text] with what was already typed in normal weight and the rest in bold. */
+private fun highlightRest(text: String, typed: String): androidx.compose.ui.text.AnnotatedString =
+    androidx.compose.ui.text.buildAnnotatedString {
+        val bold = androidx.compose.ui.text.SpanStyle(fontWeight = FontWeight.Bold)
+        if (typed.isNotEmpty() && text.startsWith(typed, ignoreCase = true)) {
+            append(text.substring(0, typed.length))
+            pushStyle(bold)
+            append(text.substring(typed.length))
+            pop()
+        } else {
+            pushStyle(bold)
+            append(text)
+            pop()
+        }
+    }
 
 @Composable
 private fun GenreTile(tile: BrowseTile, onClick: () -> Unit) {

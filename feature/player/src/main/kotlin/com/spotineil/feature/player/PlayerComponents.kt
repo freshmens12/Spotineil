@@ -200,6 +200,15 @@ fun FullPlayer(
     val track = state.track
     val background = opaqueBackground()
     val dominant by rememberDominantColor(track?.imageUrl, MaterialTheme.colorScheme.surfaceContainerHigh)
+    // Next / Previous also tell the cover which way to slide.
+    val skip = com.spotineil.core.ui.rememberSkipDirection()
+    val controlActions = remember(actions, skip) {
+        actions.copy(
+            onNext = { skip.next(); actions.onNext() },
+            onPrevious = { skip.previous(); actions.onPrevious() },
+        )
+    }
+    val restrictions = state.playback.restrictions
 
     Box(
         modifier
@@ -251,12 +260,19 @@ fun FullPlayer(
                 if (showLyrics) {
                     lyricsContent()
                 } else {
-                    com.spotineil.core.ui.LivingCover(
-                        track?.imageUrl,
-                        track?.album,
+                    com.spotineil.core.ui.NowPlayingCover(
+                        songKey = track?.uri,
+                        imageUrl = track?.imageUrl,
+                        contentDescription = track?.album,
                         isPlaying = state.playback.isPlaying,
                         modifier = artworkModifier.fillMaxWidth().aspectRatio(1f),
                         shape = MaterialTheme.shapes.medium,
+                        direction = skip,
+                        onSwipeNext = actions.onNext.takeIf { restrictions.canSkipNext },
+                        onSwipePrevious = actions.onPrevious.takeIf { restrictions.canSkipPrevious },
+                        title = track?.name,
+                        artist = track?.artists,
+                        album = track?.album,
                     )
                 }
             }
@@ -285,7 +301,7 @@ fun FullPlayer(
             }
 
             SeekBar(state, actions.onSeek)
-            Controls(state, actions)
+            Controls(state, controlActions)
 
             Row(
                 Modifier.fillMaxWidth().padding(vertical = 8.dp),

@@ -82,6 +82,7 @@ abstract class RepositoryModule {
     @Binds abstract fun lyrics(impl: DefaultLyricsRepository): LyricsRepository
     @Binds abstract fun stats(impl: DefaultStatsRepository): StatsRepository
     @Binds abstract fun settings(impl: DataStoreSettingsRepository): SettingsRepository
+    @Binds abstract fun motionArtwork(impl: com.spotineil.core.data.repository.AppleMotionArtworkRepository): com.spotineil.core.data.repository.MotionArtworkRepository
     @Binds abstract fun localMedia(impl: MediaStoreRepository): LocalMediaRepository
     @Binds abstract fun freeMusic(impl: com.spotineil.core.data.repository.DefaultFreeMusicRepository): com.spotineil.core.data.repository.FreeMusicRepository
     @Binds abstract fun radio(impl: com.spotineil.core.data.repository.DefaultRadioRepository): com.spotineil.core.data.repository.RadioRepository

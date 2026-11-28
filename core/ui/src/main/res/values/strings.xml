@@ -30,4 +30,23 @@
     <string name="lyrics_save_failed">Couldn’t save the lyrics</string>
     <string name="ui_download">Download</string>
     <string name="ui_more_options">More options</string>
+    <string name="ui_cover_style">Cover style</string>
+    <string name="ui_cover_style_hint">Tip: touch and hold the cover on Now playing to change it, and swipe it to skip.</string>
+    <string name="ui_cover_still">Still</string>
+    <string name="ui_cover_still_desc">A plain cover that does not move</string>
+    <string name="ui_cover_living">Living</string>
+    <string name="ui_cover_living_desc">Slowly moves, pulses with the music and glows in its colours</string>
+    <string name="ui_cover_vinyl">Vinyl</string>
+    <string name="ui_cover_vinyl_desc">A spinning record; the arm drops on it when you press play</string>
+    <string name="ui_cover_disc">CD</string>
+    <string name="ui_cover_disc_desc">A spinning CD with a rainbow shine</string>
+    <string name="ui_cover_beat">Beat</string>
+    <string name="ui_cover_beat_desc">Bounces and flashes on the beat</string>
+    <string name="ui_cover_tilt">3D tilt</string>
+    <string name="ui_cover_tilt_desc">Floats and tilts in 3D with a glossy shine</string>
+    <string name="ui_cover_ripples">Ripples</string>
+    <string name="ui_cover_ripples_desc">Rings ripple out from the cover on the beat</string>
+    <string name="ui_download_all">Download all</string>
+    <string name="ui_download_all_title">Download “%1$s”?</string>
+    <plurals name="ui_download_all_body"><item quantity="one">%1$d song will be saved in its own folder, “%2$s”, inside your downloads folder, with a playlist file so music players show it as one.</item><item quantity="other">%1$d songs will be saved in their own folder, “%2$s”, inside your downloads folder, numbered in order and with a playlist file so music players show them as one.</item></plurals>
 </resources>

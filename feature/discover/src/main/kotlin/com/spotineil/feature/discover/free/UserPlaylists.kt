@@ -113,6 +113,7 @@ fun UserPlaylistScreen(nav: FreeNavigation, viewModel: UserPlaylistViewModel = h
                 Text(playlist?.name.orEmpty(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(pluralStringResource(R.plurals.playlist_song_count, order.size, order.size), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
+            if (order.isNotEmpty()) com.spotineil.core.ui.DownloadCollectionButton(playlist?.name.orEmpty(), order)
             if (order.isNotEmpty()) PlaylistRadioButton(nav) { viewModel.radio(order) }
             Box {
                 IconButton(onClick = { menuOpen = true }) { Icon(Icons.Rounded.MoreVert, stringResource(R.string.playlist_options)) }

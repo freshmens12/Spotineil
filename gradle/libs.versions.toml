@@ -75,6 +75,7 @@ androidx-paging-testing = { module = "androidx.paging:paging-testing", version.r
 androidx-palette = { module = "androidx.palette:palette-ktx", version.ref = "androidxPalette" }
 androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "androidxMedia3" }
 androidx-media3-session = { module = "androidx.media3:media3-session", version.ref = "androidxMedia3" }
+androidx-media3-exoplayer-hls = { module = "androidx.media3:media3-exoplayer-hls", version.ref = "androidxMedia3" }
 androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "androidxGlance" }
 androidx-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "androidxGlance" }
 

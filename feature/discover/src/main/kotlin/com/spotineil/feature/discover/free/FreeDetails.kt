@@ -584,6 +584,7 @@ fun LikedMediaScreen(nav: FreeNavigation, viewModel: LikedMediaViewModel = hiltV
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(start = 8.dp).weight(1f),
                     )
+                    if (all.isNotEmpty()) com.spotineil.core.ui.DownloadCollectionButton(stringResource(R.string.free_liked_songs), all)
                     if (list.isNotEmpty()) PlaylistRadioButton(nav) { viewModel.radio(list) }
                     if (list.isNotEmpty()) PlayShuffle(
                         onPlay = { if (viewModel.play(list, 0)) nav.onYouTubePlayer() },

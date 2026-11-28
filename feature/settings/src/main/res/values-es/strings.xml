@@ -93,6 +93,11 @@
     <string name="settings_download_format_m4a_desc">256 kbps. Se reproduce en todas partes, más pequeño que MP3 con la misma calidad</string>
     <string name="settings_download_parallel">Descargas a la vez</string>
     <string name="settings_download_parallel_desc">Las demás esperan su turno</string>
-    <string name="settings_animated_cover">Portada animada</string>
-    <string name="settings_animated_cover_desc">En Reproduciendo, la portada se mueve despacio y late con la música</string>
+    <string name="settings_animated_artwork">Portada animada de Apple Music</string>
+    <string name="settings_animated_artwork_desc">Si un álbum tiene portada en movimiento en Apple Music, se reproduce en Reproduciendo. Se envían a Apple el nombre de la canción y del artista para encontrarla. Usa algo más de datos; desactivada con Ahorro de datos.</string>
+    <string name="settings_download_folder">Guardar en</string>
+    <string name="settings_download_folder_default">Música/Spotineil (predeterminada)</string>
+    <string name="settings_download_folder_change">Cambiar</string>
+    <string name="settings_download_folder_reset">Predeterminada</string>
+    <string name="settings_download_folder_unavailable">Este teléfono no tiene selector de carpetas</string>
 </resources>

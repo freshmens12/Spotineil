@@ -106,7 +106,10 @@ class LocalPlaybackService : MediaLibraryService() {
 
         // Crossfade / AutoMix between songs: a second player carries the end of the old song.
         val sourceFactory = DefaultMediaSourceFactory(RoutingDataSourceFactory(DefaultDataSource.Factory(this), youTubeStreamFactory))
-        transitions = TransitionController(player) {
+        transitions = TransitionController(
+            player,
+            prefetch = { item -> youTubeStreamFactory.prefetch(item.localConfiguration?.uri) },
+        ) {
             ExoPlayer.Builder(this)
                 .setMediaSourceFactory(sourceFactory)
                 .setAudioAttributes(

@@ -18,6 +18,10 @@ data class DownloadTask(
     /** The saved file's name, once saved. */
     val fileName: String? = null,
     val addedAt: Long = 0,
+    /** The album or playlist folder it goes into (with the others of it), or null for a single song. */
+    val folder: String? = null,
+    /** Its place in that album or playlist (1, 2, …): the file name starts with it. */
+    val track: Int? = null,
     /** Current download speed while downloading (not saved). */
     @kotlinx.serialization.Transient val bytesPerSecond: Long = 0,
 ) {

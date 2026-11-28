@@ -370,7 +370,14 @@ fun YouTubePlayerScreen(nav: FreeNavigation, viewModel: YouTubePlayerViewModel =
                 .padding(bottom = LocalBottomContentPadding.current + 16.dp),
         ) {
             // Inside the scrolling area: a pinned cover would sit on top of the lyrics as they scroll by.
-            ArtworkFrame(video, isPlaying = playing, modifier = Modifier.padding(top = 8.dp))
+            ArtworkFrame(
+                video,
+                isPlaying = playing,
+                index = state.index,
+                onNext = viewModel::next.takeIf { state.hasNext },
+                onPrevious = viewModel::previous.takeIf { state.hasPrevious || canRestart },
+                modifier = Modifier.padding(top = 8.dp),
+            )
 
             Row(Modifier.fillMaxWidth().padding(start = 24.dp, end = 12.dp, top = 20.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
@@ -475,12 +482,31 @@ fun YouTubePlayerScreen(nav: FreeNavigation, viewModel: YouTubePlayerViewModel =
     }
 }
 
-/** The album art: a square cover. */
+/** The album art: a square cover that slides to the next song and can be swiped to skip. */
 @Composable
-private fun ArtworkFrame(video: YouTubeVideo?, isPlaying: Boolean, modifier: Modifier = Modifier) {
+private fun ArtworkFrame(
+    video: YouTubeVideo?,
+    isPlaying: Boolean,
+    index: Int,
+    onNext: (() -> Unit)?,
+    onPrevious: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+) {
     BoxWithConstraints(modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         val side = (maxWidth * 0.82f).coerceAtMost(340.dp)
-        com.spotineil.core.ui.LivingCover(video?.thumbnailUrl, null, isPlaying = isPlaying, modifier = Modifier.size(side), shape = RoundedCornerShape(10.dp))
+        com.spotineil.core.ui.NowPlayingCover(
+            songKey = video?.id,
+            imageUrl = video?.thumbnailUrl,
+            contentDescription = null,
+            isPlaying = isPlaying,
+            modifier = Modifier.size(side),
+            shape = RoundedCornerShape(10.dp),
+            index = index,
+            onSwipeNext = onNext,
+            onSwipePrevious = onPrevious,
+            title = video?.songTitle,
+            artist = video?.artist,
+        )
     }
 }
 
